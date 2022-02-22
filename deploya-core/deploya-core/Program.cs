@@ -93,6 +93,7 @@ namespace deploya_core
 
         private static void Run(Options options)
         {
+            Console.WriteLine("deploya Core [Version: " + Program.ver + "." + Program.build + "]\n" + Program.copyright);
             string image = options.wimfile.ToString();
             string Index = options.index.ToString();
             string diskId = options.driveid.ToString();
@@ -158,6 +159,14 @@ namespace deploya_core
             // -----------------------------
 
             #region Partitioning destination
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            if (!Program.uimode)
+            {
+                Console.Write("\n[*] Partitioning disk ...         ");
+                ConsoleUtility.WriteProgressBar(0);
+            }
+            if (Program.uimode) { Console.WriteLine("\n[A] Partitioning disk ... "); }
+
             Process partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
             partDest.StartInfo.UseShellExecute = false;
@@ -240,6 +249,7 @@ namespace deploya_core
             #endregion
 
             #region Apply WIM file & Bootloader
+            Console.WriteLine();
             Program.applyWim(image, Index, "W:\\");
 
             if (!Program.uimode)
