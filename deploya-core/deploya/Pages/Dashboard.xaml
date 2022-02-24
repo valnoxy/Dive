@@ -1,0 +1,143 @@
+﻿<Page x:Class="deploya.Pages.Dashboard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:deploya.Pages"
+      xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+      mc:Ignorable="d" 
+      d:DesignHeight="549" d:DesignWidth="728"
+      Title="Dashboard">
+
+    <Grid Margin="19,20,19,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" Margin="0,55,0,0" HorizontalAlignment="Center" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <wpfui:Icon FontSize="19" Glyph="Heart28" />
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="Open Source" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Find me on GitHub!" />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="1" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <wpfui:Icon FontSize="19" Glyph="FastForward24" />
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="Fast Deployment" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Apply under 5 minutes" />
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Column="2" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <wpfui:Icon FontSize="19" Glyph="DesignIdeas24" />
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="Compatible" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Legacy &amp; Modern System" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+        
+        <Grid Grid.Row="2" Margin="0,25,0,0">
+            <StackPanel>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Click="SwitchToApplyPage"
+                    Icon="WindowApps24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="Apply Image" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Install your Windows image on this device." />
+                    </StackPanel>
+                </wpfui:CardAction>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Icon="Copy24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="Capture Windows" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Create a image of your Windows instance." />
+                    </StackPanel>
+                </wpfui:CardAction>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Icon="Cloud24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="Cloud Installation" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Install Windows directly from the Internet." />
+                    </StackPanel>
+                </wpfui:CardAction>
+
+                <wpfui:Hyperlink
+                    Margin="0,0,0,4"
+                    Content="Source code on GitHub"
+                    Icon="Link48"
+                    NavigateUri="https://github.com/valnoxy/deploya" />
+                <wpfui:Hyperlink
+                    Content="Project on Exploitox"
+                    Icon="Link48"
+                    NavigateUri="https://exploitox.de/deploya" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

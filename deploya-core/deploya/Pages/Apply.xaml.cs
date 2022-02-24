@@ -13,16 +13,17 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace deploya
+namespace deploya.Pages
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaktionslogik für Apply.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Apply : Page
     {
-        public MainWindow()
+        public Apply()
         {
             InitializeComponent();
         }
+#warning Apply: Code not implemented yet
     }
 }
