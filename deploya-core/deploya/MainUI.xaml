@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:deploya"
         mc:Ignorable="d"
         Title="deploya" Height="600" Width="800"
+        MinHeight="600" MinWidth="800"
         xmlns:pages="clr-namespace:deploya.Pages"
         xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
         WindowStartupLocation="CenterScreen"

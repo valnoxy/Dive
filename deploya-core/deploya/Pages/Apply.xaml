@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -25,8 +26,15 @@
             <Label Content="Image Index" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontFamily="Segoe UI Variable Display" FontSize="15"/>
             <ComboBox x:Name="indexBox" Margin="0,25,0,0"/>
         </Grid>
+        
+        <Grid Grid.Row="3" Margin="0,15,0,0" VerticalAlignment="Top">
+            <Label Content="Hard Drive" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontFamily="Segoe UI Variable Display" FontSize="15"/>
+            <ComboBox x:Name="hddBox" Margin="0,25,150,0"/>
+            <Button Content="Debug Reload" Click="DebugReload" HorizontalAlignment="Right" Margin="0,25,0,0" VerticalAlignment="Top" Width="145" Height="34"/>
+        </Grid>
+        
 
-        <Grid Grid.Row="3" Margin="-19,0,-19,0" VerticalAlignment="Bottom">
+        <Grid Grid.Row="4" Margin="-19,0,-19,0" VerticalAlignment="Bottom">
             <StatusBar>
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>
