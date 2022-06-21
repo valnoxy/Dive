@@ -1,38 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>deploya_core</RootNamespace>
-	<PublishSingleFile>true</PublishSingleFile>
-	<SelfContained>true</SelfContained>
-	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <UseWPF>false</UseWPF>
-    <AssemblyName>deployaCLI</AssemblyName>
-    <ApplicationIcon>deploya.ico</ApplicationIcon>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>AnyCPU;x64</Platforms>
-    <DebugType>embedded</DebugType>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <PackageId>deploya</PackageId>
-    <Version>12.0.0.401</Version>
-    <Authors>valnoxy</Authors>
-    <Company>Exploitox</Company>
-    <Product>deploya</Product>
-    <Title>CLI version of deploya</Title>
-    <Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
-    <PackageProjectUrl>https://github.com/valnoxy/deploya</PackageProjectUrl>
-    <PackageReleaseNotes>CLI version of deploya</PackageReleaseNotes>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>deploya_core</RootNamespace>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>Link</TrimMode>
+		<SelfContained>true</SelfContained>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<UseWPF>false</UseWPF>
+		<AssemblyName>deploya-core</AssemblyName>
+		<ApplicationIcon>deploya.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>AnyCPU;x64</Platforms>
+		<DebugType>embedded</DebugType>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<PackageId>deploya</PackageId>
+		<Version>12.0.0.401</Version>
+		<Authors>valnoxy</Authors>
+		<Company>Exploitox</Company>
+		<Product>deploya</Product>
+		<Title>CLI version of deploya</Title>
+		<Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/deploya</PackageProjectUrl>
+		<PackageReleaseNotes>CLI version of deploya</PackageReleaseNotes>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="deploya.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="deploya.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Microsoft.Wim" Version="1.2.11" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.8.0" />
+		<PackageReference Include="Microsoft.Wim" Version="1.2.11" />
+	</ItemGroup>
 
 </Project>

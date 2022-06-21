@@ -35,38 +35,36 @@ namespace deploya_core
             [Option('w', "wim", Required = true, HelpText = "Input WIM-file to be processed.")]
             public string wimfile { get; set; }
 
-
             [Option(Default = false, Hidden = true, HelpText = "Used for deploya UI - Network Installation")]
             public bool uimode { get; set; }
-
 
             [Option('i', "index", Required = true, HelpText = "Index ID of the selected Windows-Installation.")]
             public int index { get; set; }
 
-
-            [Option('e', "efi", Default = false, HelpText = "Use EFI for installation.")]
-            public bool efi { get; set; }
-
-
             [Option('d', "driveid", Required = true, HelpText = "Hard Drive ID of the destination hard drive.")]
             public int driveid { get; set; }
 
+            [Option('e', "efi", Default = false, HelpText = "Use EFI for installation.")]
+            public bool efi { get; set; }
+            
+            [Option('n', "ntldr", Default = false, HelpText = "Use NTLDR bootloader for XP and below.")]
+            public bool ntldr { get; set; }
 
-            [Option('l', "legacy", Default = false, HelpText = "Use legacy bootloader for XP and below.")]
-            public bool legacy { get; set; }
-
-            /*
-            [Usage(ApplicationAlias = "deployaCLI")]
+            
+            [Usage(ApplicationAlias = "deploya-core")]
             public static IEnumerable<Example> Examples
             {
                 get
                 {
                     return new List<Example>() {
-                         new Example("Apply WIM file on a EFI system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = true, legacy = false })
+                         new Example("\nApply WIM file on a EFI system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = true, ntldr = false }),
+                         new Example("\nApply WIM file on a Legacy system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = false }),
+                         new Example("\nApply XP-based image on a Legacy system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = true }),
+
                     };
                 }
             }
-            */
+            
         }
 
         static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
@@ -102,34 +100,33 @@ namespace deploya_core
             if (diskId.Contains("\\\\.\\PHYSICALDRIVE"))
                 diskId = new string(Enumerable.ToArray<char>(Enumerable.Where<char>((IEnumerable<char>)diskId, new Func<char, bool>(char.IsDigit))));
 
-            // -----------------------------
             #region Check options
 
             #region WIM-File
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            if (!File.Exists(image))
-            {
-                Console.WriteLine("[i] Image not exist.");
-                Console.ForegroundColor = (ConsoleColor)15;
-                Environment.Exit(1);
-            }
-            Console.WriteLine("[i] Image     = " + image);
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                if (!File.Exists(image))
+                {
+                    Console.WriteLine("[i] Image not exist.");
+                    Console.ForegroundColor = (ConsoleColor)15;
+                    Environment.Exit(1);
+                }
+                Console.WriteLine("[i] Image     = " + image);
             #endregion
 
             #region Target
-            if (Program.GetDiskIndex(diskId) > 0U)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[!] Target not exist. ID: " + Program.GetDiskIndex(diskId).ToString());
-                Console.ResetColor();
-                Environment.Exit(1);
-            }
-            Console.WriteLine("[i] Target    = disk" + diskId);
+                if (Program.GetDiskIndex(diskId) > 0U)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("[!] Target not exist. ID: " + Program.GetDiskIndex(diskId).ToString());
+                    Console.ResetColor();
+                    Environment.Exit(1);
+                }
+                Console.WriteLine("[i] Target    = disk" + diskId);
             #endregion
 
             #region BIOS type & Bootloader
 
-            if (options.efi && options.legacy)
+            if (options.efi && options.ntldr)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("[!] You cannot use EFI with a legacy bootloader. Aborting ...");
@@ -142,7 +139,7 @@ namespace deploya_core
                 Console.WriteLine("[i] Firmware  = EFI");
                 Console.WriteLine("[i] Legacy    = false");
             }
-            else if (options.legacy)
+            else if (options.ntldr)
             {
                 Console.WriteLine("[i] Firmware  = BIOS");
                 Console.WriteLine("[i] Legacy    = true");
@@ -156,7 +153,6 @@ namespace deploya_core
             #endregion
 
             #endregion
-            // -----------------------------
 
             #region Partitioning destination
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -176,7 +172,7 @@ namespace deploya_core
             partDest.Start();
             if (!options.efi)
             {
-                if (options.legacy)
+                if (options.ntldr)
                 {
                     partDest.StandardInput.WriteLine("select disk " + diskId);
                     partDest.StandardInput.WriteLine("clean");
@@ -189,7 +185,7 @@ namespace deploya_core
                     if (!Program.uimode)
                         ConsoleUtility.WriteProgressBar(100, true);
                 }
-                if (!options.legacy)
+                if (!options.ntldr)
                 {
                     partDest.StandardInput.WriteLine("select disk " + diskId);
                     partDest.StandardInput.WriteLine("clean");
@@ -254,16 +250,16 @@ namespace deploya_core
 
             if (!Program.uimode)
             {
-                Console.Write("[*] Installing Bootloader ...     ");
+                Console.Write("\n[*] Installing Bootloader ...     ");
                 ConsoleUtility.WriteProgressBar(0);
             }
-            if (Program.uimode) { Console.WriteLine("[A] Installing Bootloader ..."); }
+            if (Program.uimode) { Console.WriteLine("\n[A] Installing Bootloader ..."); }
 
             Process bootld = new Process();
             bootld.StartInfo.FileName = "cmd.exe";
 
             #region Legacy check
-            if (options.legacy)
+            if (options.ntldr)
             {
                 if (diskId.EndsWith("\\"))
                 {
@@ -278,7 +274,7 @@ namespace deploya_core
             #endregion
 
             #region BIOS / EFI check
-            if (!options.legacy)
+            if (!options.ntldr)
             {
                 if (!options.efi) // BIOS
                     bootld.StartInfo.Arguments = "/c \"bcdboot.exe W:\\Windows /s S: /f BIOS >NUL\"";
@@ -321,17 +317,18 @@ namespace deploya_core
         #region Get Disk index
         public static int GetDiskIndex(string diskId)
         {
-            string tempPath = Path.GetTempPath();
-            File.WriteAllText(tempPath + "getdiskindex.cmd", "@wmic diskdrive get index | more +1");
+            // string tempPath = Path.GetTempPath();
+            // File.WriteAllText(tempPath + "getdiskindex.cmd", "@wmic diskdrive get index | more +1");
             Process process = new Process();
+            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.Arguments = "/c \"@wmic diskdrive get index | more +1\"";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.FileName = tempPath + "getdiskindex.cmd";
             process.Start();
             string end = process.StandardOutput.ReadToEnd();
             process.WaitForExit();
 
-            try { File.Delete(Path.Combine(tempPath, "getdiskindex.cmd")); } catch { }
+            // try { File.Delete(Path.Combine(tempPath, "getdiskindex.cmd")); } catch { }
             return end.Contains(diskId) ? 0 : -1;
         }
         #endregion
