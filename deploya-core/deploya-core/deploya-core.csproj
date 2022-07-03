@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>Exe</OutputType>
+		<OutputType>Library</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
 		<RootNamespace>deploya_core</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
@@ -33,7 +33,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommandLineParser" Version="2.8.0" />
 		<PackageReference Include="Microsoft.Wim" Version="1.2.11" />
 	</ItemGroup>
 

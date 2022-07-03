@@ -6,8 +6,11 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "deploya-core", "deploya-core\deploya-core.csproj", "{1426C8F0-619B-44BA-8A0E-1ABFC1C6E50F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "deploya", "deploya\deploya.csproj", "{67E38F1B-7162-40AA-84A2-55131CDB631B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1426C8F0-619B-44BA-8A0E-1ABFC1C6E50F} = {1426C8F0-619B-44BA-8A0E-1ABFC1C6E50F}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "deploya-setup", "deploya-setup\deploya-setup.csproj", "{8617A735-5FE9-4322-9D46-31070A179736}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "deploya-setup", "deploya-setup\deploya-setup.csproj", "{8617A735-5FE9-4322-9D46-31070A179736}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

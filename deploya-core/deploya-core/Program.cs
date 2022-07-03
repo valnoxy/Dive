@@ -10,158 +10,44 @@
  * Source code: https://github.com/valnoxy/deploya
  */
 
-using CommandLine;
-using CommandLine.Text;
 using Microsoft.Wim;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 
 namespace deploya_core
 {
-    internal class Program
+    public class Entities
     {
-        public static string ver = "12.0.0";
-        public static string build = "401";
-        public static string codename = "deploya Core";
-        public static string copyright = "Copyright (c) 2018 - 2022 Exploitox. All rights reserved.";
-        public static bool uimode = false;
-
-        #region Parser options
-        class Options
+        public enum Firmware
         {
-            [Option('w', "wim", Required = true, HelpText = "Input WIM-file to be processed.")]
-            public string wimfile { get; set; }
-
-            [Option(Default = false, Hidden = true, HelpText = "Used for deploya UI - Network Installation")]
-            public bool uimode { get; set; }
-
-            [Option('i', "index", Required = true, HelpText = "Index ID of the selected Windows-Installation.")]
-            public int index { get; set; }
-
-            [Option('d', "driveid", Required = true, HelpText = "Hard Drive ID of the destination hard drive.")]
-            public int driveid { get; set; }
-
-            [Option('e', "efi", Default = false, HelpText = "Use EFI for installation.")]
-            public bool efi { get; set; }
-            
-            [Option('n', "ntldr", Default = false, HelpText = "Use NTLDR bootloader for XP and below.")]
-            public bool ntldr { get; set; }
-
-            
-            [Usage(ApplicationAlias = "deploya-core")]
-            public static IEnumerable<Example> Examples
-            {
-                get
-                {
-                    return new List<Example>() {
-                         new Example("\nApply WIM file on a EFI system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = true, ntldr = false }),
-                         new Example("\nApply WIM file on a Legacy system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = false }),
-                         new Example("\nApply XP-based image on a Legacy system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = true }),
-
-                    };
-                }
-            }
-            
+            BIOS,
+            EFI,
         }
 
-        static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
+        public enum Bootloader
         {
-            var helpText = HelpText.AutoBuild(result, h =>
-            {
-                h.AdditionalNewLineAfterOption = false; // Remove the extra newline between options
-                h.Heading = Program.codename + " [Version: " + Program.ver + "." + Program.build + "]"; // Change header
-                h.Copyright = Program.copyright; // Change copyright text
-                return HelpText.DefaultParsingErrorsHandler(result, h);
-            }, e => e);
-            Console.WriteLine(helpText);
-        }
-        #endregion
-
-        static void Main(string[] args)
-        {
-            var parser = new CommandLine.Parser(with => with.HelpWriter = null);
-            var parserResult = parser.ParseArguments<Options>(args);
-            parserResult
-             .WithParsed<Options>(options => Run(options))
-             .WithNotParsed(errs => DisplayHelp(parserResult, errs));
+            BOOTMGR,
+            NTLDR,
         }
 
-        private static void Run(Options options)
+        public enum UI
         {
-            Console.WriteLine("deploya Core [Version: " + Program.ver + "." + Program.build + "]\n" + Program.copyright);
-            string image = options.wimfile.ToString();
-            string Index = options.index.ToString();
-            string diskId = options.driveid.ToString();
-            uimode = options.uimode;
+            Graphical,
+            Command,
+        }
+    }
 
-            if (diskId.Contains("\\\\.\\PHYSICALDRIVE"))
-                diskId = new string(Enumerable.ToArray<char>(Enumerable.Where<char>((IEnumerable<char>)diskId, new Func<char, bool>(char.IsDigit))));
-
-            #region Check options
-
-            #region WIM-File
-                Console.ForegroundColor = ConsoleColor.Magenta;
-                if (!File.Exists(image))
-                {
-                    Console.WriteLine("[i] Image not exist.");
-                    Console.ForegroundColor = (ConsoleColor)15;
-                    Environment.Exit(1);
-                }
-                Console.WriteLine("[i] Image     = " + image);
-            #endregion
-
-            #region Target
-                if (Program.GetDiskIndex(diskId) > 0U)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("[!] Target not exist. ID: " + Program.GetDiskIndex(diskId).ToString());
-                    Console.ResetColor();
-                    Environment.Exit(1);
-                }
-                Console.WriteLine("[i] Target    = disk" + diskId);
-            #endregion
-
-            #region BIOS type & Bootloader
-
-            if (options.efi && options.ntldr)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[!] You cannot use EFI with a legacy bootloader. Aborting ...");
-                Console.ResetColor();
-                Environment.Exit(1);
-            }
-
-            if (options.efi)
-            {
-                Console.WriteLine("[i] Firmware  = EFI");
-                Console.WriteLine("[i] Legacy    = false");
-            }
-            else if (options.ntldr)
-            {
-                Console.WriteLine("[i] Firmware  = BIOS");
-                Console.WriteLine("[i] Legacy    = true");
-            }
-            else
-            {
-                Console.WriteLine("[i] Firmware  = BIOS");
-                Console.WriteLine("[i] Legacy    = false");
-            }
-
-            #endregion
-
-            #endregion
-
-            #region Partitioning destination
+    public class Actions
+    {
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk)
+        {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            if (!Program.uimode)
+            if (ui == Entities.UI.Command)
             {
-                Console.Write("\n[*] Partitioning disk ...         ");
+                Console.Write("[*] Partitioning disk ...         ");
                 ConsoleUtility.WriteProgressBar(0);
             }
-            if (Program.uimode) { Console.WriteLine("\n[A] Partitioning disk ... "); }
+            if (ui == Entities.UI.Graphical) { Console.WriteLine("[A] Partitioning disk ... "); }
 
             Process partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
@@ -170,11 +56,12 @@ namespace deploya_core
             partDest.StartInfo.RedirectStandardInput = true;
             partDest.StartInfo.RedirectStandardOutput = true;
             partDest.Start();
-            if (!options.efi)
+
+            if (firmware == Entities.Firmware.BIOS)
             {
-                if (options.ntldr)
+                if (bootloader == Entities.Bootloader.NTLDR)
                 {
-                    partDest.StandardInput.WriteLine("select disk " + diskId);
+                    partDest.StandardInput.WriteLine("select disk " + disk);
                     partDest.StandardInput.WriteLine("clean");
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
@@ -182,12 +69,12 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("assign letter=W");
                     partDest.StandardInput.WriteLine("exit");
                     partDest.WaitForExit();
-                    if (!Program.uimode)
+                    if (ui == Entities.UI.Command)
                         ConsoleUtility.WriteProgressBar(100, true);
                 }
-                if (!options.ntldr)
+                if (bootloader == Entities.Bootloader.BOOTMGR)
                 {
-                    partDest.StandardInput.WriteLine("select disk " + diskId);
+                    partDest.StandardInput.WriteLine("select disk " + disk);
                     partDest.StandardInput.WriteLine("clean");
                     partDest.StandardInput.WriteLine("create partition primary size=100");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
@@ -203,13 +90,26 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("set id=27");
                     partDest.StandardInput.WriteLine("exit");
                     partDest.WaitForExit();
-                    if (!Program.uimode)
+                    if (ui == Entities.UI.Command)
                         ConsoleUtility.WriteProgressBar(100, true);
                 }
             }
-            if (options.efi)
+
+            if (firmware == Entities.Firmware.EFI)
             {
-                partDest.StandardInput.WriteLine("select disk " + diskId);
+                if (bootloader == Entities.Bootloader.NTLDR)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("");
+                    Console.WriteLine("   An Error has occurred.");
+                    Console.WriteLine("   Error: You cannot use NTLDR as bootloader on EFI.");
+                    if (ui == Entities.UI.Command)
+                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                    Console.ResetColor();
+                    return;
+                }
+
+                partDest.StandardInput.WriteLine("select disk " + disk);
                 partDest.StandardInput.WriteLine("clean");
                 partDest.StandardInput.WriteLine("convert gpt");
                 partDest.StandardInput.WriteLine("create partition efi size=100");
@@ -227,7 +127,7 @@ namespace deploya_core
                 partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
                 partDest.StandardInput.WriteLine("exit");
                 partDest.WaitForExit();
-                if (!Program.uimode)
+                if (ui == Entities.UI.Command)
                     ConsoleUtility.WriteProgressBar(100, true);
             }
 
@@ -237,50 +137,53 @@ namespace deploya_core
                 Console.WriteLine("");
                 Console.WriteLine("   An Error has occurred.");
                 Console.WriteLine("   Error: " + partDest.ExitCode.ToString());
-                if (!Program.uimode)
+                if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
                 return;
             }
-            #endregion
+        }
 
-            #region Apply WIM file & Bootloader
-            Console.WriteLine();
-            Program.applyWim(image, Index, "W:\\");
-
-            if (!Program.uimode)
+        public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            if (ui == Entities.UI.Command)
             {
-                Console.Write("\n[*] Installing Bootloader ...     ");
+                Console.Write("[*] Applying Image ...            ");
                 ConsoleUtility.WriteProgressBar(0);
             }
-            if (Program.uimode) { Console.WriteLine("\n[A] Installing Bootloader ..."); }
+            if (ui == Entities.UI.Graphical) { Console.WriteLine("[A] Applying Image ..."); }
+            Apply.WriteToDisk(wimfile, index, path);
+        }
+
+        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            if (ui == Entities.UI.Command)
+            {
+                Console.Write("[*] Installing Bootloader ...     ");
+                ConsoleUtility.WriteProgressBar(0);
+            }
+            if (ui == Entities.UI.Graphical) { Console.WriteLine("[A] Installing Bootloader ..."); }
 
             Process bootld = new Process();
             bootld.StartInfo.FileName = "cmd.exe";
 
             #region Legacy check
-            if (options.ntldr)
+            if (bootloader == Entities.Bootloader.NTLDR)
             {
-                if (diskId.EndsWith("\\"))
-                {
-                    diskId = diskId.Remove(diskId.Length - 1);
-                    bootld.StartInfo.Arguments = "/c \"bootsect /nt52 " + diskId + " /force /mbr\"";
-                }
-                else
-                {
-                    bootld.StartInfo.Arguments = "/c \"bootsect.exe /nt52 " + diskId + " /force /mbr > nul\"";
-                }
+                bootld.StartInfo.Arguments = $"/c \"bootsect /nt52 {BootloaderLetter} /force /mbr >NUL\"";
             }
             #endregion
 
             #region BIOS / EFI check
-            if (!options.ntldr)
+            if (bootloader == Entities.Bootloader.BOOTMGR)
             {
-                if (!options.efi) // BIOS
-                    bootld.StartInfo.Arguments = "/c \"bcdboot.exe W:\\Windows /s S: /f BIOS >NUL\"";
+                if (firmware == Entities.Firmware.BIOS) // BIOS
+                    bootld.StartInfo.Arguments = $"/c \"bcdboot.exe {WindowsPath} /s {BootloaderLetter} /f BIOS >NUL\"";
 
-                if (options.efi) // EFI
-                    bootld.StartInfo.Arguments = "/c \"bcdboot.exe W:\\Windows /s S: /f UEFI >NUL\"";
+                if (firmware == Entities.Firmware.EFI) // EFI
+                    bootld.StartInfo.Arguments = $"/c \"bcdboot.exe {WindowsPath} /s {BootloaderLetter} /f UEFI >NUL\"";
             }
             #endregion
 
@@ -293,90 +196,58 @@ namespace deploya_core
                 Console.WriteLine("");
                 Console.WriteLine("   An Error has occurred.");
                 Console.WriteLine("   Error: " + bootld.ExitCode.ToString());
-                if (!Program.uimode)
+                if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
                 Environment.Exit(bootld.ExitCode);
             }
 
-            if (!Program.uimode)
+            if (ui == Entities.UI.Command)
             {
                 ConsoleUtility.WriteProgressBar(100, true);
-                Console.WriteLine("");
+                Console.WriteLine();
             }
+        }
+    }
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("[*] Installation completed.");
-            Console.ResetColor();
-            Environment.Exit(0);
-            #endregion
+    internal class Apply
+    {
+        internal class UI
+        {
+            internal static bool UIMode;
         }
 
-        #region Modules
-
-        #region Get Disk index
-        public static int GetDiskIndex(string diskId)
+        internal static void WriteToDisk(string ImagePath, int Index, string Drive)
         {
-            // string tempPath = Path.GetTempPath();
-            // File.WriteAllText(tempPath + "getdiskindex.cmd", "@wmic diskdrive get index | more +1");
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = "/c \"@wmic diskdrive get index | more +1\"";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.Start();
-            string end = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            // try { File.Delete(Path.Combine(tempPath, "getdiskindex.cmd")); } catch { }
-            return end.Contains(diskId) ? 0 : -1;
-        }
-        #endregion
-
-        #region Apply Wim file
-        private static void applyWim(string ImagePath, string Index, string Drive)
-        {
-            Environment.GetCommandLineArgs();
-            if (!Program.uimode) 
-            { 
-                Console.Write("[*] Applying Image ...            "); 
-                ConsoleUtility.WriteProgressBar(0);
-            }
-            if (Program.uimode) { Console.WriteLine("[A] Applying Image ..."); }
-            
             string path = Drive;
             using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
             {
                 WimgApi.SetTemporaryPath(file, Environment.GetEnvironmentVariable("TEMP"));
-                WimgApi.RegisterMessageCallback(file, new WimMessageCallback(Program.MyCallbackMethod));
+                WimgApi.RegisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
                 try
                 {
-                    using (WimHandle imageHandle = WimgApi.LoadImage(file, Convert.ToInt32(Index)))
+                    using (WimHandle imageHandle = WimgApi.LoadImage(file, Index))
                         WimgApi.ApplyImage(imageHandle, path, WimApplyImageOptions.None);
                 }
                 finally
                 {
-                    WimgApi.UnregisterMessageCallback(file, new WimMessageCallback(Program.MyCallbackMethod));
+                    WimgApi.UnregisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
                 }
             }
         }
-        #endregion
 
-        #region WimCallbackMessage
-        private static WimMessageResult MyCallbackMethod(WimMessageType messageType, object message, object userData)
+        private static WimMessageResult ApplyCallbackMethod(WimMessageType messageType, object message, object userData)
         {
             switch (messageType)
             {
                 case WimMessageType.Progress:
                     WimMessageProgress wimMessageProgress = (WimMessageProgress)message;
-                    if (!Program.uimode)
-                        ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
-                    if (Program.uimode)
-                    {
+                    if (UI.UIMode) 
                         Console.WriteLine(wimMessageProgress.PercentComplete);
-                        break;
-                    }
+                    else 
+                        ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
                     break;
+                        
                 case WimMessageType.Error:
                     WimMessageError wimMessageError = (WimMessageError)message;
                     Console.WriteLine($"Error: {0} ({1})", (object)wimMessageError.Path, (object)wimMessageError.Win32ErrorCode);
@@ -388,8 +259,5 @@ namespace deploya_core
             }
             return WimMessageResult.Success;
         }
-        #endregion
-
-        #endregion
     }
 }
