@@ -12,10 +12,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\icon-windows-10-40.png" />
+    <None Remove="Assets\icon-windows-11-40.png" />
+    <None Remove="Assets\icon-windows-240.png" />
+    <None Remove="Assets\icon-windows-7-40.png" />
+    <None Remove="Assets\icon-windows-vista-40.png" />
+    <None Remove="Assets\icon-windows-xp-40.png" />
     <None Remove="icon.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\icon-windows-10-40.png" />
+    <Resource Include="Assets\icon-windows-11-40.png" />
+    <Resource Include="Assets\icon-windows-240.png" />
+    <Resource Include="Assets\icon-windows-7-40.png" />
+    <Resource Include="Assets\icon-windows-vista-40.png" />
+    <Resource Include="Assets\icon-windows-xp-40.png" />
     <Resource Include="icon.png" />
   </ItemGroup>
 
@@ -25,7 +37,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Management" Version="6.0.0" />
-    <PackageReference Include="WPF-UI" Version="1.2.1" />
+    <PackageReference Include="WPF-UI" Version="2.0.1" />
   </ItemGroup>
 
 </Project>

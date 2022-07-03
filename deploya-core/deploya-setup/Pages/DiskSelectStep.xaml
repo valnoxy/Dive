@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="deploya_setup.Pages.DiskSelectStep"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:local="clr-namespace:deploya_setup.Pages"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid ShowGridLines="false">
+            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="500"/> <!-- Graphic image -->
+            <ColumnDefinition Width="*"/> <!-- Content -->
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Image Source="pack://application:,,,/Assets/setup-100.png" Width="100"/>
+        </Grid>
+
+        <Grid Grid.Column="1" ShowGridLines="false">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                
+                <TextBlock FontWeight="Bold" FontSize="20">
+                    Where do you want to install Windows?
+                </TextBlock>
+                
+                <TextBlock FontWeight="Normal" FontSize="14">
+                    Please select from one of the available disks to continue.
+                </TextBlock>
+                
+            </StackPanel>
+
+            <StackPanel Grid.Row="1">
+                
+                <wpfui:Card HorizontalAlignment="Stretch" Margin="0,0,15,0" VerticalAlignment="Top">
+                    <TreeView Name="DiskListView">
+                        <TreeViewItem Header="Disk 0" IsExpanded="true">
+                            <TreeViewItem Header="Partition 1: Windows (NTFS)"/>
+                            <TreeViewItem Header="Partition 2: Data (NTFS)"/>
+                            <TreeViewItem Header="Partition 3 (RAW)"/>
+                        </TreeViewItem>
+                        <TreeViewItem Header="Disk 1" IsExpanded="true">
+                            <TreeViewItem Header="Partition 1 (ext4)"/>
+                        </TreeViewItem>
+                    </TreeView>
+                </wpfui:Card>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <wpfui:Button Grid.Column="0" Icon="ArrowReset24" Content="Reload" Margin="0,15,15,0"/>
+                    <wpfui:Button Grid.Column="1" Icon="New24" Content="New" Margin="0,15,15,0"/>
+                    <wpfui:Button Grid.Column="2" Icon="Delete20" Content="Delete" Margin="0,15,15,0" Appearance="Danger"/>
+                    <wpfui:Button Grid.Column="3" Icon="Eraser24" Content="Format" Margin="0,15,15,0" Appearance="Danger"/>
+                </Grid>
+                
+            </StackPanel>
+
+
+
+        </Grid>
+        
+    </Grid>
+
+</UserControl>

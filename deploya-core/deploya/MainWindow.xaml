@@ -1,16 +1,17 @@
-﻿<Window x:Class="deploya.MainUI"
+﻿<Window x:Class="deploya.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:deploya"
         mc:Ignorable="d"
-        Title="deploya" Height="600" Width="800"
+        Title="Dive" Height="600" Width="800"
         MinHeight="600" MinWidth="800"
         xmlns:pages="clr-namespace:deploya.Pages"
-        xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+        xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
         WindowStartupLocation="CenterScreen"
-        Style="{StaticResource UiWindow}" ResizeMode="NoResize">
+        Style="{StaticResource UiWindow}"
+        ResizeMode="NoResize">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -34,46 +35,49 @@
                     <wpfui:NavigationItem
                         Content="Home"
                         Icon="Home24"
-                        Tag="dashboard"
-                        Type="{x:Type pages:Dashboard}"/>
+                        PageTag="dashboard"
+                        PageType="{x:Type pages:Dashboard}"/>
                     <wpfui:NavigationItem
                         Content="Apply"
                         Icon="WindowApps24"
-                        Tag="apply"
-                        Type="{x:Type pages:Apply}" />
+                        PageTag="apply"
+                        PageType="{x:Type pages:ApplyContent}"/>
                     <wpfui:NavigationItem
                         Content="Capture"
                         Icon="Copy24"
-                        Tag="capture"
-                         />
+                        PageTag="capture"/>
                     <wpfui:NavigationItem
                         Content="Cloud"
                         Icon="Cloud24"
-                        Tag="cloud" Cursor="Hand"
-                         />
+                        PageTag="cloud"/>
                 </wpfui:NavigationStore.Items>
                 <wpfui:NavigationStore.Footer>
                     <wpfui:NavigationItem
                         Content="CMD"
                         Icon="Window24"
-                        Tag="cmd"
-                        Click="CommandLine_Click" />
+                        PageTag="cmd"
+                        Click="CommandLine_Click"/>
                     <wpfui:NavigationItem
                         Content="About"
                         Icon="QuestionCircle24"
-                        Tag="help"
-                         />
+                        PageTag="help"/>
                 </wpfui:NavigationStore.Footer>
             </wpfui:NavigationStore>
 
+            <!--  We display our pages inside this element.  -->
             <Border
                 Grid.Column="1"
                 Background="{DynamicResource ControlFillColorDefaultBrush}"
                 CornerRadius="8,0,0,0">
                 <Grid>
-                    <Frame x:Name="RootFrame" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Frame x:Name="RootFrame" Grid.Row="1" />
                     <wpfui:Breadcrumb
-                        Margin="18,18,0,0"
+                        Grid.Row="0"
+                        Margin="18"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Top"
                         FontSize="24"
@@ -81,9 +85,31 @@
                 </Grid>
             </Border>
         </Grid>
-        <wpfui:TitleBar Grid.Row="0" ApplicationNavigation="True" ShowMaximize="False" ShowMinimize="False" Title="deploya" Icon="pack://application:,,,/icon.png"/>
-        <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" HorizontalAlignment="Left" Margin="91,17,0,0" VerticalAlignment="Top" >
-            12.0
+        <wpfui:TitleBar
+            Title="Dive - Deployment is very easy"
+            ShowMaximize="False"
+            Icon="pack://application:,,,/icon.png"
+            ShowMinimize="False"
+            Grid.Row="0">
+            <wpfui:TitleBar.Tray>
+                <wpfui:NotifyIcon
+                    Icon="pack://application:,,,/icon.png"
+                    FocusOnLeftClick="True"
+                    MenuOnRightClick="True"
+                    TooltipText="Dive">
+                    <wpfui:NotifyIcon.Menu>
+                        <ContextMenu>
+                            <wpfui:MenuItem
+                                Header="Home"
+                                SymbolIcon="Home24"
+                                Tag="home" />
+                        </ContextMenu>
+                    </wpfui:NotifyIcon.Menu>
+                </wpfui:NotifyIcon>
+            </wpfui:TitleBar.Tray>
+        </wpfui:TitleBar>
+        <TextBlock HorizontalAlignment="Left" Margin="211,17,0,0" VerticalAlignment="Top" FontSize="13">
+            [1.0]
             <TextBlock x:Name="DebugString" Margin="5,0,0,0" Foreground="Red">Debug build - This is not a production ready build.</TextBlock>
         </TextBlock>
     </Grid>

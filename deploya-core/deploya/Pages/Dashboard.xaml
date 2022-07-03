@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:deploya.Pages"
-      xmlns:wpfui="clr-namespace:WPFUI.Controls;assembly=WPFUI"
+      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d" 
       d:DesignHeight="549" d:DesignWidth="728"
       Title="Dashboard">
@@ -16,39 +16,20 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" Margin="0,55,0,0" HorizontalAlignment="Center" >
+        <Grid Grid.Row="1" HorizontalAlignment="Center" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-
+            
             <Grid Grid.Column="0" Margin="15,0,15,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <wpfui:Icon FontSize="19" Glyph="Heart28" />
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="19,0,0,0"
-                    VerticalAlignment="Center">
-                    <TextBlock
-                        Margin="0,0,0,4"
-                        FontSize="16"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="Open Source" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Find me on GitHub!" />
-                </StackPanel>
-            </Grid>
-            <Grid Grid.Column="1" Margin="15,0,15,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <wpfui:Icon FontSize="19" Glyph="FastForward24" />
+                <wpfui:SymbolIcon FontSize="19" Symbol="FastForward24" />
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -62,12 +43,13 @@
                     <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Deploy Windows in minutes" />
                 </StackPanel>
             </Grid>
-            <Grid Grid.Column="2" Margin="15,0,15,0">
+            
+            <Grid Grid.Column="1" Margin="15,0,15,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:Icon FontSize="19" Glyph="DesignIdeas24" />
+                <wpfui:SymbolIcon FontSize="19" Symbol="DesignIdeas24" />
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -77,8 +59,28 @@
                         FontSize="16"
                         FontWeight="Medium"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="Compatible" />
+                        Text="Compatibility" />
                     <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Legacy &amp; Modern System" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="2" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <wpfui:SymbolIcon FontSize="19" Symbol="Heart24" />
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="Open Source" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Find me on GitHub!" />
                 </StackPanel>
             </Grid>
         </Grid>
@@ -129,15 +131,28 @@
                     </StackPanel>
                 </wpfui:CardAction>
 
-                <wpfui:Hyperlink
-                    Margin="0,0,0,4"
-                    Content="Source code on GitHub"
-                    Icon="Link48"
-                    NavigateUri="https://github.com/valnoxy/deploya" />
-                <wpfui:Hyperlink
-                    Content="Project on Exploitox"
-                    Icon="Link48"
-                    NavigateUri="https://exploitox.de/deploya" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid Grid.Column="0">
+                        <wpfui:Anchor
+                            Content="Source code on GitHub"
+                            Margin="0,0,8,0"
+                            Icon="Link48"
+                            NavigateUri="https://github.com/valnoxy/deploya" />
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <wpfui:Anchor
+                            Content="Project on Exploitox"
+                            Icon="Link48"
+                            NavigateUri="https://exploitox.de/deploya" />
+                    </Grid>
+                </Grid>
+
+
             </StackPanel>
         </Grid>
     </Grid>

@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:deploya.Pages"
       mc:Ignorable="d" 
       d:DesignHeight="549" d:DesignWidth="728"
+      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
       Title="Apply">
 
     <Grid Margin="19,20,19,0">
@@ -13,28 +14,33 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="1" Margin="0,44,0,0" VerticalAlignment="Top">
-            <Label Content="Source file" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontFamily="Segoe UI Variable Display" FontSize="15"/>
+            <Label Content="Source file" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontFamily="Segoe UI Variable Display" FontSize="15"/>
             <TextBox x:Name="srcDir" Margin="0,25,150,0" IsEnabled="False"/>
-            <Button Content="Browse" HorizontalAlignment="Right" Margin="0,25,0,0" VerticalAlignment="Top" Width="145" Height="34"/>
+            <Button Content="Browse" HorizontalAlignment="Right" Margin="0,25,0,0" VerticalAlignment="Top" Width="145" Height="35"/>
         </Grid>
 
         <Grid Grid.Row="2" Margin="0,15,0,0" VerticalAlignment="Top">
-            <Label Content="Image Index" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontFamily="Segoe UI Variable Display" FontSize="15"/>
+            <Label Content="Image Index" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontFamily="Segoe UI Variable Display" FontSize="15"/>
             <ComboBox x:Name="indexBox" Margin="0,25,0,0"/>
         </Grid>
         
         <Grid Grid.Row="3" Margin="0,15,0,0" VerticalAlignment="Top">
-            <Label Content="Hard Drive" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Foreground="{DynamicResource TextFillColorPrimaryBrush}" FontFamily="Segoe UI Variable Display" FontSize="15"/>
+            <Label Content="Hard Drive" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontFamily="Segoe UI Variable Display" FontSize="15"/>
             <ComboBox x:Name="hddBox" Margin="0,25,150,0"/>
-            <Button Content="Debug Reload" Click="DebugReload" HorizontalAlignment="Right" Margin="0,25,0,0" VerticalAlignment="Top" Width="145" Height="34"/>
+            <Button Content="Debug Reload" Click="DebugReload" HorizontalAlignment="Right" Margin="0,25,0,0" VerticalAlignment="Top" Width="145" Height="36"/>
         </Grid>
-        
 
-        <Grid Grid.Row="4" Margin="-19,0,-19,0" VerticalAlignment="Bottom">
+        <Grid Grid.Row="4" Margin="0,15,0,0" VerticalAlignment="Top">
+            <wpfui:Button Icon="Apps24" Content="Apply Image" Click="DebugReload" HorizontalAlignment="Right" Margin="0,25,0,0" VerticalAlignment="Top" Width="145" Height="36"/>
+        </Grid>
+
+
+        <Grid Grid.Row="5" Margin="-19,0,-19,0" VerticalAlignment="Bottom">
             <StatusBar>
                 <StatusBar.ItemsPanel>
                     <ItemsPanelTemplate>

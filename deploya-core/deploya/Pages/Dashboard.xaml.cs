@@ -16,7 +16,7 @@ namespace deploya.Pages
 
         private void SwitchToApplyPage(object sender, RoutedEventArgs e)
         {
-            (Application.Current.MainWindow as MainUI)?.RootNavigation.Navigate("apply");
+            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("apply");
         }
     }
 }

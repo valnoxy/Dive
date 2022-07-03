@@ -1,0 +1,113 @@
+﻿<Window x:Class="deploya_setup.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:pages="clr-namespace:deploya_setup.Pages"
+        Style="{StaticResource UiWindow}"
+        WindowStartupLocation="CenterScreen"
+        Title="deploya Setup"
+        xmlns:local="clr-namespace:deploya_setup"
+        mc:Ignorable="d"
+        Background="#727A7A7A"
+        WindowState="Maximized"
+        ResizeMode="NoResize"
+        Height="450" Width="800">
+
+    <Grid>
+        
+        <!-- Background -->
+        <Image Source="pack://application:,,,/assets/background.jpg" Stretch="Fill" Margin="-50">
+            <Image.Effect>
+                <BlurEffect KernelType="Gaussian" Radius="80" />
+            </Image.Effect>
+        </Image>
+        
+        <Grid Margin="15,40,15,15" ShowGridLines="false">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="150"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="150"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Content Control -->
+            <Grid Grid.Column="1" Grid.Row="1" Background="#2d2d2d">
+                
+                <!-- Shadow -->
+                <Border CornerRadius="0" Background="#2d2d2d" Grid.Row="1">
+                    <Border.Effect>
+                        <DropShadowEffect ShadowDepth="3" Opacity="0.3"/>
+                    </Border.Effect>
+                </Border>
+                
+                <!-- Panel -->
+                <Grid ShowGridLines="false">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="75"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Titlebar -->
+                    <wpfui:TitleBar x:Name="Titlebar" Grid.Row="0" ShowMaximize="False" ShowMinimize="False" Title="deploya Setup" Icon="pack://application:,,,/icon.png"/>
+
+                    <!-- Control -->
+                    <ContentControl Grid.Row="1" x:Name="FrameWindow"/>
+                    
+                    <!-- Status Bar-->
+                    <StatusBar Grid.Row="2" Margin="0,8,0,0">
+                        <StatusBar.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </ItemsPanelTemplate>
+                        </StatusBar.ItemsPanel>
+                        <StatusBarItem Grid.Column="0">
+                            <Button Content="Cancel"
+                                x:Name="CancelBtn"
+                                IsCancel="True"
+                                Width="80"
+                                Click="CancelBtn_Click"/>
+                        </StatusBarItem>
+                        <Separator Grid.Column="1" />
+                        <StatusBarItem Grid.Column="2">
+                            <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Version: 12.0 - Debug build" />
+                        </StatusBarItem>
+                        <Separator Grid.Column="3" />
+                        <StatusBarItem Grid.Column="4">
+                            <Button Grid.Column="2"
+                                Content="Next"
+                                x:Name="NextBtn"
+                                x:FieldModifier="public"
+                                Width="80"
+                                Click="Button_Click"
+                                IsDefault="True"/>
+                        </StatusBarItem>
+                        
+                    </StatusBar>
+
+                </Grid>
+                
+            </Grid>
+            
+        </Grid>
+
+        <!-- <wpfui:TitleBar x:Name="Titlebar" Grid.Row="0" ShowMaximize="False" ShowMinimize="False" Visibility="Hidden" Title="deploya Setup" Icon="pack://application:,,,/icon.png"/> -->
+
+    </Grid>
+</Window>
