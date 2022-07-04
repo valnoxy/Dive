@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\deploya-core\deploya-core.csproj" />
+    <ProjectReference Include="..\deployaCore\deployaCore.csproj" />
   </ItemGroup>
 
 </Project>

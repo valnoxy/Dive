@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
-		<RootNamespace>deploya_core</RootNamespace>
+		<RootNamespace>deployaCore</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>Link</TrimMode>
@@ -11,7 +11,7 @@
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<UseWPF>false</UseWPF>
-		<AssemblyName>deploya-core</AssemblyName>
+		<AssemblyName>deployaCore</AssemblyName>
 		<ApplicationIcon>deploya.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>AnyCPU;x64</Platforms>
