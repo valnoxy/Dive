@@ -13,6 +13,7 @@
 using Microsoft.Wim;
 using System;
 using System.Diagnostics;
+using System.Windows.Controls;
 
 namespace deploya_core
 {
@@ -39,15 +40,19 @@ namespace deploya_core
 
     public class Actions
     {
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk)
+        public static ProgressBar progBar = null;
+
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, ProgressBar progressBar = null)
         {
+            progBar = progressBar;
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             if (ui == Entities.UI.Command)
             {
                 Console.Write("[*] Partitioning disk ...         ");
                 ConsoleUtility.WriteProgressBar(0);
             }
-            if (ui == Entities.UI.Graphical) { Console.WriteLine("[A] Partitioning disk ... "); }
+            if (ui == Entities.UI.Graphical) { progBar.IsIndeterminate = true; }
 
             Process partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
@@ -144,27 +149,31 @@ namespace deploya_core
             }
         }
 
-        public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index)
+        public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index, ProgressBar progressBar = null)
         {
+            progBar = progressBar;
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             if (ui == Entities.UI.Command)
             {
                 Console.Write("[*] Applying Image ...            ");
                 ConsoleUtility.WriteProgressBar(0);
             }
-            if (ui == Entities.UI.Graphical) { Console.WriteLine("[A] Applying Image ..."); }
-            Apply.WriteToDisk(wimfile, index, path);
+            if (ui == Entities.UI.Graphical) { progBar.IsIndeterminate = false; progBar.Value = 0; }
+            Apply.WriteToDisk(wimfile, index, path, progressBar);
         }
 
-        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter)
+        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter, ProgressBar progressBar = null)
         {
+            progBar = progressBar;
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             if (ui == Entities.UI.Command)
             {
                 Console.Write("[*] Installing Bootloader ...     ");
                 ConsoleUtility.WriteProgressBar(0);
             }
-            if (ui == Entities.UI.Graphical) { Console.WriteLine("[A] Installing Bootloader ..."); }
+            if (ui == Entities.UI.Graphical) { progBar.IsIndeterminate = true; progBar.Value = 0; }
 
             Process bootld = new Process();
             bootld.StartInfo.FileName = "cmd.exe";
@@ -207,6 +216,20 @@ namespace deploya_core
                 ConsoleUtility.WriteProgressBar(100, true);
                 Console.WriteLine();
             }
+            if (ui == Entities.UI.Graphical)
+            {
+                progBar.Value = 100;
+                progBar.IsIndeterminate = false;
+            }
+        }
+    
+        public static string GetInfo(string ImagePath)
+        {
+            using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
+            {
+                string a = WimgApi.GetImageInformationAsString(file);
+                return a;
+            }
         }
     }
 
@@ -215,10 +238,13 @@ namespace deploya_core
         internal class UI
         {
             internal static bool UIMode;
+            internal static ProgressBar progBar = null;
         }
 
-        internal static void WriteToDisk(string ImagePath, int Index, string Drive)
+        internal static void WriteToDisk(string ImagePath, int Index, string Drive, ProgressBar progressBar = null)
         {
+            UI.progBar = progressBar;
+
             string path = Drive;
             using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
             {
@@ -242,9 +268,9 @@ namespace deploya_core
             {
                 case WimMessageType.Progress:
                     WimMessageProgress wimMessageProgress = (WimMessageProgress)message;
-                    if (UI.UIMode) 
-                        Console.WriteLine(wimMessageProgress.PercentComplete);
-                    else 
+                    if (UI.UIMode)
+                        UI.progBar.Value = wimMessageProgress.PercentComplete;
+                    else
                         ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
                     break;
                         

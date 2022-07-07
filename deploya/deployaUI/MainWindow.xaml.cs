@@ -11,14 +11,16 @@ namespace deploya
     {
         public MainWindow()
         {
-            Loaded += (sender, args) =>
-            {
-                Wpf.Ui.Appearance.Watcher.Watch(
-                  this,                           // Window class
-                  BackgroundType.Mica,            // Background type
-                  true                            // Whether to change accents automatically
-                );
-            };
+            Wpf.Ui.Appearance.Background.Apply(
+              this,                                 // Window class
+              Wpf.Ui.Appearance.BackgroundType.Mica // Background type
+            );
+
+            Wpf.Ui.Appearance.Theme.Apply(
+              Wpf.Ui.Appearance.ThemeType.Dark,     // Theme type
+              Wpf.Ui.Appearance.BackgroundType.Mica, // Background type
+              true                                   // Whether to change accents automatically
+            );
 
             InitializeComponent();
             

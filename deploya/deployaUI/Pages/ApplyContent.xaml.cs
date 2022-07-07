@@ -18,6 +18,7 @@ namespace deploya.Pages
             InitializeComponent();
 
             NextBtn.IsEnabled = false;
+            BackBtn.IsEnabled = false;
             FrameWindow.Content = SKUSS;
             ContentWindow = this;
         }
@@ -27,8 +28,26 @@ namespace deploya.Pages
             switch (FrameWindow.Content)
             {
                 case SKUSelectStep:
-                    //FrameWindow.Content = PRSV;
-                    //PRSV.InitializeAsync();
+                    DiskSelectStep DiskSS = new DiskSelectStep();
+                    FrameWindow.Content = DiskSS;
+                    break;
+                case DiskSelectStep:
+                    ApplySelectStep ApplySS = new ApplySelectStep();
+                    FrameWindow.Content = ApplySS;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            switch (FrameWindow.Content)
+            {
+                case DiskSelectStep:
+                    FrameWindow.Content = SKUSS;
+                    NextBtn.IsEnabled = true;
+                    BackBtn.IsEnabled = false;
                     break;
                 default:
                     break;

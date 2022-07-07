@@ -45,4 +45,14 @@
     <ProjectReference Include="..\deployaCore\deployaCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Update="Pages\ApplyPages\ApplySelectStep.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Pages\ApplyPages\DiskSelectStep.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+  </ItemGroup>
+
 </Project>

@@ -38,8 +38,8 @@
                         </Grid.ColumnDefinitions>
 
                         <Image Grid.Column="0" Source="{Binding Picture}" Height="40"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
-                        <TextBlock Grid.Column="2" Text="{Binding ImageFile}" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                        <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
+                        <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

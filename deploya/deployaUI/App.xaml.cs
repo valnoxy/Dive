@@ -22,6 +22,10 @@ using System.Reflection;
 using System.IO;
 using deploya_core;
 
+// Debug
+using System.Xml;
+// End Debug
+
 namespace deploya
 {
     /// <summary>
@@ -97,7 +101,7 @@ namespace deploya
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
+        // const int SW_SHOW = 5;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -105,7 +109,8 @@ namespace deploya
             var handle = GetConsoleWindow();
             ShowWindow(handle, SW_HIDE);
 
-            if (args.Length == 1) {
+            if (args.Length == 1) 
+            {                
                 ShowGUI();
             }
 

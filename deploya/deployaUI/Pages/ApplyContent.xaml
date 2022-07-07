@@ -23,7 +23,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
 
             <Button Content="Cancel"
@@ -32,6 +33,13 @@
                     Width="80"
                     Click="CancelBtn_Click"/>
             <Button Grid.Column="2"
+                    Content="Back"
+                    x:Name="BackBtn"
+                    Margin="-8,0,0,0"
+                    Width="80"
+                    Click="Back_Click"
+                    IsEnabled="False"/>
+            <Button Grid.Column="3"
                     Content="Next"
                     x:Name="NextBtn"
                     Width="80"
