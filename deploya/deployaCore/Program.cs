@@ -12,8 +12,8 @@
 
 using Microsoft.Wim;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Windows.Controls;
 
 namespace deploya_core
 {
@@ -38,21 +38,46 @@ namespace deploya_core
         }
     }
 
+    public static class Output
+    {
+        public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("[");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("*");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("] ");
+
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
+        public static void Write(string message, ConsoleColor color = ConsoleColor.White)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("[");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("*");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("] ");
+
+            Console.ForegroundColor = color;
+            Console.Write(message);
+            Console.ResetColor();
+        }
+    }
+
     public class Actions
     {
-        public static ProgressBar progBar = null;
+        public static BackgroundWorker progBar = null;
 
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, ProgressBar progressBar = null)
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, BackgroundWorker worker = null)
         {
-            progBar = progressBar;
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            if (ui == Entities.UI.Command)
-            {
-                Console.Write("[*] Partitioning disk ...         ");
-                ConsoleUtility.WriteProgressBar(0);
-            }
-            if (ui == Entities.UI.Graphical) { progBar.IsIndeterminate = true; }
+            Output.Write("Partitioning disk ...         ");
+            ConsoleUtility.WriteProgressBar(0);
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); }
 
             Process partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
@@ -74,8 +99,6 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("assign letter=W");
                     partDest.StandardInput.WriteLine("exit");
                     partDest.WaitForExit();
-                    if (ui == Entities.UI.Command)
-                        ConsoleUtility.WriteProgressBar(100, true);
                 }
                 if (bootloader == Entities.Bootloader.BOOTMGR)
                 {
@@ -95,8 +118,6 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("set id=27");
                     partDest.StandardInput.WriteLine("exit");
                     partDest.WaitForExit();
-                    if (ui == Entities.UI.Command)
-                        ConsoleUtility.WriteProgressBar(100, true);
                 }
             }
 
@@ -131,9 +152,7 @@ namespace deploya_core
                 partDest.StandardInput.WriteLine("set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac");
                 partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
                 partDest.StandardInput.WriteLine("exit");
-                partDest.WaitForExit();
-                if (ui == Entities.UI.Command)
-                    ConsoleUtility.WriteProgressBar(100, true);
+                partDest.WaitForExit();                    
             }
 
             if (partDest.ExitCode != 0)
@@ -147,33 +166,27 @@ namespace deploya_core
                 Console.ResetColor();
                 return;
             }
+            
+            ConsoleUtility.WriteProgressBar(100, true);
+            Console.WriteLine();
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
 
-        public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index, ProgressBar progressBar = null)
+        public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index, BackgroundWorker worker = null)
         {
-            progBar = progressBar;
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            if (ui == Entities.UI.Command)
-            {
-                Console.Write("[*] Applying Image ...            ");
-                ConsoleUtility.WriteProgressBar(0);
-            }
-            if (ui == Entities.UI.Graphical) { progBar.IsIndeterminate = false; progBar.Value = 0; }
-            Apply.WriteToDisk(wimfile, index, path, progressBar);
+            Output.Write("Applying Image ...            ");
+            ConsoleUtility.WriteProgressBar(0);
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
+            
+            Apply.WriteToDisk(wimfile, index, path, worker);
+            Console.WriteLine();
         }
 
-        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter, ProgressBar progressBar = null)
+        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter, BackgroundWorker worker = null)
         {
-            progBar = progressBar;
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            if (ui == Entities.UI.Command)
-            {
-                Console.Write("[*] Installing Bootloader ...     ");
-                ConsoleUtility.WriteProgressBar(0);
-            }
-            if (ui == Entities.UI.Graphical) { progBar.IsIndeterminate = true; progBar.Value = 0; }
+            Output.Write("Installing Bootloader ...     ");
+            ConsoleUtility.WriteProgressBar(0);
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
 
             Process bootld = new Process();
             bootld.StartInfo.FileName = "cmd.exe";
@@ -181,7 +194,8 @@ namespace deploya_core
             #region Legacy check
             if (bootloader == Entities.Bootloader.NTLDR)
             {
-                bootld.StartInfo.Arguments = $"/c \"bootsect /nt52 {BootloaderLetter} /force /mbr >NUL\"";
+                string StrBl = BootloaderLetter.Substring(0, 2);
+                bootld.StartInfo.Arguments = $"/c \"bootsect /nt52 {StrBl} /force /mbr >NUL\"";
             }
             #endregion
 
@@ -211,15 +225,12 @@ namespace deploya_core
                 Environment.Exit(bootld.ExitCode);
             }
 
-            if (ui == Entities.UI.Command)
-            {
-                ConsoleUtility.WriteProgressBar(100, true);
-                Console.WriteLine();
-            }
+            ConsoleUtility.WriteProgressBar(100, true);
+            Console.WriteLine();
             if (ui == Entities.UI.Graphical)
             {
-                progBar.Value = 100;
-                progBar.IsIndeterminate = false;
+                worker.ReportProgress(101, "");
+                worker.ReportProgress(100, "");
             }
         }
     
@@ -235,15 +246,11 @@ namespace deploya_core
 
     internal class Apply
     {
-        internal class UI
-        {
-            internal static bool UIMode;
-            internal static ProgressBar progBar = null;
-        }
+        internal static BackgroundWorker BW = null;
 
-        internal static void WriteToDisk(string ImagePath, int Index, string Drive, ProgressBar progressBar = null)
+        internal static void WriteToDisk(string ImagePath, int Index, string Drive, BackgroundWorker worker = null)
         {
-            UI.progBar = progressBar;
+            BW = worker;
 
             string path = Drive;
             using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
@@ -268,16 +275,21 @@ namespace deploya_core
             {
                 case WimMessageType.Progress:
                     WimMessageProgress wimMessageProgress = (WimMessageProgress)message;
-                    if (UI.UIMode)
-                        UI.progBar.Value = wimMessageProgress.PercentComplete;
-                    else
-                        ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
+                    
+                    if (BW != null)
+                    {
+                        BW.ReportProgress(wimMessageProgress.PercentComplete, ""); // Update progress bar
+                        BW.ReportProgress(202, ""); // Update progress text
+                    }
+
+                    ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
                     break;
                         
                 case WimMessageType.Error:
                     WimMessageError wimMessageError = (WimMessageError)message;
                     Console.WriteLine($"Error: {0} ({1})", (object)wimMessageError.Path, (object)wimMessageError.Win32ErrorCode);
                     break;
+                    
                 case WimMessageType.Warning:
                     WimMessageWarning wimMessageWarning = (WimMessageWarning)message;
                     Console.WriteLine($"Warning: {0} ({1})", (object)wimMessageWarning.Path, (object)wimMessageWarning.Win32ErrorCode);

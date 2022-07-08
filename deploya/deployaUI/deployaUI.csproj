@@ -9,6 +9,7 @@
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 	<Platforms>AnyCPU;x64</Platforms>
+	<ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

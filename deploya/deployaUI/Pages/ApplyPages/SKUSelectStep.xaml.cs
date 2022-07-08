@@ -41,50 +41,61 @@ namespace deploya.Pages.ApplyPages
         private void LoadImages()
         {
             images = new List<Image>();
-            string[] dirs = Directory.GetFiles(@"G:\WIMs", "*.wim");
 
-            foreach (string binary in dirs)
+            // Find WIM USB device 
+            DriveInfo[] allDrives = DriveInfo.GetDrives();
+            foreach (DriveInfo d in allDrives)
             {
-                try
+                if (File.Exists(Path.Combine(d.Name, ".diveusb")) && Directory.Exists(Path.Combine(d.Name, "WIMs")))
                 {
-                    string action = Actions.GetInfo(binary);
+                    string[] dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim");
 
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml(action);
-
-                    XmlNodeList imageNames = doc.DocumentElement.SelectNodes("/WIM/IMAGE");
-
-                    string product_id = "", product_name = "", product_size = "";
-
-                    foreach (XmlNode node in imageNames)
+                    foreach (string binary in dirs)
                     {
-                        product_id = node.Attributes?["INDEX"]?.Value;
-                        product_name = node.SelectSingleNode("NAME").InnerText;
-                        product_size = node.SelectSingleNode("TOTALBYTES").InnerText;
-                        string sizeInGB = convertSize(Convert.ToDouble(product_size));
+                        try
+                        {
+                            string action = Actions.GetInfo(binary);
 
-                        Console.WriteLine($"ID : {product_id}");
-                        Console.WriteLine($"Name : {product_name}");
-                        Console.WriteLine($"Size : {sizeInGB}\n");
+                            XmlDocument doc = new XmlDocument();
+                            doc.LoadXml(action);
 
-                        string imageVersion = "";
-                        if (product_name.Contains("Windows XP"))
-                            imageVersion = "windows-xp";
-                        if (product_name.Contains("Windows Vista"))
-                            imageVersion = "windows-Vista";
-                        if (product_name.Contains("Windows 7"))
-                            imageVersion = "windows-7";
-                        if (product_name.Contains("Windows 8"))
-                            imageVersion = "windows-8";
-                        if (product_name.Contains("Windows 10"))
-                            imageVersion = "windows-10";
-                        if (product_name.Contains("Windows 11"))
-                            imageVersion = "windows-11";
+                            XmlNodeList imageNames = doc.DocumentElement.SelectNodes("/WIM/IMAGE");
 
-                        images.Add(new Image { Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png", ImageFile = binary, Name = product_name, Index = product_id });
+                            string product_id = "", product_name = "", product_size = "";
+
+                            foreach (XmlNode node in imageNames)
+                            {
+                                product_id = node.Attributes?["INDEX"]?.Value;
+                                product_name = node.SelectSingleNode("NAME").InnerText;
+                                product_size = node.SelectSingleNode("TOTALBYTES").InnerText;
+                                string sizeInGB = convertSize(Convert.ToDouble(product_size));
+
+                                Common.Debug.WriteLine("--- Image ---", ConsoleColor.White);
+                                Common.Debug.WriteLine($"ID : {product_id}", ConsoleColor.White);
+                                Common.Debug.WriteLine($"Name : {product_name}", ConsoleColor.White);
+                                Common.Debug.WriteLine($"Size : {sizeInGB}", ConsoleColor.White);
+                                Common.Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
+
+                                string imageVersion = "";
+                                if (product_name.Contains("Windows XP"))
+                                    imageVersion = "windows-xp";
+                                if (product_name.Contains("Windows Vista"))
+                                    imageVersion = "windows-Vista";
+                                if (product_name.Contains("Windows 7"))
+                                    imageVersion = "windows-7";
+                                if (product_name.Contains("Windows 8"))
+                                    imageVersion = "windows-8";
+                                if (product_name.Contains("Windows 10"))
+                                    imageVersion = "windows-10";
+                                if (product_name.Contains("Windows 11"))
+                                    imageVersion = "windows-11";
+
+                                images.Add(new Image { Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png", ImageFile = binary, Name = product_name, Index = product_id });
+                            }
+                        }
+                        catch (Exception ex) { Console.WriteLine(ex.Message); }
                     }
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
 
             //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-11-40.png", ImageFile = "win11.wim", Name = "Windows 11 Pro (22H2)" });
@@ -121,9 +132,9 @@ namespace deploya.Pages.ApplyPages
                 Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
                 Common.ApplyDetails.FileName = item.ImageFile;
 
-                Console.WriteLine(Common.ApplyDetails.Index);
-                Console.WriteLine(Common.ApplyDetails.Name);
-                Console.WriteLine(Common.ApplyDetails.FileName);
+                Common.Debug.WriteLine($"Selected Index: {Common.ApplyDetails.Index}", ConsoleColor.White);
+                Common.Debug.WriteLine($"Selected Name: {Common.ApplyDetails.Name}", ConsoleColor.White);
+                Common.Debug.WriteLine($"Selected Image File Path: {Common.ApplyDetails.FileName}\n", ConsoleColor.White);
 
                 ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
             }

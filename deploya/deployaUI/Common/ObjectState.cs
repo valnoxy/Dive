@@ -18,4 +18,21 @@ namespace deploya.Common
         public static bool UseNTLDR { get; set; }
     }
 
+    public static class Debug
+    {
+        public static void WriteLine(string message, ConsoleColor color)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("[");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("*");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write("] ");
+
+            Console.ForegroundColor = color;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+    }
+
 }

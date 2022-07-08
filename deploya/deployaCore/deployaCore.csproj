@@ -10,7 +10,6 @@
 		<SelfContained>true</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<UseWPF>True</UseWPF>
 		<AssemblyName>deployaCore</AssemblyName>
 		<ApplicationIcon>deploya.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>

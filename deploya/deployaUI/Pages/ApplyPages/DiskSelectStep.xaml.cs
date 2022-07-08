@@ -79,29 +79,43 @@ namespace deploya.Pages.ApplyPages
             DiskListView.Items.Clear();
             try
             {
-                ManagementObjectSearcher searcher =
-                new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
                 foreach (ManagementObject info in searcher.Get())
                 {
-                    Console.WriteLine("DeviceID: " + info["DeviceID"].ToString());
-                    Console.WriteLine("Model: " + info["Model"].ToString());
-                    Console.WriteLine("Interface: " + info["InterfaceType"].ToString());
-                    Console.WriteLine("Serial#: " + info["SerialNumber"].ToString());
-                    Console.WriteLine("Size: " + info["Size"].ToString());
-                    Console.WriteLine("Size in GB: " + ByteToGB(Convert.ToDouble(info["Size"])).ToString());
-                    Console.WriteLine("==========================================================");
+                    string DeviceID = "";
+                    string Model = "";
+                    string Interface = "";
+                    string Serial = "";
+                    string Size = "";
+                    string SizeInGB = "";
 
-                    if (info["InterfaceType"].ToString() == "USB")
+                    if (info["DeviceID"] != null) DeviceID = info["DeviceID"].ToString();
+                    if (info["Model"] != null) Model = info["Model"].ToString();
+                    if (info["InterfaceType"] != null) Interface = info["InterfaceType"].ToString();
+                    if (info["SerialNumber"] != null) Serial = info["SerialNumber"].ToString();
+                    if (info["Size"] != null) Size = info["Size"].ToString();
+                    if (info["Size"] != null) SizeInGB = ByteToGB(Convert.ToDouble(info["Size"])).ToString();
+
+                    Common.Debug.WriteLine($"DeviceID: {DeviceID}", ConsoleColor.White);
+                    Common.Debug.WriteLine($"Model: {Model}", ConsoleColor.White);
+                    Common.Debug.WriteLine($"Interface: {Interface}", ConsoleColor.White);
+                    Common.Debug.WriteLine($"Serial: {Serial}", ConsoleColor.White);
+                    Common.Debug.WriteLine($"Size: {Size}", ConsoleColor.White);
+                    Common.Debug.WriteLine($"Size in GB: {SizeInGB}", ConsoleColor.White);
+
+                    if (Interface != "USB")
                     {
-                        Console.WriteLine("Skipping as this is a USB Device ...");
-                        //return;
+                        // Add to list
+                        string driveid = DeviceID;
+                        driveid = Regex.Match(driveid, @"\d+").Value;
+                        string drive = $"{Model} | {Interface} | {SizeInGB} GB | Disk {driveid}";
+                        DiskListView.Items.Add(drive);
                     }
-
-                    // Add to list
-                    string driveid = info["DeviceID"].ToString();
-                    driveid = Regex.Match(driveid, @"\d+").Value;
-                    string drive = $"{info["Model"]} | {info["InterfaceType"]} | {ByteToGB(Convert.ToDouble(info["Size"]))} GB | Disk {driveid}";
-                    DiskListView.Items.Add(drive);
+                    else
+                    {
+                        Common.Debug.WriteLine("Skipping as this is a USB Device ...", ConsoleColor.Yellow);
+                    }
+                    Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }
             catch (Exception)

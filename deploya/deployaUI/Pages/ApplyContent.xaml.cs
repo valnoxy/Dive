@@ -35,6 +35,12 @@ namespace deploya.Pages
                     ApplySelectStep ApplySS = new ApplySelectStep();
                     FrameWindow.Content = ApplySS;
                     break;
+                case ApplySelectStep:
+                    if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
+                        System.Diagnostics.Process.Start("wpeutil.exe", "restart");
+                    else
+                        System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
+                    break;
                 default:
                     break;
             }
