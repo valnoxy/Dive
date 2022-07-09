@@ -41,6 +41,7 @@ namespace deploya.Pages.ApplyPages
         private void LoadImages()
         {
             images = new List<Image>();
+            int counter = 0;
 
             // Find WIM USB device 
             DriveInfo[] allDrives = DriveInfo.GetDrives();
@@ -77,20 +78,41 @@ namespace deploya.Pages.ApplyPages
                                 Common.Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
 
                                 string imageVersion = "";
+                                
+                                // Windows Client
                                 if (product_name.Contains("Windows XP"))
                                     imageVersion = "windows-xp";
                                 if (product_name.Contains("Windows Vista"))
                                     imageVersion = "windows-Vista";
                                 if (product_name.Contains("Windows 7"))
                                     imageVersion = "windows-7";
-                                if (product_name.Contains("Windows 8"))
-                                    imageVersion = "windows-8";
+                                if (product_name.Contains("Windows 8") || product_name.Contains("Windows 8.1"))
+                                    imageVersion = "windows-10";
                                 if (product_name.Contains("Windows 10"))
                                     imageVersion = "windows-10";
                                 if (product_name.Contains("Windows 11"))
                                     imageVersion = "windows-11";
 
+                                // Windows Server
+                                if (product_name.Contains("Windows Server 2003"))
+                                    imageVersion = "windows-xp";
+                                if (product_name.Contains("Windows Server 2008"))
+                                    imageVersion = "windows-7";
+                                if (product_name.Contains("Windows Server 2012"))
+                                    imageVersion = "windows-server-2012";
+                                if (product_name.Contains("Windows Server 2016"))
+                                    imageVersion = "windows-server-2012";
+                                if (product_name.Contains("Windows Server 2019"))
+                                    imageVersion = "windows-server-2012";
+                                if (product_name.Contains("Windows Server 2022"))
+                                    imageVersion = "windows-server-2012";
+                                
+                                // Exploitox Internal
+                                if (product_name.Contains("AI Operating System") || product_name.Contains("AIOS"))
+                                    imageVersion = "aios";
+
                                 images.Add(new Image { Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png", ImageFile = binary, Name = product_name, Index = product_id });
+                                counter++;
                             }
                         }
                         catch (Exception ex) { Console.WriteLine(ex.Message); }
@@ -105,6 +127,7 @@ namespace deploya.Pages.ApplyPages
             //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-vista-40.png", ImageFile = "winvista.wim", Name = "Windows Vista" });
             //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-xp-40.png", ImageFile = "winxp.wim", Name = "Windows XP" });
 
+            ImageCounter.Text = $"Images loaded: {counter}";
             this.DataContext = this;
         }
 
@@ -131,6 +154,7 @@ namespace deploya.Pages.ApplyPages
                 Common.ApplyDetails.Name = item.Name;
                 Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
                 Common.ApplyDetails.FileName = item.ImageFile;
+                Common.ApplyDetails.IconPath = item.Picture;
 
                 Common.Debug.WriteLine($"Selected Index: {Common.ApplyDetails.Index}", ConsoleColor.White);
                 Common.Debug.WriteLine($"Selected Name: {Common.ApplyDetails.Name}", ConsoleColor.White);

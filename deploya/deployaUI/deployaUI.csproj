@@ -13,20 +13,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\icon-aios-40.png" />
     <None Remove="Assets\icon-windows-10-40.png" />
     <None Remove="Assets\icon-windows-11-40.png" />
     <None Remove="Assets\icon-windows-240.png" />
     <None Remove="Assets\icon-windows-7-40.png" />
+    <None Remove="Assets\icon-windows-server-2012-40.png" />
     <None Remove="Assets\icon-windows-vista-40.png" />
     <None Remove="Assets\icon-windows-xp-40.png" />
     <None Remove="icon.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\icon-aios-40.png" />
     <Resource Include="Assets\icon-windows-10-40.png" />
     <Resource Include="Assets\icon-windows-11-40.png" />
     <Resource Include="Assets\icon-windows-240.png" />
     <Resource Include="Assets\icon-windows-7-40.png" />
+    <Resource Include="Assets\icon-windows-server-2012-40.png" />
     <Resource Include="Assets\icon-windows-vista-40.png" />
     <Resource Include="Assets\icon-windows-xp-40.png" />
     <Resource Include="icon.png" />
