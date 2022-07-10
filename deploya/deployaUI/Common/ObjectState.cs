@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace deploya.Common
 {
-
     public static class ApplyDetails
     {
         public static string Name { get; set; }
@@ -21,7 +20,7 @@ namespace deploya.Common
 
     public static class Debug
     {
-        public static void WriteLine(string message, ConsoleColor color)
+        public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.Write("[");
@@ -35,5 +34,4 @@ namespace deploya.Common
             Console.ResetColor();
         }
     }
-
 }

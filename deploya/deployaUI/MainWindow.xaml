@@ -49,6 +49,7 @@
                     <wpfui:NavigationItem
                         Content="Cloud"
                         Icon="Cloud24"
+                        PageType="{x:Type pages:CloudContent}"
                         PageTag="cloud"/>
                 </wpfui:NavigationStore.Items>
                 <wpfui:NavigationStore.Footer>
@@ -88,12 +89,12 @@
         <wpfui:TitleBar
             Title="Dive - Deployment is very easy"
             ShowMaximize="False"
-            Icon="pack://application:,,,/icon.png"
+            Icon="pack://application:,,,/Dive.ico"
             ShowMinimize="False"
             Grid.Row="0">
             <wpfui:TitleBar.Tray>
                 <wpfui:NotifyIcon
-                    Icon="pack://application:,,,/icon.png"
+                    Icon="pack://application:,,,/Dive.ico"
                     FocusOnLeftClick="True"
                     MenuOnRightClick="True"
                     TooltipText="Dive">
@@ -108,9 +109,9 @@
                 </wpfui:NotifyIcon>
             </wpfui:TitleBar.Tray>
         </wpfui:TitleBar>
-        <TextBlock HorizontalAlignment="Left" Margin="211,17,0,0" VerticalAlignment="Top" FontSize="13">
+        <TextBlock HorizontalAlignment="Left" Margin="211,17,0,0" VerticalAlignment="Top" FontSize="14" x:Name="VersionString">
             [1.0]
-            <TextBlock x:Name="DebugString" Margin="5,0,0,0" Foreground="Red">Debug build - This is not a production ready build.</TextBlock>
+            <TextBlock x:Name="DebugString" Margin="5,0,0,0" Foreground="Red"></TextBlock>
         </TextBlock>
     </Grid>
 </Window>

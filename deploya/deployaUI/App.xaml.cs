@@ -1,8 +1,8 @@
 ﻿/* 
- * deploya - Fast and Easy way to deploy Windows
+ * Dive (deploya) - Fast and Easy way to deploy Windows
  * Copyright (c) 2018 - 2022 Exploitox.
  * 
- * deploya is licensed under MIT License (https://github.com/valnoxy/deploya/blob/main/LICENSE). 
+ * Dive is licensed under MIT License (https://github.com/valnoxy/deploya/blob/main/LICENSE). 
  * So you are allowed to use freely and modify the application. 
  * I will not be responsible for any outcome. 
  * Proceed with any action at your own risk.
@@ -34,7 +34,7 @@ namespace deploya
     public partial class App : Application
     {
         public static string ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static string codename = "deploya";
+        public static string codename = "Dive";
         public static string copyright = "Copyright (c) 2018 - 2022 Exploitox. All rights reserved.";
 
         #region Parser options

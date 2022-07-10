@@ -18,5 +18,11 @@ namespace deploya.Pages
         {
             (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("apply");
         }
+
+        private void SwitchToCloudPage(object sender, RoutedEventArgs e)
+        {
+            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("cloud");
+        }
+
     }
 }

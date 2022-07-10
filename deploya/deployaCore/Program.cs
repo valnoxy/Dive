@@ -132,6 +132,7 @@ namespace deploya_core
                     if (ui == Entities.UI.Command)
                         Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                     Console.ResetColor();
+                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(301, ""); }
                     return;
                 }
 
@@ -164,6 +165,7 @@ namespace deploya_core
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(301, ""); }
                 return;
             }
             
@@ -222,7 +224,8 @@ namespace deploya_core
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                Environment.Exit(bootld.ExitCode);
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(303, ""); }
+                if (ui == Entities.UI.Command) { Environment.Exit(bootld.ExitCode); }
             }
 
             ConsoleUtility.WriteProgressBar(100, true);
@@ -275,19 +278,18 @@ namespace deploya_core
             {
                 case WimMessageType.Progress:
                     WimMessageProgress wimMessageProgress = (WimMessageProgress)message;
-                    
                     if (BW != null)
                     {
                         BW.ReportProgress(wimMessageProgress.PercentComplete, ""); // Update progress bar
                         BW.ReportProgress(202, ""); // Update progress text
                     }
-
                     ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
                     break;
                         
                 case WimMessageType.Error:
                     WimMessageError wimMessageError = (WimMessageError)message;
                     Console.WriteLine($"Error: {0} ({1})", (object)wimMessageError.Path, (object)wimMessageError.Win32ErrorCode);
+                    if (BW != null) { BW.ReportProgress(302, ""); }
                     break;
                     
                 case WimMessageType.Warning:

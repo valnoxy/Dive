@@ -31,6 +31,22 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+            <Grid Grid.Row="0">
+                <wpfui:Card>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image Grid.Column="0" x:Name="ImageIcon" Height="40"/>
+                        <TextBlock Grid.Column="1" x:Name="ImageName" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
+                        <TextBlock Grid.Column="2" x:Name="ImageFile" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                    </Grid>
+                </wpfui:Card>
+            </Grid>
+            
             <Grid Grid.Row="1">
                 <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>

@@ -10,6 +10,8 @@
 	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 	<Platforms>AnyCPU;x64</Platforms>
 	<ApplicationManifest>app.manifest</ApplicationManifest>
+	<ApplicationIcon>Dive.ico</ApplicationIcon>
+	<AssemblyName>Dive</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +23,7 @@
     <None Remove="Assets\icon-windows-server-2012-40.png" />
     <None Remove="Assets\icon-windows-vista-40.png" />
     <None Remove="Assets\icon-windows-xp-40.png" />
-    <None Remove="icon.png" />
+    <None Remove="Dive.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,11 +35,7 @@
     <Resource Include="Assets\icon-windows-server-2012-40.png" />
     <Resource Include="Assets\icon-windows-vista-40.png" />
     <Resource Include="Assets\icon-windows-xp-40.png" />
-    <Resource Include="icon.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="AutoDeploya\" />
+    <Resource Include="dive.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +49,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Pages\ApplyPages\CloudSelectStep.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Pages\CloudContent.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="Pages\ApplyPages\ApplySelectStep.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

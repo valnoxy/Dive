@@ -26,8 +26,10 @@ namespace deploya
             
 #if DEBUG
             DebugString.Visibility = Visibility.Visible;
+            DebugString.Text = "Debug build - This is not a production ready build.";
 #else
-            DebugString.Visibility = Visibility.Hidden;
+            DebugString.Visibility = Visibility.Visible;
+            DebugString.Text = "Beta build [B1 Internal]";
 #endif
         }
 
@@ -38,9 +40,11 @@ namespace deploya
 
         private void CommandLine_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("cmd.exe");
-        }
-
-        
+            Process p = new Process();
+            p.StartInfo.FileName = "cmd.exe";
+            p.StartInfo.CreateNoWindow = false;
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
+        }        
     }
 }

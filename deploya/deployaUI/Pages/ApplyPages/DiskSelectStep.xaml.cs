@@ -1,14 +1,10 @@
 ﻿using deploya_core;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml;
 
 namespace deploya.Pages.ApplyPages
 {
@@ -50,12 +46,20 @@ namespace deploya.Pages.ApplyPages
         public DiskSelectStep()
         {
             InitializeComponent();
+            
+            if (ApplyContent.ContentWindow != null)
+            {
+                ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                ApplyContent.ContentWindow.BackBtn.IsEnabled = true;
+            }
 
-            ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-            ApplyContent.ContentWindow.BackBtn.IsEnabled = true;
+            if (CloudContent.ContentWindow != null)
+            {
+                CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                CloudContent.ContentWindow.BackBtn.IsEnabled = true;
+            }
 
             ContentWindow = this;
-
             LoadDisks();
             CheckFirmware();
 
@@ -69,9 +73,15 @@ namespace deploya.Pages.ApplyPages
         private void CheckFirmware()
         {
             if (IsWindowsUEFI())
+            {
                 EFIRadio.IsChecked = true;
+                Common.Debug.WriteLine("Firmware detected: EFI", ConsoleColor.White);
+            }
             else
+            {
                 BIOSRadio.IsChecked = true;
+                Common.Debug.WriteLine("Firmware detected: BIOS / CSM", ConsoleColor.White);
+            }
         }
 
         private void LoadDisks()
@@ -144,9 +154,16 @@ namespace deploya.Pages.ApplyPages
                 {
                     string diskindex = itemData.Substring(ix + toBeSearched.Length);
                     Common.ApplyDetails.DiskIndex = Convert.ToInt32(diskindex);
-                    Console.WriteLine(Common.ApplyDetails.DiskIndex);
+                    Common.Debug.WriteLine($"Using disk {Common.ApplyDetails.DiskIndex} for deployment", ConsoleColor.White);
 
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = true;
+                    }
                 }
             }
         }
@@ -170,12 +187,12 @@ namespace deploya.Pages.ApplyPages
         {
             if ((bool)UseNTLDRBtn.IsChecked)
             {
-                Console.WriteLine("Using NTLDR");
+                Common.Debug.WriteLine("Using NTLDR", ConsoleColor.White);
                 return true;
             }
             else
             {
-                Console.WriteLine("Using BOOTMGR");
+                Common.Debug.WriteLine("Using BOOTMGR", ConsoleColor.White);
                 return false;
             }
         }
