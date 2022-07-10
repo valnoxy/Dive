@@ -65,12 +65,14 @@ namespace deploya.Pages.ApplyPages
             //   201: ProgText -> Prepare Disk
             //   202: ProgText -> Applying WIM
             //   203: ProgText -> Installing Bootloader
-            //   204: Installation complete
+            //   204: ProgText -> Installing recovery
+            //   205: Installation complete
             //
             // Error message handling
             //   301: Failed at preparing disk
             //   302: Failed at applying WIM
             //   303: Failed at installing bootloader
+            //   304: Failed at installing recovery
             //
             // Range 0-100 -> Progressbar percentage
             //
@@ -88,7 +90,9 @@ namespace deploya.Pages.ApplyPages
                 ProgrText.Text = $"Applying Image to disk ({ProgrBar.Value}%) ...";
             if (e.ProgressPercentage == 203)        // 203: ProgText -> Installing Bootloader
                 ProgrText.Text = "Installing bootloader to disk ...";
-            if (e.ProgressPercentage == 204)        // 204: Installation complete          
+            if (e.ProgressPercentage == 204)        // 204: ProgText -> Installing recovery
+                ProgrText.Text = "Registering recovery partition to Windows ...";
+            if (e.ProgressPercentage == 205)        // 205: Installation complete          
             {
                 ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
                 ProgrBar.Value = 100;
@@ -153,6 +157,24 @@ namespace deploya.Pages.ApplyPages
                 }
                 IsCanceled = true;
             }
+            if (e.ProgressPercentage == 304)        // 303: Failed at installing recovery
+            {
+                ProgrText.Text = "Failed at installing recovery. Please check your image and try again.";
+                ProgrBar.Value = 0;
+                if (ApplyContent.ContentWindow != null)
+                {
+                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+                if (CloudContent.ContentWindow != null)
+                {
+                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+                IsCanceled = true;
+            }
 
             // Progressbar percentage
             if (e.ProgressPercentage <= 100)
@@ -191,6 +213,7 @@ namespace deploya.Pages.ApplyPages
 
             // Apply image
             worker.ReportProgress(202, "");     // Applying Image Text
+            worker.ReportProgress(0, "");       // Value 0
             Actions.ApplyWIM(ui, "W:\\", Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
@@ -212,8 +235,21 @@ namespace deploya.Pages.ApplyPages
                 return;
             }
 
+            // Install Recovery (only for Vista and higher)
+            if (bootloader == Entities.Bootloader.BOOTMGR)
+            {
+                worker.ReportProgress(204, "");     // Installing Bootloader Text
+                Actions.InstallRecovery(ui, "W:\\Windows", "R:\\", worker);
+            
+                if (IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
             // Installation complete
-            worker.ReportProgress(204, "");     // Installation complete Text
+            worker.ReportProgress(205, "");     // Installation complete Text
         }
     }
 }

@@ -191,27 +191,32 @@ namespace deploya_core
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
 
             Process bootld = new Process();
-            bootld.StartInfo.FileName = "cmd.exe";
 
             #region Legacy check
             if (bootloader == Entities.Bootloader.NTLDR)
             {
                 string StrBl = BootloaderLetter.Substring(0, 2);
-                bootld.StartInfo.Arguments = $"/c \"bootsect /nt52 {StrBl} /force /mbr >NUL\"";
+                bootld.StartInfo.FileName = "bootsect.exe";
+                bootld.StartInfo.Arguments = $"/nt52 {StrBl} /force /mbr";
             }
             #endregion
 
             #region BIOS / EFI check
             if (bootloader == Entities.Bootloader.BOOTMGR)
             {
+                bootld.StartInfo.FileName = "bcdboot.exe";
+
                 if (firmware == Entities.Firmware.BIOS) // BIOS
-                    bootld.StartInfo.Arguments = $"/c \"bcdboot.exe {WindowsPath} /s {BootloaderLetter} /f BIOS >NUL\"";
+                    bootld.StartInfo.Arguments = $"{WindowsPath} /s {BootloaderLetter} /f BIOS";
 
                 if (firmware == Entities.Firmware.EFI) // EFI
-                    bootld.StartInfo.Arguments = $"/c \"bcdboot.exe {WindowsPath} /s {BootloaderLetter} /f UEFI >NUL\"";
+                    bootld.StartInfo.Arguments = $"{WindowsPath} /s {BootloaderLetter} /f UEFI";
             }
             #endregion
 
+            bootld.StartInfo.UseShellExecute = false;
+            bootld.StartInfo.RedirectStandardOutput = true;
+            bootld.StartInfo.CreateNoWindow = true;
             bootld.Start();
             bootld.WaitForExit();
 
@@ -230,13 +235,100 @@ namespace deploya_core
 
             ConsoleUtility.WriteProgressBar(100, true);
             Console.WriteLine();
-            if (ui == Entities.UI.Graphical)
-            {
-                worker.ReportProgress(101, "");
-                worker.ReportProgress(100, "");
-            }
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
-    
+
+        public static void InstallRecovery(Entities.UI ui, string WindowsPath, string RecoveryLetter, BackgroundWorker worker = null)
+        {
+            Output.Write("Installing Recovery ...       ");
+            ConsoleUtility.WriteProgressBar(0);
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
+
+            // Create Recovery directory
+            try
+            {
+                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(RecoveryLetter, "Recovery", "WindowsRE"));
+            }
+            catch 
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("");
+                Console.WriteLine("   An Error has occurred.");
+                Console.WriteLine("   Error: Cannot create recovery directory.");
+                if (ui == Entities.UI.Command)
+                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                Console.ResetColor();
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
+                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+            }
+
+            // Copy WinRE image to Recovery partition
+            try
+            {
+                if (System.IO.File.Exists(System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim")))
+                {
+                    System.IO.File.Copy(
+                        System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim"),
+                        System.IO.Path.Combine(RecoveryLetter, "Recovery", "WindowsRE", "Winre.wim"),
+                        true
+                    );
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("");
+                    Console.WriteLine("   An Error has occurred.");
+                    Console.WriteLine("   Error: Cannot find WindowsRE.wim.");
+                    if (ui == Entities.UI.Command)
+                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                    Console.ResetColor();
+                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
+                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                }
+            }
+            catch
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("");
+                Console.WriteLine("   An Error has occurred.");
+                Console.WriteLine("   Error: Cannot copy recovery image.");
+                if (ui == Entities.UI.Command)
+                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                Console.ResetColor();
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
+                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+            }
+
+            // Register recovery partition
+            try
+            {
+                Process p = new Process();
+                p.StartInfo.FileName = System.IO.Path.Combine(WindowsPath, "System32", "Reagentc.exe");
+                p.StartInfo.Arguments = $"/Setreimage /Path {RecoveryLetter}\\Recovery\\WindowsRE /Target {WindowsPath}";
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.CreateNoWindow = true;
+                p.Start();
+                p.WaitForExit();
+            }
+            catch
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("");
+                Console.WriteLine("   An Error has occurred.");
+                Console.WriteLine("   Error: Cannot register recovery partition.");
+                if (ui == Entities.UI.Command)
+                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                Console.ResetColor();
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
+                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+            }
+
+            ConsoleUtility.WriteProgressBar(100, true);
+            Console.WriteLine();
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+        }
+
+
         public static string GetInfo(string ImagePath)
         {
             using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
