@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace deploya.Common
+namespace deployaUI.Common
 {
     public static class ApplyDetails
     {

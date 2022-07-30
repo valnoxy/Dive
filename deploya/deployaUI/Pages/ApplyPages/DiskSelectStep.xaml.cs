@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace deploya.Pages.ApplyPages
+namespace deployaUI.Pages.ApplyPages
 {
     /// <summary>
     /// Interaktionslogik für DiskSelectStep.xaml

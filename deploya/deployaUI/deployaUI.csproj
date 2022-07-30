@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <None Remove="Assets\icon-aios-40.png" />
+    <None Remove="Assets\icon-hdd-40.png" />
     <None Remove="Assets\icon-windows-10-40.png" />
     <None Remove="Assets\icon-windows-11-40.png" />
     <None Remove="Assets\icon-windows-240.png" />
@@ -24,6 +25,10 @@
     <None Remove="Assets\icon-windows-vista-40.png" />
     <None Remove="Assets\icon-windows-xp-40.png" />
     <None Remove="Dive.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon-hdd-40.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +46,7 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="System.Management" Version="6.0.0" />
-    <PackageReference Include="WPF-UI" Version="2.0.1" />
+    <PackageReference Include="WPF-UI" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>

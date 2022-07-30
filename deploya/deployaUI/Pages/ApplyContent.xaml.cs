@@ -1,8 +1,8 @@
-﻿using deploya.Pages.ApplyPages;
+﻿using deployaUI.Pages.ApplyPages;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace deploya.Pages
+namespace deployaUI.Pages
 {
     /// <summary>
     /// Interaktionslogik für ApplyContent.xaml
@@ -37,7 +37,7 @@ namespace deploya.Pages
                     break;
                 case ApplySelectStep:
                     if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
-                        System.Diagnostics.Process.Start("wpeutil.exe", "restart");
+                        System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
                     else
                         System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
                     break;

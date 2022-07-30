@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using deploya.Pages;
+using deployaUI.Pages;
 
-namespace deploya.Pages
+namespace deployaUI.Pages
 {
     /// <summary>
     /// Interaktionslogik für Dashboard.xaml

@@ -2,24 +2,22 @@
 using System.Windows;
 using Wpf.Ui.Appearance;
 
-namespace deploya
+namespace deployaUI
 {
     /// <summary>
-    /// Interaction logic for MainUI.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Wpf.Ui.Controls.UiWindow
     {
         public MainWindow()
         {
             Wpf.Ui.Appearance.Background.Apply(
-              this,                                 // Window class
-              Wpf.Ui.Appearance.BackgroundType.Mica // Background type
+              this,         // Window class
+              BackgroundType.Mica // Background type
             );
 
-            Wpf.Ui.Appearance.Theme.Apply(
-              Wpf.Ui.Appearance.ThemeType.Dark,     // Theme type
-              Wpf.Ui.Appearance.BackgroundType.Mica, // Background type
-              true                                   // Whether to change accents automatically
+            Theme.Apply(
+              ThemeType.Dark      // Theme type
             );
 
             InitializeComponent();
@@ -29,7 +27,7 @@ namespace deploya
             DebugString.Text = "Debug build - This is not a production ready build.";
 #else
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Beta build [B1 Internal]";
+            DebugString.Text = "Beta build [B2 Internal]";
 #endif
         }
 

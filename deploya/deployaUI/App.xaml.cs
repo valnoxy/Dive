@@ -21,12 +21,10 @@ using CommandLine.Text;
 using System.Reflection;
 using System.IO;
 using deploya_core;
+using System.Drawing;
+using deployaUI;
 
-// Debug
-using System.Xml;
-// End Debug
-
-namespace deploya
+namespace deployaUI
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -92,6 +90,12 @@ namespace deploya
             wnd.ShowDialog();
             Environment.Exit(0);
         }
+        static void ShowAutoDive()
+        {
+            AutoDive wnd = new AutoDive();
+            wnd.ShowDialog();
+            Environment.Exit(0);
+        }
         #endregion
 
         [DllImport("kernel32.dll")]
@@ -107,16 +111,32 @@ namespace deploya
         {
             string[] args = Environment.GetCommandLineArgs();
             var handle = GetConsoleWindow();
-            ShowWindow(handle, SW_HIDE);
+            //ShowWindow(handle, SW_HIDE);
 
-#if DEBUG
             ShowWindow(handle, SW_SHOW);
             Console.Title = "Dive - Debug Console";
+            Console.WriteLine($"{codename} [Version: {ver}]"); // Header
+            Console.WriteLine(copyright + "\n"); // Copyright text
             Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
-#endif
 
-            if (args.Length == 1) 
-            {                
+            if (args.Length == 1)
+            {
+                DriveInfo[] allDrives = DriveInfo.GetDrives();
+                foreach (DriveInfo d in allDrives)
+                {
+                    if (File.Exists(Path.Combine(d.Name, ".diveconfig")))
+                    {
+                        string message = "Auto deployment config detected. Do you want to debug AutoDive?";
+                        string title = "AutoDive";
+                        MessageBoxButton buttons = MessageBoxButton.YesNo;
+                        MessageBoxResult result = MessageBox.Show(message, title, buttons, MessageBoxImage.Question);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            ShowAutoDive();
+                        }
+                    }
+                }
+
                 ShowGUI();
             }
 

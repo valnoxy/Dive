@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
 
-namespace deploya.Pages.ApplyPages
+namespace deployaUI.Pages.ApplyPages
 {
     /// <summary>
     /// Interaktionslogik für SKUSelectStep.xaml
@@ -78,38 +78,52 @@ namespace deploya.Pages.ApplyPages
                                 Common.Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
 
                                 string imageVersion = "";
-                                
+
                                 // Windows Client
-                                if (product_name.Contains("Windows XP"))
+                                if (product_name.ToLower().Contains("windows xp"))
                                     imageVersion = "windows-xp";
-                                if (product_name.Contains("Windows Vista"))
-                                    imageVersion = "windows-Vista";
-                                if (product_name.Contains("Windows 7"))
+                                if (product_name.ToLower().Contains("windows vista"))
+                                    imageVersion = "windows-vista";
+                                if (product_name.ToLower().Contains("windows 7"))
                                     imageVersion = "windows-7";
-                                if (product_name.Contains("Windows 8") || product_name.Contains("Windows 8.1"))
+                                if (product_name.ToLower().Contains("windows 8") || product_name.ToLower().Contains("windows 8.1"))
                                     imageVersion = "windows-10";
-                                if (product_name.Contains("Windows 10"))
+                                if (product_name.ToLower().Contains("windows 10"))
                                     imageVersion = "windows-10";
-                                if (product_name.Contains("Windows 11"))
+                                if (product_name.ToLower().Contains("windows 11"))
                                     imageVersion = "windows-11";
 
                                 // Windows Server
-                                if (product_name.Contains("Windows Server 2003"))
+                                if (product_name.ToLower().Contains("windows server 2003"))
                                     imageVersion = "windows-xp";
-                                if (product_name.Contains("Windows Server 2008"))
+                                if (product_name.ToLower().Contains("windows server 2008"))
                                     imageVersion = "windows-7";
-                                if (product_name.Contains("Windows Server 2012"))
+                                if (product_name.ToLower().Contains("windows server 2012"))
                                     imageVersion = "windows-server-2012";
-                                if (product_name.Contains("Windows Server 2016"))
+                                if (product_name.ToLower().Contains("windows server 2016"))
                                     imageVersion = "windows-server-2012";
-                                if (product_name.Contains("Windows Server 2019"))
+                                if (product_name.ToLower().Contains("windows server 2019"))
                                     imageVersion = "windows-server-2012";
-                                if (product_name.Contains("Windows Server 2022"))
+                                if (product_name.ToLower().Contains("windows server 2022"))
                                     imageVersion = "windows-server-2012";
-                                
+
                                 // Exploitox Internal
-                                if (product_name.Contains("AI Operating System") || product_name.Contains("AIOS"))
+                                if (product_name.ToLower().Contains("ai operating system") || product_name.ToLower().Contains("aios"))
                                     imageVersion = "aios";
+
+                                // Microsoft Internal / Other OS
+                                if (product_name.ToLower().Contains("windows core os") || product_name.ToLower().Contains("wcos"))
+                                    imageVersion = "windows-10";
+                                if (product_name.ToLower().Contains("phone"))
+                                    imageVersion = "windows-10";
+
+                                // Beta
+                                if (product_name.ToLower().Contains("whistler"))
+                                    imageVersion = "windows-xp";
+                                if (product_name.ToLower().Contains("longhorn"))
+                                    imageVersion = "windows-vista";
+                                if (product_name.ToLower().Contains("blue"))
+                                    imageVersion = "windows-10";
 
                                 images.Add(new Image { Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png", ImageFile = binary, Name = product_name, Index = product_id });
                                 counter++;

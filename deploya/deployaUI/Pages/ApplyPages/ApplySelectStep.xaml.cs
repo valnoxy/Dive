@@ -5,7 +5,7 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace deploya.Pages.ApplyPages
+namespace deployaUI.Pages.ApplyPages
 {
     /// <summary>
     /// Interaktionslogik für ApplySelectStep.xaml
