@@ -181,7 +181,7 @@ namespace deployaUI.Pages.ApplyPages
             }
             if (e.ProgressPercentage == 305)        // 305: Failed at installing unattend.xml
             {
-                ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image and try again.";
+                ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image or config and try again.";
                 ProgrBar.Value = 0;
                 if (ApplyContent.ContentWindow != null)
                 {
@@ -263,6 +263,19 @@ namespace deployaUI.Pages.ApplyPages
                 worker.ReportProgress(204, "");     // Installing Bootloader Text
                 Actions.InstallRecovery(ui, "W:\\Windows", "R:\\", worker);
             
+                if (IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            // Install unattend file (only for Vista and higher)
+            if (bootloader == Entities.Bootloader.BOOTMGR)
+            {
+                worker.ReportProgress(205, "");     // Installing unattend file Text
+                Actions.InstallUnattend(ui, "W:\\Windows", "R:\\", worker);
+
                 if (IsCanceled)
                 {
                     e.Cancel = true;

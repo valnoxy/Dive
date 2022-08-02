@@ -352,7 +352,7 @@ namespace deploya_core
                 if (ui == Entities.UI.Command) { Environment.Exit(1); }
             }
 
-            // Copy WinRE image to Recovery partition
+            // Write config to disk as unattend.xml
             try
             {
                 if (System.IO.File.Exists(System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim")))
@@ -388,31 +388,7 @@ namespace deploya_core
                 if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
                 if (ui == Entities.UI.Command) { Environment.Exit(1); }
             }
-
-            // Register recovery partition
-            try
-            {
-                Process p = new Process();
-                p.StartInfo.FileName = System.IO.Path.Combine(WindowsPath, "System32", "Reagentc.exe");
-                p.StartInfo.Arguments = $"/Setreimage /Path {RecoveryLetter}\\Recovery\\WindowsRE /Target {WindowsPath}";
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.CreateNoWindow = true;
-                p.Start();
-                p.WaitForExit();
-            }
-            catch
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot register recovery partition.");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
-            }
-
+            
             ConsoleUtility.WriteProgressBar(100, true);
             Console.WriteLine();
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
