@@ -54,7 +54,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="Deployment configuration" />
+                            Text="Deployment Settings (unattend.xml)" />
                     </Grid>
                 </Expander.Header>
 
@@ -69,7 +69,20 @@
                             FontSize="14"
                             Margin="0,6,0,0"
                             Text="Username" />
-                        <wpfui:TextBox x:Name="TbUser" Grid.Column="1" Icon="Person24" PlaceholderText="SMB Share" IsEnabled="false" />
+                        <wpfui:TextBox x:Name="TbUser" Grid.Column="1" Icon="Person24" PlaceholderText="Local Username" IsEnabled="true" TextChanged="TbUser_OnTextChanged"/>
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            FontSize="14"
+                            Margin="0,6,0,0"
+                            Text="Password" />
+                        <wpfui:TextBox x:Name="TbPassword" Grid.Column="1" Icon="Key24" PlaceholderText="Password of Local User" IsEnabled="false" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
@@ -82,9 +95,9 @@
                         <TextBlock
                             FontSize="14"
                             Margin="0,6,0,0"
-                            Text="Password" />
-                        <wpfui:TextBox x:Name="TbPassword" Grid.Column="1" Icon="Key24" PlaceholderText="SMB Share" IsEnabled="false" />
-                        <ToggleButton Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" />
+                            Text="Config file" />
+                        <wpfui:TextBox x:Name="TbCustomFile" Grid.Column="1" Icon="Document24" PlaceholderText="Custom unattend.xml file" IsEnabled="false" />
+                        <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" Icon="DocumentSearch24" Click="ConfigFile_Click"/>
                     </Grid>
                 </StackPanel>
 
@@ -108,7 +121,7 @@
                 <wpfui:Button Grid.Column="3" Icon="Eraser24" Content="Format" Margin="0,15,15,0" Appearance="Danger" Visibility="Hidden"/>
 
                 <ToggleButton Grid.Column="1" x:Name="UseNTLDRBtn" Content="Use NTLDR (XP)" Margin="0,15,15,0"/>
-                <ToggleButton Grid.Column="2" Content="Use auto configuration (WIP)" Margin="0,15,15,0"/>
+                <wpfui:Button Grid.Column="2" Icon="Toolbox28" Content="Add driver" IsEnabled="false" Margin="0,15,15,0"/>
                 <RadioButton Grid.Column="3" x:Name="BIOSRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="BIOS" Margin="0,15,0,0" MaxWidth="1" Checked="BIOSRadio_Checked" />
                 <RadioButton Grid.Column="4" x:Name="EFIRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
             </Grid>

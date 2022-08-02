@@ -1,10 +1,12 @@
 ﻿using deploya_core;
 using System;
+using System.IO;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace deployaUI.Pages.ApplyPages
 {
@@ -62,6 +64,7 @@ namespace deployaUI.Pages.ApplyPages
             ContentWindow = this;
             LoadDisks();
             CheckFirmware();
+            Console.WriteLine(Common.DeploymentInfo.PreConfigUserPass);
 
             if (Common.ApplyDetails.Name.Contains("Windows XP"))
             {
@@ -173,6 +176,13 @@ namespace deployaUI.Pages.ApplyPages
             LoadDisks();
         }
 
+        private void ConfigFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                TbCustomFile.Text = openFileDialog.FileName;
+        }
+
         private void EFIRadio_Checked(object sender, RoutedEventArgs e)
         {
             Common.ApplyDetails.UseEFI = true;
@@ -194,6 +204,19 @@ namespace deployaUI.Pages.ApplyPages
             {
                 Common.Debug.WriteLine("Using BOOTMGR", ConsoleColor.White);
                 return false;
+            }
+        }
+
+        private void TbUser_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (TbUser.Text == "")
+            {
+                TbPassword.IsEnabled = false;
+                TbPassword.Text = "";
+            }
+            else
+            {
+                TbPassword.IsEnabled = true;
             }
         }
     }

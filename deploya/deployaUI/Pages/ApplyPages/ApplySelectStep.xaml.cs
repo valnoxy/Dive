@@ -66,13 +66,15 @@ namespace deployaUI.Pages.ApplyPages
             //   202: ProgText -> Applying WIM
             //   203: ProgText -> Installing Bootloader
             //   204: ProgText -> Installing recovery
-            //   205: Installation complete
+            //   205: ProgText -> Installing unattend.xml
+            //   250: Installation complete
             //
             // Error message handling
             //   301: Failed at preparing disk
             //   302: Failed at applying WIM
             //   303: Failed at installing bootloader
             //   304: Failed at installing recovery
+            //   305: Failed at installing unattend.xml
             //
             // Range 0-100 -> Progressbar percentage
             //
@@ -92,7 +94,9 @@ namespace deployaUI.Pages.ApplyPages
                 ProgrText.Text = "Installing bootloader to disk ...";
             if (e.ProgressPercentage == 204)        // 204: ProgText -> Installing recovery
                 ProgrText.Text = "Registering recovery partition to Windows ...";
-            if (e.ProgressPercentage == 205)        // 205: Installation complete          
+            if (e.ProgressPercentage == 205)        // 205: ProgText -> Installing unattend.xml
+                ProgrText.Text = "Copying unattend.xml to disk ...";
+            if (e.ProgressPercentage == 250)        // 250: Installation complete          
             {
                 ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
                 ProgrBar.Value = 100;
@@ -157,9 +161,27 @@ namespace deployaUI.Pages.ApplyPages
                 }
                 IsCanceled = true;
             }
-            if (e.ProgressPercentage == 304)        // 303: Failed at installing recovery
+            if (e.ProgressPercentage == 304)        // 304: Failed at installing recovery
             {
                 ProgrText.Text = "Failed at installing recovery. Please check your image and try again.";
+                ProgrBar.Value = 0;
+                if (ApplyContent.ContentWindow != null)
+                {
+                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+                if (CloudContent.ContentWindow != null)
+                {
+                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+                IsCanceled = true;
+            }
+            if (e.ProgressPercentage == 305)        // 305: Failed at installing unattend.xml
+            {
+                ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image and try again.";
                 ProgrBar.Value = 0;
                 if (ApplyContent.ContentWindow != null)
                 {
@@ -249,7 +271,7 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Installation complete
-            worker.ReportProgress(205, "");     // Installation complete Text
+            worker.ReportProgress(250, "");     // Installation complete Text
         }
     }
 }
