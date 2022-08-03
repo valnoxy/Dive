@@ -29,6 +29,11 @@ namespace deployaUI
             DebugString.Visibility = Visibility.Visible;
             DebugString.Text = "Beta build [B2 Internal]";
 #endif
+            // Get version
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+            VersionString.Text = $"[{version}]";
         }
 
         private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)

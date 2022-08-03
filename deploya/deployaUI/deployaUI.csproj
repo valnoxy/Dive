@@ -12,6 +12,12 @@
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<ApplicationIcon>Dive.ico</ApplicationIcon>
 	<AssemblyName>Dive</AssemblyName>
+	<Company>Exploitox</Company>
+	<Authors>valnoxy</Authors>
+	<Version>1.0.0.249</Version>
+	<Copyright>Copyright (c) 2018 - 2022 Exploitox. All rights reserved.</Copyright>
+	<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -68,5 +74,9 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\tools\bin\i386\signtool.exe&quot; sign /sha1 &quot;f7125a71d214eeecf79461d790a62067e3607169&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;)" />
+  </Target>
 
 </Project>

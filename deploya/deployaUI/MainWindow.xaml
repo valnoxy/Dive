@@ -63,6 +63,7 @@
                     <ui:NavigationItem
                         Content="About"
                         Icon="QuestionCircle24"
+                        PageType="{x:Type pages:AboutPage}"
                         PageTag="help"/>
                 </ui:NavigationStore.Footer>
             </ui:NavigationStore>
@@ -111,9 +112,15 @@
                 </ui:NotifyIcon>
             </ui:TitleBar.Tray>
         </ui:TitleBar>
-        <TextBlock HorizontalAlignment="Left" Margin="211,17,0,0" VerticalAlignment="Top" FontSize="14" x:Name="VersionString">
-            [1.0]
-            <TextBlock x:Name="DebugString" Margin="5,0,0,0" Foreground="Red"></TextBlock>
-        </TextBlock>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="1.0" HorizontalAlignment="Left" Margin="211,17,0,0" VerticalAlignment="Top" FontSize="14" x:Name="VersionString"/>
+            <TextBlock Grid.Column="1" x:Name="DebugString" Text="Debug" Margin="0,17,50,0" Foreground="Red" TextAlignment="Right" HorizontalAlignment="Right"/>
+        </Grid>
+        
     </Grid>
 </ui:UiWindow>

@@ -144,7 +144,7 @@
                             Content="Source code on GitHub"
                             Margin="0,0,8,0"
                             Icon="Link48"
-                            NavigateUri="https://github.com/valnoxy/deploya" />
+                            NavigateUri="https://github.com/valnoxy/dive" />
                     </Grid>
                     <Grid Grid.Column="1">
                         <wpfui:Anchor
@@ -153,8 +153,6 @@
                             NavigateUri="https://exploitox.de/deploya" />
                     </Grid>
                 </Grid>
-
-
             </StackPanel>
         </Grid>
     </Grid>

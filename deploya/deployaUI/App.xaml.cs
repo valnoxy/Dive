@@ -111,9 +111,12 @@ namespace deployaUI
         {
             string[] args = Environment.GetCommandLineArgs();
             var handle = GetConsoleWindow();
-            //ShowWindow(handle, SW_HIDE);
 
+#if DEBUG
             ShowWindow(handle, SW_SHOW);
+#else
+            ShowWindow(handle, SW_HIDE);
+#endif
             Console.Title = "Dive - Debug Console";
             Console.WriteLine($"{codename} [Version: {ver}]"); // Header
             Console.WriteLine(copyright + "\n"); // Copyright text
@@ -174,9 +177,9 @@ namespace deployaUI
             if (diskId.Contains("\\\\.\\PHYSICALDRIVE"))
                 diskId = new string(Enumerable.ToArray<char>(Enumerable.Where<char>((IEnumerable<char>)diskId, new Func<char, bool>(char.IsDigit))));
 
-            #region Check options
+#region Check options
 
-            #region WIM-File
+#region WIM-File
             Console.ForegroundColor = ConsoleColor.Magenta;
             if (!File.Exists(image))
             {
@@ -185,9 +188,9 @@ namespace deployaUI
                 Environment.Exit(1);
             }
             Console.WriteLine("[i] Image     = " + image);
-            #endregion
+#endregion
 
-            #region Target
+#region Target
             if (App.GetDiskIndex(diskId) > 0U)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -196,9 +199,9 @@ namespace deployaUI
                 Environment.Exit(1);
             }
             Console.WriteLine("[i] Target    = disk" + diskId);
-            #endregion
+#endregion
 
-            #region BIOS type & Bootloader
+#region BIOS type & Bootloader
 
             if (options.efi && options.ntldr)
             {
@@ -224,9 +227,9 @@ namespace deployaUI
                 Console.WriteLine("[i] Legacy    = false");
             }
 
-            #endregion
+#endregion
 
-            #endregion
+#endregion
 
             Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
             Actions.ApplyWIM(ui, "W:\\", options.wimfile, options.index);
@@ -238,7 +241,7 @@ namespace deployaUI
                 Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "W:\\");
         }
 
-        #region Get Disk index
+#region Get Disk index
         public static int GetDiskIndex(string diskId)
         {
             // string tempPath = Path.GetTempPath();
@@ -255,6 +258,6 @@ namespace deployaUI
             // try { File.Delete(Path.Combine(tempPath, "getdiskindex.cmd")); } catch { }
             return end.Contains(diskId) ? 0 : -1;
         }
-        #endregion
+#endregion
     }
 }
