@@ -16,6 +16,7 @@ namespace deployaUI.Common
         public static int DiskIndex { get; set; }
         public static bool UseEFI { get; set; }
         public static bool UseNTLDR { get; set; }
+        public static bool UseRecovery { get; set; }
     }
 
     public static class DeploymentInfo

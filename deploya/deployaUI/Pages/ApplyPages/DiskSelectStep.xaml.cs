@@ -64,12 +64,17 @@ namespace deployaUI.Pages.ApplyPages
             ContentWindow = this;
             LoadDisks();
             CheckFirmware();
-            Console.WriteLine(Common.DeploymentInfo.PreConfigUserPass);
 
-            if (Common.ApplyDetails.Name.Contains("Windows XP"))
+            if (Common.ApplyDetails.Name.ToLower().Contains("windows xp"))
             {
                 UseNTLDRBtn.IsChecked = true;
                 BIOSRadio.IsChecked = true;
+                UseRecoveryBtn.IsChecked = false;
+            }
+            else
+            {
+                UseNTLDRBtn.IsChecked = false;
+                UseRecoveryBtn.IsChecked = true;
             }
         }
 
@@ -179,8 +184,13 @@ namespace deployaUI.Pages.ApplyPages
         private void ConfigFile_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Deployment Information (*.xml)|*.xml";
             if (openFileDialog.ShowDialog() == true)
+            {
                 TbCustomFile.Text = openFileDialog.FileName;
+                TbUser.Clear();
+                TbUser.IsEnabled = false;
+            }
         }
 
         private void EFIRadio_Checked(object sender, RoutedEventArgs e)
@@ -207,6 +217,20 @@ namespace deployaUI.Pages.ApplyPages
             }
         }
 
+        public bool IsRecoveryChecked()
+        {
+            if ((bool)UseRecoveryBtn.IsChecked)
+            {
+                Common.Debug.WriteLine("Using Recovery partition", ConsoleColor.White);
+                return true;
+            }
+            else
+            {
+                Common.Debug.WriteLine("Using no Recovery partition", ConsoleColor.White);
+                return false;
+            }
+        }
+
         private void TbUser_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             if (TbUser.Text == "")
@@ -217,7 +241,24 @@ namespace deployaUI.Pages.ApplyPages
             else
             {
                 TbPassword.IsEnabled = true;
+                Common.DeploymentInfo.Username = TbUser.Text;
             }
+        }
+
+        private void TbPassword_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Common.DeploymentInfo.Password = TbPassword.Text;
+        }
+
+        private void ClearConfigTb_Click(object sender, RoutedEventArgs e)
+        {
+            TbCustomFile.Clear();
+            TbUser.IsEnabled = true;
+        }
+
+        private void TbCustomFile_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Common.DeploymentInfo.CustomFilePath = TbCustomFile.Text;
         }
     }
 }

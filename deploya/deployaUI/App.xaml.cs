@@ -228,7 +228,7 @@ namespace deployaUI
 
             #endregion
 
-            Actions.PrepareDisk(firmware, bootloader, ui, options.driveid);
+            Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
             Actions.ApplyWIM(ui, "W:\\", options.wimfile, options.index);
 
             if (bootloader == Entities.Bootloader.BOOTMGR)

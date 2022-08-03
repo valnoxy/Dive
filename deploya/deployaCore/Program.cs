@@ -14,6 +14,7 @@ using Microsoft.Wim;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 
 namespace deploya_core
 {
@@ -73,7 +74,7 @@ namespace deploya_core
     {
         public static BackgroundWorker progBar = null;
 
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, BackgroundWorker worker = null)
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, bool UseRecovery, BackgroundWorker worker = null)
         {
             Output.Write("Partitioning disk ...         ");
             ConsoleUtility.WriteProgressBar(0);
@@ -102,22 +103,39 @@ namespace deploya_core
                 }
                 if (bootloader == Entities.Bootloader.BOOTMGR)
                 {
-                    partDest.StandardInput.WriteLine("select disk " + disk);
-                    partDest.StandardInput.WriteLine("clean");
-                    partDest.StandardInput.WriteLine("create partition primary size=100");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                    partDest.StandardInput.WriteLine("assign letter=S");
-                    partDest.StandardInput.WriteLine("active");
-                    partDest.StandardInput.WriteLine("create partition primary");
-                    partDest.StandardInput.WriteLine("shrink minimum=650");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("assign letter=W");
-                    partDest.StandardInput.WriteLine("create partition primary");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                    partDest.StandardInput.WriteLine("assign letter=R");
-                    partDest.StandardInput.WriteLine("set id=27");
-                    partDest.StandardInput.WriteLine("exit");
-                    partDest.WaitForExit();
+                    if (UseRecovery)
+                    {
+                        partDest.StandardInput.WriteLine("select disk " + disk);
+                        partDest.StandardInput.WriteLine("clean");
+                        partDest.StandardInput.WriteLine("create partition primary size=100");
+                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
+                        partDest.StandardInput.WriteLine("assign letter=S");
+                        partDest.StandardInput.WriteLine("active");
+                        partDest.StandardInput.WriteLine("create partition primary");
+                        partDest.StandardInput.WriteLine("shrink minimum=650");
+                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                        partDest.StandardInput.WriteLine("assign letter=W");
+                        partDest.StandardInput.WriteLine("create partition primary");
+                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
+                        partDest.StandardInput.WriteLine("assign letter=R");
+                        partDest.StandardInput.WriteLine("set id=27");
+                        partDest.StandardInput.WriteLine("exit");
+                        partDest.WaitForExit();
+                    }
+                    else
+                    {
+                        partDest.StandardInput.WriteLine("select disk " + disk);
+                        partDest.StandardInput.WriteLine("clean");
+                        partDest.StandardInput.WriteLine("create partition primary size=100");
+                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
+                        partDest.StandardInput.WriteLine("assign letter=S");
+                        partDest.StandardInput.WriteLine("active");
+                        partDest.StandardInput.WriteLine("create partition primary");
+                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                        partDest.StandardInput.WriteLine("assign letter=W");
+                        partDest.StandardInput.WriteLine("exit");
+                        partDest.WaitForExit();
+                    }
                 }
             }
 
@@ -136,23 +154,41 @@ namespace deploya_core
                     return;
                 }
 
-                partDest.StandardInput.WriteLine("select disk " + disk);
-                partDest.StandardInput.WriteLine("clean");
-                partDest.StandardInput.WriteLine("convert gpt");
-                partDest.StandardInput.WriteLine("create partition efi size=100");
-                partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
-                partDest.StandardInput.WriteLine("assign letter=S");
-                partDest.StandardInput.WriteLine("create partition msr size=16");
-                partDest.StandardInput.WriteLine("create partition primary");
-                partDest.StandardInput.WriteLine("shrink minimum=650");
-                partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                partDest.StandardInput.WriteLine("assign letter=W");
-                partDest.StandardInput.WriteLine("create partition primary");
-                partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                partDest.StandardInput.WriteLine("assign letter=R");
-                partDest.StandardInput.WriteLine("set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac");
-                partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
-                partDest.StandardInput.WriteLine("exit");
+                if (UseRecovery)
+                {
+                    partDest.StandardInput.WriteLine("select disk " + disk);
+                    partDest.StandardInput.WriteLine("clean");
+                    partDest.StandardInput.WriteLine("convert gpt");
+                    partDest.StandardInput.WriteLine("create partition efi size=100");
+                    partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
+                    partDest.StandardInput.WriteLine("assign letter=S");
+                    partDest.StandardInput.WriteLine("create partition msr size=16");
+                    partDest.StandardInput.WriteLine("create partition primary");
+                    partDest.StandardInput.WriteLine("shrink minimum=650");
+                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                    partDest.StandardInput.WriteLine("assign letter=W");
+                    partDest.StandardInput.WriteLine("create partition primary");
+                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
+                    partDest.StandardInput.WriteLine("assign letter=R");
+                    partDest.StandardInput.WriteLine("set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac");
+                    partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
+                    partDest.StandardInput.WriteLine("exit");
+                }
+                else
+                {
+                    partDest.StandardInput.WriteLine("select disk " + disk);
+                    partDest.StandardInput.WriteLine("clean");
+                    partDest.StandardInput.WriteLine("convert gpt");
+                    partDest.StandardInput.WriteLine("create partition efi size=100");
+                    partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
+                    partDest.StandardInput.WriteLine("assign letter=S");
+                    partDest.StandardInput.WriteLine("create partition msr size=16");
+                    partDest.StandardInput.WriteLine("create partition primary");
+                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                    partDest.StandardInput.WriteLine("assign letter=W");
+                    partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
+                    partDest.StandardInput.WriteLine("exit");
+                }
                 partDest.WaitForExit();                    
             }
 
@@ -330,7 +366,7 @@ namespace deploya_core
 
         public static void InstallUnattend(Entities.UI ui, string WindowsPath, string Configuration, BackgroundWorker worker = null)
         {
-            Output.Write("Installing unattend file ...       ");
+            Output.Write("Installing unattend file ...  ");
             ConsoleUtility.WriteProgressBar(0);
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
 
@@ -355,37 +391,18 @@ namespace deploya_core
             // Write config to disk as unattend.xml
             try
             {
-                if (System.IO.File.Exists(System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim")))
-                {
-                    System.IO.File.Copy(
-                        System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim"),
-                        System.IO.Path.Combine(RecoveryLetter, "Recovery", "WindowsRE", "Winre.wim"),
-                        true
-                    );
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: Cannot find WindowsRE.wim.");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
-                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
-                }
+                System.IO.File.WriteAllText(System.IO.Path.Combine(WindowsPath, "Panther", "unattend.xml"), Configuration);
             }
             catch
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("");
                 Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot copy recovery image.");
+                Console.WriteLine("   Error: Cannot write content of unattend.xml!");
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(305, ""); }
                 if (ui == Entities.UI.Command) { Environment.Exit(1); }
             }
             

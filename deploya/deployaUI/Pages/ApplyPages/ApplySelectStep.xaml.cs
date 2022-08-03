@@ -1,6 +1,7 @@
 ﻿using deploya_core;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -36,6 +37,80 @@ namespace deployaUI.Pages.ApplyPages
                 Common.ApplyDetails.UseNTLDR = true;
             else 
                 Common.ApplyDetails.UseNTLDR = false;
+
+            if (DiskSelectStep.ContentWindow.IsRecoveryChecked())
+                Common.ApplyDetails.UseRecovery = true;
+            else
+                Common.ApplyDetails.UseRecovery = false;
+
+            // Update unattend.xml config
+            Common.DeploymentInfo.PreConfigUserPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <UserAccounts>
+                <LocalAccounts>
+                    <LocalAccount wcm:action=""add"">
+                        <Password>
+                            <Value>{Common.DeploymentInfo.Password}</Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+                        <Name>{Common.DeploymentInfo.Username}</Name>
+                        <Group>Administratoren</Group>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>";
+
+            Common.DeploymentInfo.PreConfigAdminPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>{Common.DeploymentInfo.Username}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+            </UserAccounts>
+            <AutoLogon>
+                <Username>Administrator</Username>
+                <Password>
+                    <Value>{Common.DeploymentInfo.Password}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+            </AutoLogon>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>
+";
+
+            Common.DeploymentInfo.PreConfigAdminWithoutPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <AutoLogon>
+                <Username>Administrator</Username>
+            </AutoLogon>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>
+";
+
+            
+
+            Console.WriteLine("=====================================================");
+            Console.WriteLine(Common.DeploymentInfo.PreConfigUserPass);
+            Console.WriteLine("=====================================================");
+            Console.WriteLine(Common.DeploymentInfo.PreConfigAdminPass);
+            Console.WriteLine("=====================================================");
+            Console.WriteLine(Common.DeploymentInfo.PreConfigAdminWithoutPass);
+            Console.WriteLine("=====================================================");
+
 
             // Set active Image to card
             ImageName.Text = Common.ApplyDetails.Name;
@@ -226,7 +301,7 @@ namespace deployaUI.Pages.ApplyPages
 
             // Prepare disk
             worker.ReportProgress(201, "");     // Prepare Disk Text
-            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, worker);
+            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, Common.ApplyDetails.UseRecovery, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -258,7 +333,7 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Install Recovery (only for Vista and higher)
-            if (bootloader == Entities.Bootloader.BOOTMGR)
+            if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
                 worker.ReportProgress(204, "");     // Installing Bootloader Text
                 Actions.InstallRecovery(ui, "W:\\Windows", "R:\\", worker);
@@ -271,10 +346,33 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Install unattend file (only for Vista and higher)
-            if (bootloader == Entities.Bootloader.BOOTMGR)
+            if (Common.DeploymentInfo.Username != null || Common.DeploymentInfo.CustomFilePath != null)
             {
                 worker.ReportProgress(205, "");     // Installing unattend file Text
-                Actions.InstallUnattend(ui, "W:\\Windows", "R:\\", worker);
+
+                // Building config
+                string config = "";
+                if (Common.DeploymentInfo.Username != null && Common.DeploymentInfo.Password != null)
+                {
+                    config = Common.DeploymentInfo.PreConfigUserPass;
+                }
+
+                if (Common.DeploymentInfo.Username == "Administrator")
+                {
+                    if (Common.DeploymentInfo.Password != null)
+                        config = Common.DeploymentInfo.PreConfigAdminWithoutPass;
+                    else
+                        config = Common.DeploymentInfo.PreConfigAdminPass;
+                }
+
+                if (File.Exists(Common.DeploymentInfo.CustomFilePath))
+                {
+                    config = File.ReadAllText(Common.DeploymentInfo.CustomFilePath);
+                }
+
+                Console.WriteLine(config);
+
+                Actions.InstallUnattend(ui, "W:\\Windows", config, worker);
 
                 if (IsCanceled)
                 {
