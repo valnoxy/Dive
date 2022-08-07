@@ -1,10 +1,10 @@
-<h1 align="center"><br><img src="https://dl.exploitox.de/other/dive.png" alt="deploya Logo" width=100></h1>
+<h1 align="center"><br><img src="https://dl.exploitox.de/other/dive.png" alt="Dive Logo" width=100></h1>
 
 <h3 align="center">Dive - Deployment is very easy</h3>
 <p align="center">
     Easy Deployment for Windows
     <br />
-    <strong>Version: </strong>1.0
+    <strong>Version: </strong>1.0.0.249 (Beta 2)
     <br />
     <br />
     <a href="https://github.com/valnoxy/dive/releases"><strong>Download now »</strong></a>
@@ -33,7 +33,7 @@ Dive (formally deploya) is a little application for deploying Windows on a machi
 3. Create a new Folder called "WIMs" on your USB flash drive.
 4. Copy your WIM-Files to the "WIMs" Folder. You can extract the WIM file from every Windows iso between Windows Vista and higher. 
 
-> Note: In some cases, you will only find a ESD file instead. In that case, you'll need to convert the ESD file to a WIM file. You can follow [this guide](https://community.spiceworks.com/how_to/163540-convert-esd-to-wim) to do so.
+> **Note** In some cases, you will only find a ESD file instead. In that case, you'll need to convert the ESD file to a WIM file. You can follow [this guide](https://community.spiceworks.com/how_to/163540-convert-esd-to-wim) to do so.
 
 ## Screenshots
 ![Windows PE with Dive](https://dl.exploitox.de/other/dive-screenshot1.png)
