@@ -101,17 +101,6 @@ namespace deployaUI.Pages.ApplyPages
 </unattend>
 ";
 
-            
-
-            Console.WriteLine("=====================================================");
-            Console.WriteLine(Common.DeploymentInfo.PreConfigUserPass);
-            Console.WriteLine("=====================================================");
-            Console.WriteLine(Common.DeploymentInfo.PreConfigAdminPass);
-            Console.WriteLine("=====================================================");
-            Console.WriteLine(Common.DeploymentInfo.PreConfigAdminWithoutPass);
-            Console.WriteLine("=====================================================");
-
-
             // Set active Image to card
             ImageName.Text = Common.ApplyDetails.Name;
             ImageFile.Text = Common.ApplyDetails.FileName;

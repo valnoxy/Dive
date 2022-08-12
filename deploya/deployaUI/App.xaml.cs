@@ -131,12 +131,23 @@ namespace deployaUI
                     {
                         string message = "Auto deployment config detected. Do you want to debug AutoDive?";
                         string title = "AutoDive";
-                        MessageBoxButton buttons = MessageBoxButton.YesNo;
-                        MessageBoxResult result = MessageBox.Show(message, title, buttons, MessageBoxImage.Question);
-                        if (result == MessageBoxResult.Yes)
+                        string btn1 = "No";
+                        string btn2 = "Yes";
+
+                        var w = new MessageUI(title, message, btn1, btn2);
+                        if (w.ShowDialog() == false)
                         {
-                            ShowAutoDive();
+                            string summary = w.Summary;
+                            if (summary == "Btn2")
+                            {
+                                ShowAutoDive();
+                            }
                         }
+                        // MessageBoxResult result = MessageBox.Show(message, title, buttons, MessageBoxImage.Question);
+                        //if (result == MessageBoxResult.Yes)
+                        //{
+                        //    ShowAutoDive();
+                        //}
                     }
                 }
 
