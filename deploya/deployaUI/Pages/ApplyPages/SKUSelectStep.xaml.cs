@@ -80,6 +80,8 @@ namespace deployaUI.Pages.ApplyPages
                                 string imageVersion = "";
 
                                 // Windows Client
+                                if (product_name.ToLower().Contains("windows 2000"))
+                                    imageVersion = "windows-2000";
                                 if (product_name.ToLower().Contains("windows xp"))
                                     imageVersion = "windows-xp";
                                 if (product_name.ToLower().Contains("windows vista"))

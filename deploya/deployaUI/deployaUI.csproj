@@ -25,6 +25,7 @@
     <None Remove="Assets\icon-hdd-40.png" />
     <None Remove="Assets\icon-windows-10-40.png" />
     <None Remove="Assets\icon-windows-11-40.png" />
+    <None Remove="Assets\icon-windows-2000-40.png" />
     <None Remove="Assets\icon-windows-240.png" />
     <None Remove="Assets\icon-windows-7-40.png" />
     <None Remove="Assets\icon-windows-server-2012-40.png" />
@@ -41,6 +42,7 @@
     <Resource Include="Assets\icon-aios-40.png" />
     <Resource Include="Assets\icon-windows-10-40.png" />
     <Resource Include="Assets\icon-windows-11-40.png" />
+    <Resource Include="Assets\icon-windows-2000-40.png" />
     <Resource Include="Assets\icon-windows-240.png" />
     <Resource Include="Assets\icon-windows-7-40.png" />
     <Resource Include="Assets\icon-windows-server-2012-40.png" />
@@ -76,7 +78,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe&quot; sign /sha1 &quot;f7125a71d214eeecf79461d790a62067e3607169&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;)" />
+    <Exec Command="for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe&quot; sign /sha1 &quot;35f4e53a88751bbe67eaa097513e3db1ad2f49e3&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;)" />
   </Target>
 
 </Project>

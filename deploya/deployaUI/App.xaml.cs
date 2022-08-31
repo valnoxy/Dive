@@ -133,21 +133,22 @@ namespace deployaUI
                         string title = "AutoDive";
                         string btn1 = "No";
                         string btn2 = "Yes";
+                        MessageBoxButton buttons = MessageBoxButton.YesNo;
 
-                        var w = new MessageUI(title, message, btn1, btn2);
-                        if (w.ShowDialog() == false)
+                        // var w = new MessageUI(title, message, btn1, btn2);
+                        // if (w.ShowDialog() == false)
+                        // {
+                        //     string summary = w.Summary;
+                        //     if (summary == "Btn2")
+                        //     {
+                        //         ShowAutoDive();
+                        //     }
+                        // }
+                        MessageBoxResult result = MessageBox.Show(message, title, buttons, MessageBoxImage.Question);
+                        if (result == MessageBoxResult.Yes)
                         {
-                            string summary = w.Summary;
-                            if (summary == "Btn2")
-                            {
-                                ShowAutoDive();
-                            }
+                            ShowAutoDive();
                         }
-                        // MessageBoxResult result = MessageBox.Show(message, title, buttons, MessageBoxImage.Question);
-                        //if (result == MessageBoxResult.Yes)
-                        //{
-                        //    ShowAutoDive();
-                        //}
                     }
                 }
 
