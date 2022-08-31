@@ -48,4 +48,4 @@ Clone this source and restore the NUGET Packages.
 ## 🧾 License
 Dive is licensed under [GNU GENERAL PUBLIC LICENSE](https://github.com/valnoxy/dive/blob/main/LICENSE). So you are allowed to use freely and modify the application. I will not be responsible for any outcome. Proceed with any action at your own risk.
 
-```Copyright (c) 2018 - 2022 valnoxy. By Jonas G. <jonas@exploitox.de> ```
+```Copyright (c) 2018 - 2022 valnoxy. By Jonas Günner <jonas@exploitox.de> ```
