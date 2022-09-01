@@ -127,10 +127,10 @@ namespace deployaUI.Pages.ApplyPages
             //
             // Standard Message handling
             //   201: ProgText -> Prepare Disk
-            //   202: ProgText -> Applying WIM
-            //   203: ProgText -> Installing Bootloader
-            //   204: ProgText -> Installing recovery
-            //   205: ProgText -> Installing unattend.xml
+            //   202: ProgText -> Apply WIM
+            //   203: ProgText -> Install Bootloader
+            //   204: ProgText -> Install recovery
+            //   205: ProgText -> Install unattend.xml
             //   250: Installation complete
             //
             // Error message handling
@@ -144,122 +144,130 @@ namespace deployaUI.Pages.ApplyPages
             //
 
             // Progress bar handling
-            if (e.ProgressPercentage == 101)        // 101: Progressbar is not Indeterminate
-                ProgrBar.IsIndeterminate = false;
-            if (e.ProgressPercentage == 102)        // 102: Progressbar is Indeterminate
-                ProgrBar.IsIndeterminate = true;
+            switch (e.ProgressPercentage)
+            {
+                #region Progress bar settings
+                case 101:                           // 101: Progressbar is not Indeterminate
+                    ProgrBar.IsIndeterminate = false;
+                    break;
+                case 102:                           // 102: Progressbar is Indeterminate
+                    ProgrBar.IsIndeterminate = true;
+                    break;
+                #endregion
 
-            // Standard Message handling
-            if (e.ProgressPercentage == 201)        // 201: ProgText -> Prepare Disk
-                ProgrText.Text = "Preparing disk ...";
-            if (e.ProgressPercentage == 202)        // 202: ProgText -> Applying WIM
-                ProgrText.Text = $"Applying Image to disk ({ProgrBar.Value}%) ...";
-            if (e.ProgressPercentage == 203)        // 203: ProgText -> Installing Bootloader
-                ProgrText.Text = "Installing bootloader to disk ...";
-            if (e.ProgressPercentage == 204)        // 204: ProgText -> Installing recovery
-                ProgrText.Text = "Registering recovery partition to Windows ...";
-            if (e.ProgressPercentage == 205)        // 205: ProgText -> Installing unattend.xml
-                ProgrText.Text = "Copying unattend.xml to disk ...";
-            if (e.ProgressPercentage == 250)        // 250: Installation complete          
-            {
-                ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
-                ProgrBar.Value = 100;
-                if (ApplyContent.ContentWindow != null)
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
-                if (CloudContent.ContentWindow != null)
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = true;
-            }
+                #region Standard Message handling
+                case 201:                           // 201: ProgText -> Prepare Disk
+                    ProgrText.Text = "Preparing disk ...";
+                    break;
+                case 202:                           // 202: ProgText -> Applying WIM
+                    ProgrText.Text = $"Applying Image to disk ({ProgrBar.Value}%) ...";
+                    break;
+                case 203:                           // 203: ProgText -> Installing Bootloader
+                    ProgrText.Text = "Installing bootloader to disk ...";
+                    break;
+                case 204:                           // 204: ProgText -> Installing recovery
+                    ProgrText.Text = "Registering recovery partition to Windows ...";
+                    break;
+                case 205:                           // 205: ProgText -> Installing unattend.xml
+                    ProgrText.Text = "Copying unattend.xml to disk ...";
+                    break;
+                case 250:                           // 250: Installation complete
+                    ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
+                    ProgrBar.Value = 100;
+                    if (ApplyContent.ContentWindow != null)
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                    if (CloudContent.ContentWindow != null)
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = true;
+                    break;
+                #endregion
 
-            // Error message handling
-            if (e.ProgressPercentage == 301)        // 301: Failed at preparing disk
-            {
-                ProgrText.Text = "Failed at preparing disk. Please check your disk and try again.";
-                ProgrBar.Value = 0;
-                if (ApplyContent.ContentWindow != null)
-                {
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                if (CloudContent.ContentWindow != null)
-                {
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                IsCanceled = true;
-            }
-            if (e.ProgressPercentage == 302)        // 302: Failed at applying WIM
-            {
-                ProgrText.Text = "Failed at applying WIM. Please check your image and try again.";
-                ProgrBar.Value = 0;
-                if (ApplyContent.ContentWindow != null)
-                {
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                if (CloudContent.ContentWindow != null)
-                {
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                IsCanceled = true;
-            }
-            if (e.ProgressPercentage == 303)        // 303: Failed at installing bootloader
-            {
-                ProgrText.Text = "Failed at installing bootloader. Please check your image and try again.";
-                ProgrBar.Value = 0;
-                if (ApplyContent.ContentWindow != null)
-                {
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                if (CloudContent.ContentWindow != null)
-                {
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                IsCanceled = true;
-            }
-            if (e.ProgressPercentage == 304)        // 304: Failed at installing recovery
-            {
-                ProgrText.Text = "Failed at installing recovery. Please check your image and try again.";
-                ProgrBar.Value = 0;
-                if (ApplyContent.ContentWindow != null)
-                {
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                if (CloudContent.ContentWindow != null)
-                {
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                IsCanceled = true;
-            }
-            if (e.ProgressPercentage == 305)        // 305: Failed at installing unattend.xml
-            {
-                ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image or config and try again.";
-                ProgrBar.Value = 0;
-                if (ApplyContent.ContentWindow != null)
-                {
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                if (CloudContent.ContentWindow != null)
-                {
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                IsCanceled = true;
+                #region Error message handling
+                case 301:                           // 301: Failed at preparing disk
+                    ProgrText.Text = "Failed at preparing disk. Please check your disk and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                case 302:                           // 302: Failed at applying WIM
+                    ProgrText.Text = "Failed at applying WIM. Please check your image and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                case 303:                           // 303: Failed at installing bootloader
+                    ProgrText.Text = "Failed at installing bootloader. Please check your image and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                case 304:                           // 304: Failed at installing recovery
+                    ProgrText.Text = "Failed at installing recovery. Please check your image and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                case 305:                           // 305: Failed at installing unattend.xml
+                    ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image or config and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                #endregion
             }
 
             // Progressbar percentage
