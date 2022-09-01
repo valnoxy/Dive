@@ -155,7 +155,7 @@ namespace deployaUI.Pages.ApplyPages
                     break;
                 #endregion
 
-                #region Standard Message handling
+                #region Standard message handling
                 case 201:                           // 201: ProgText -> Prepare Disk
                     ProgrText.Text = "Preparing disk ...";
                     break;

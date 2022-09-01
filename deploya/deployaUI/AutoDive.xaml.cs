@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Windows;
 using System.Windows.Media;
 using deploya_core;
 using System.Xml;
 using deployaUI.Common;
 using System.Management;
-using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace deployaUI
 {
@@ -131,7 +129,280 @@ namespace deployaUI
                 }
             }
 
+            // Update unattend.xml config
+            Common.DeploymentInfo.PreConfigUserPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <UserAccounts>
+                <LocalAccounts>
+                    <LocalAccount wcm:action=""add"">
+                        <Password>
+                            <Value>{Common.DeploymentInfo.Password}</Value>
+                            <PlainText>true</PlainText>
+                        </Password>
+                        <Name>{Common.DeploymentInfo.Username}</Name>
+                        <Group>Administratoren</Group>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>";
+
+            Common.DeploymentInfo.PreConfigAdminPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>{Common.DeploymentInfo.Username}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+            </UserAccounts>
+            <AutoLogon>
+                <Username>Administrator</Username>
+                <Password>
+                    <Value>{Common.DeploymentInfo.Password}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+            </AutoLogon>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>
+";
+
+            Common.DeploymentInfo.PreConfigAdminWithoutPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <AutoLogon>
+                <Username>Administrator</Username>
+            </AutoLogon>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>
+";
+
+            // Backgrond worker for deployment
+            applyBackgroundWorker = new BackgroundWorker();
+            applyBackgroundWorker.WorkerReportsProgress = true;
+            applyBackgroundWorker.WorkerSupportsCancellation = true;
+            applyBackgroundWorker.DoWork += ApplyWim;
+            applyBackgroundWorker.ProgressChanged += applyBackgroundWorker_ProgressChanged;
+            applyBackgroundWorker.RunWorkerAsync();
         }
+
+        #region Applying functions
+
+        private BackgroundWorker applyBackgroundWorker;
+        bool IsCanceled = false;
+
+        private void applyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
+        {
+            //
+            // Value list
+            // --------------------------
+            // Progressbar handling
+            //   101: Progressbar is not Indeterminate
+            //   102: Progressbar is Indeterminate
+            //
+            // Standard Message handling
+            //   201: ProgText -> Prepare Disk
+            //   202: ProgText -> Apply WIM
+            //   203: ProgText -> Install Bootloader
+            //   204: ProgText -> Install recovery
+            //   205: ProgText -> Install unattend.xml
+            //   250: Installation complete
+            //
+            // Error message handling
+            //   301: Failed at preparing disk
+            //   302: Failed at applying WIM
+            //   303: Failed at installing bootloader
+            //   304: Failed at installing recovery
+            //   305: Failed at installing unattend.xml
+            //
+            // Range 0-100 -> Progressbar percentage
+            //
+
+            // Progress bar handling
+            switch (e.ProgressPercentage)
+            {
+                #region Progress bar settings
+                case 101:                           // 101: Progressbar is not Indeterminate
+                    ProgrBar.IsIndeterminate = false;
+                    break;
+                case 102:                           // 102: Progressbar is Indeterminate
+                    ProgrBar.IsIndeterminate = true;
+                    break;
+                #endregion
+
+                #region Standard message handling
+                case 201:                           // 201: ProgText -> Prepare Disk
+                    ProgrText.Text = "Preparing disk ...";
+                    break;
+                case 202:                           // 202: ProgText -> Applying WIM
+                    ProgrText.Text = $"Applying Image to disk ({ProgrBar.Value}%) ...";
+                    break;
+                case 203:                           // 203: ProgText -> Installing Bootloader
+                    ProgrText.Text = "Installing bootloader to disk ...";
+                    break;
+                case 204:                           // 204: ProgText -> Installing recovery
+                    ProgrText.Text = "Registering recovery partition to Windows ...";
+                    break;
+                case 205:                           // 205: ProgText -> Installing unattend.xml
+                    ProgrText.Text = "Copying unattend.xml to disk ...";
+                    break;
+                case 250:                           // 250: Installation complete
+                    ProgrText.Text = "Installation completed. Restarting now ...";
+                    ProgrBar.Value = 100;
+                    if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
+                        System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
+                    else
+                        System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
+                    break;
+                #endregion
+
+                #region Error message handling
+                case 301:                           // 301: Failed at preparing disk
+                    ExceptionMessage("Failed at preparing disk. Please check your disk and try again.");
+                    IsCanceled = true;
+                    break;
+                case 302:                           // 302: Failed at applying WIM
+                    ExceptionMessage("Failed at applying WIM. Please check your image and try again.");
+                    IsCanceled = true;
+                    break;
+                case 303:                           // 303: Failed at installing bootloader
+                    ExceptionMessage("Failed at installing bootloader. Please check your image and try again.");
+                    IsCanceled = true;
+                    break;
+                case 304:                           // 304: Failed at installing recovery
+                    ExceptionMessage("Failed at installing recovery. Please check your image and try again.");
+                    break;
+                case 305:                           // 305: Failed at installing unattend.xml
+                    ExceptionMessage("Failed at copying unattend.xml to disk. Please check your image or config and try again.");
+                    break;
+                #endregion
+            }
+
+            // Progressbar percentage
+            if (e.ProgressPercentage <= 100)
+                this.ProgrBar.Value = e.ProgressPercentage;
+        }
+
+        private void ApplyWim(object? sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            Entities.Firmware firmware = new Entities.Firmware();
+            Entities.Bootloader bootloader = new Entities.Bootloader();
+            Entities.UI ui = new Entities.UI();
+
+            // UI definition
+            ui = Entities.UI.Graphical;
+
+            // Firmware definition
+            if (Common.ApplyDetails.UseEFI) { firmware = Entities.Firmware.EFI; }
+            if (!Common.ApplyDetails.UseEFI) { firmware = Entities.Firmware.BIOS; }
+
+            // Bootloader definition
+            if (Common.ApplyDetails.UseNTLDR) { bootloader = Entities.Bootloader.NTLDR; }
+            if (!Common.ApplyDetails.UseNTLDR) { bootloader = Entities.Bootloader.BOOTMGR; }
+
+            worker.ReportProgress(0, "");       // Value 0
+
+            // Prepare disk
+            worker.ReportProgress(201, "");     // Prepare Disk Text
+            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, Common.ApplyDetails.UseRecovery, worker);
+            if (IsCanceled)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Apply image
+            worker.ReportProgress(202, "");     // Applying Image Text
+            worker.ReportProgress(0, "");       // Value 0
+            Actions.ApplyWIM(ui, "W:\\", Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            if (IsCanceled)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Install Bootloader
+            worker.ReportProgress(203, "");     // Installing Bootloader Text
+            if (bootloader == Entities.Bootloader.BOOTMGR)
+                Actions.InstallBootloader(firmware, bootloader, ui, "W:\\Windows", "S:\\", worker);
+
+            if (bootloader == Entities.Bootloader.NTLDR)
+                Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "W:\\", worker);
+
+            if (IsCanceled)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Install Recovery (only for Vista and higher)
+            if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
+            {
+                worker.ReportProgress(204, "");     // Installing Bootloader Text
+                Actions.InstallRecovery(ui, "W:\\Windows", "R:\\", worker);
+
+                if (IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            // Install unattend file (only for Vista and higher)
+            if (Common.DeploymentInfo.Username != null || Common.DeploymentInfo.CustomFilePath != null)
+            {
+                worker.ReportProgress(205, "");     // Installing unattend file Text
+
+                // Building config
+                string config = "";
+                if (Common.DeploymentInfo.Username != null && Common.DeploymentInfo.Password != null)
+                {
+                    config = Common.DeploymentInfo.PreConfigUserPass;
+                }
+
+                if (Common.DeploymentInfo.Username == "Administrator")
+                {
+                    if (Common.DeploymentInfo.Password != null)
+                        config = Common.DeploymentInfo.PreConfigAdminWithoutPass;
+                    else
+                        config = Common.DeploymentInfo.PreConfigAdminPass;
+                }
+
+                if (File.Exists(Common.DeploymentInfo.CustomFilePath))
+                {
+                    config = File.ReadAllText(Common.DeploymentInfo.CustomFilePath);
+                }
+
+                Console.WriteLine(config);
+
+                Actions.InstallUnattend(ui, "W:\\Windows", config, worker);
+
+                if (IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            // Installation complete
+            worker.ReportProgress(250, "");     // Installation complete Text
+        }
+
+        #endregion
+
+        #region Modules
 
         private void ExceptionMessage(string v)
         {
@@ -237,8 +508,8 @@ namespace deployaUI
 
                 return false;
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 Common.Debug.WriteLine(ex.Message, ConsoleColor.Red);
                 return false;
             }
@@ -304,5 +575,7 @@ namespace deployaUI
             }
             return Math.Round(size, 2) + units[i];//with 2 decimals
         }
+
+        #endregion
     }
 }
