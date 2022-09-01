@@ -30,11 +30,9 @@
                 <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="MessageText">
                     Message.Text
                 </TextBlock>
-
             </StackPanel>
 
             <Grid Grid.Row="1" HorizontalAlignment="Right">
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>

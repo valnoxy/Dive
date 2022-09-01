@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace deployaUI
 {
@@ -25,7 +13,8 @@ namespace deployaUI
         }
 
         public static string ButtonPressed = null;
-        public MessageUI(string title, string message, string Btn1 = null, string Btn2 = null)
+        private static bool MainThread;
+        public MessageUI(string title, string message, string Btn1 = null, string Btn2 = null, bool IsMainThread = false)
         {
             InitializeComponent();
 
@@ -33,18 +22,21 @@ namespace deployaUI
             MessageText.Text = message;
             this.Btn1.Content = Btn1;
             this.Btn2.Content = Btn2;
+            MainThread = IsMainThread;
         }
 
         private void Btn1_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonPressed = "Btn1";
-            this.Close();
+            if (MainThread) this.Hide();
+            else this.Close();
         }
 
         private void Btn2_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonPressed = "Btn2";
-            this.Close();
+            if (MainThread) this.Hide();
+            else this.Close();
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿/* 
- * Dive (deploya) - Fast and Easy way to deploy Windows
+ * Dive (formally deploya) - Fast and Easy way to deploy Windows
  * Copyright (c) 2018 - 2022 Exploitox.
  * 
- * Dive is licensed under MIT License (https://github.com/valnoxy/deploya/blob/main/LICENSE). 
+ * Dive is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE). 
  * So you are allowed to use freely and modify the application. 
  * I will not be responsible for any outcome. 
  * Proceed with any action at your own risk.
  * 
- * Source code: https://github.com/valnoxy/deploya
+ * Source code: https://github.com/valnoxy/dive
  */
 
 using System;
@@ -21,8 +21,6 @@ using CommandLine.Text;
 using System.Reflection;
 using System.IO;
 using deploya_core;
-using System.Drawing;
-using deployaUI;
 
 namespace deployaUI
 {
@@ -90,6 +88,7 @@ namespace deployaUI
             wnd.ShowDialog();
             Environment.Exit(0);
         }
+
         static void ShowAutoDive()
         {
             AutoDive wnd = new AutoDive();
@@ -117,7 +116,7 @@ namespace deployaUI
 #else
             ShowWindow(handle, SW_HIDE);
 #endif
-            Console.Title = "Dive - Debug Console";
+            Console.Title = $"{codename} - Debug Console";
             Console.WriteLine($"{codename} [Version: {ver}]"); // Header
             Console.WriteLine(copyright + "\n"); // Copyright text
             Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
@@ -135,19 +134,14 @@ namespace deployaUI
                         string btn2 = "Yes";
                         MessageBoxButton buttons = MessageBoxButton.YesNo;
 
-                        // var w = new MessageUI(title, message, btn1, btn2);
-                        // if (w.ShowDialog() == false)
-                        // {
-                        //     string summary = w.Summary;
-                        //     if (summary == "Btn2")
-                        //     {
-                        //         ShowAutoDive();
-                        //     }
-                        // }
-                        MessageBoxResult result = MessageBox.Show(message, title, buttons, MessageBoxImage.Question);
-                        if (result == MessageBoxResult.Yes)
+                        var w = new MessageUI(title, message, btn1, btn2, true);
+                        if (w.ShowDialog() == false)
                         {
-                            ShowAutoDive();
+                            string summary = w.Summary;
+                            if (summary == "Btn2")
+                            {
+                                ShowAutoDive();
+                            }
                         }
                     }
                 }

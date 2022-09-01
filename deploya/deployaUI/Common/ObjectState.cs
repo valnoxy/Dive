@@ -37,7 +37,7 @@ namespace deployaUI.Common
                             <PlainText>true</PlainText>
                         </Password>
                         <Name>{Username}</Name>
-                        <Group>Administratoren</Group>
+                        <Group>Administrators</Group>
                     </LocalAccount>
                 </LocalAccounts>
             </UserAccounts>

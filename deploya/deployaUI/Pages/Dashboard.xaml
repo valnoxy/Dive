@@ -150,7 +150,7 @@
                         <wpfui:Anchor
                             Content="Project on Exploitox"
                             Icon="Link48"
-                            NavigateUri="https://exploitox.de/deploya" />
+                            NavigateUri="https://exploitox.de/dive" />
                     </Grid>
                 </Grid>
             </StackPanel>
