@@ -39,11 +39,11 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0" Margin="15,0,0,0">
-                    <ui:Button x:Name="Btn1" Content="Btn1" Click="Btn1_OnClick"/>
+                    <ui:Button x:Name="Btn2" Content="Btn2" Click="Btn2_OnClick"/>
                 </Grid>
 
                 <Grid Grid.Column="1" Margin="15,0,0,0">
-                    <ui:Button x:Name="Btn2" Content="Btn2" Click="Btn2_OnClick"/>
+                    <ui:Button x:Name="Btn1" Content="Btn1" Click="Btn1_OnClick"/>
                 </Grid>
             </Grid>
         </Grid>

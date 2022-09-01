@@ -65,7 +65,7 @@ namespace deployaUI.Pages.ApplyPages
             LoadDisks();
             CheckFirmware();
 
-            if (Common.ApplyDetails.Name.ToLower().Contains("windows xp"))
+            if (Common.ApplyDetails.Name.ToLower().Contains("windows xp") || Common.ApplyDetails.Name.ToLower().Contains("windows 2000"))
             {
                 UseNTLDRBtn.IsChecked = true;
                 BIOSRadio.IsChecked = true;

@@ -132,7 +132,6 @@ namespace deployaUI
                         string title = "AutoDive";
                         string btn1 = "No";
                         string btn2 = "Yes";
-                        MessageBoxButton buttons = MessageBoxButton.YesNo;
 
                         var w = new MessageUI(title, message, btn1, btn2, true);
                         if (w.ShowDialog() == false)

@@ -40,6 +40,7 @@ namespace deployaUI
             try
             {
                 DriveInfo[] allDrives = DriveInfo.GetDrives();
+                bool IsFound = false;
                 foreach (DriveInfo d in allDrives)
                 {
                     if (File.Exists(Path.Combine(d.Name, ".diveconfig")))
@@ -54,47 +55,102 @@ namespace deployaUI
                         _imageIndex = config.Read("ImageIndex", "AutoDive");
                         _defaultUsername = config.Read("DefaultUsername", "DeploymentInfo");
                         _defaultPassword = config.Read("DefaultPassword", "DeploymentInfo");
-                        _useCloudDeployment = config.Read("UseAutoInit", "DeploymentInfo").ToLower() == "true";
+                        _useAutoInit = config.Read("UseAutoInit", "DeploymentInfo").ToLower() == "true";
+
+                        // Validate configuration
+                        if (String.IsNullOrEmpty(_version)
+                            || String.IsNullOrEmpty(_diskSN)
+                            || String.IsNullOrEmpty(_bootloader)
+                            || String.IsNullOrEmpty(_firmware)
+                            || String.IsNullOrEmpty(_imageFile)
+                            || String.IsNullOrEmpty(_imageIndex))
+                        {
+                            ExceptionMessage("The existing Windows deployment configuration file is invalid.");
+                        }
+                        else IsFound = true;
                     }
                 }
+                if (IsFound == false) ExceptionMessage("No Windows deployment configuration file could be found.");
             }
             catch
             {
-                // Config cannot be verified -> Invalid config
+                ExceptionMessage("The existing Windows deployment configuration file is invalid.");
             }
 
-            IdentifyImage(_imageFile, Convert.ToInt32(_imageIndex));
-            LoadDisks(_diskSN);
-
-            ImageName.Text = Common.ApplyDetails.Name;
-            ImageFile.Text = Common.ApplyDetails.FileName;
-            HDDName.Text = _diskName;
-            if (_defaultUsername != null || _defaultPassword != null)
-                UseDeploymentInfo.Text = "Using Deployment Info";
-            else
-                UseDeploymentInfo.Text = "Standard Installation";
-
-            if (_useAutoInit)
-                UseAutoInit.Text = "Using AutoInit";
-            else
-                UseAutoInit.Text = "No AutoInit";
+            try
+            {
                 
+                if (IdentifyImage(_imageFile, _imageIndex) == false) ExceptionMessage("The requested image file was not found.");
+                if (LoadDisks(_diskSN) == false) ExceptionMessage("The specified disk was not found on this system.");
 
-            if (Common.ApplyDetails.UseEFI)
-                Firmware.Text = "EFI";
-            else
-                Firmware.Text = "BIOS";
+                ImageName.Text = Common.ApplyDetails.Name;
+                ImageFile.Text = Common.ApplyDetails.FileName;
+                HDDName.Text = _diskName;
 
-            if (Common.ApplyDetails.UseNTLDR)
-                Bootloader.Text = "NTLDR";
-            else
-                Bootloader.Text = "BOOTMGR";
+                if (_defaultUsername != null || _defaultPassword != null)
+                    UseDeploymentInfo.Text = "Using Deployment Info";
+                else
+                    UseDeploymentInfo.Text = "Standard Installation";
 
-            ImageSourceConverter img = new ImageSourceConverter();
-            ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
+                if (_useAutoInit)
+                    UseAutoInit.Text = "Using AutoInit";
+                else
+                    UseAutoInit.Text = "No AutoInit";
+
+                if (Common.ApplyDetails.UseEFI)
+                    Firmware.Text = "EFI";
+                else
+                    Firmware.Text = "BIOS";
+
+                if (Common.ApplyDetails.UseNTLDR)
+                    Bootloader.Text = "NTLDR";
+                else
+                    Bootloader.Text = "BOOTMGR";
+
+                try
+                {
+                    ImageSourceConverter img = new ImageSourceConverter();
+                    ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
+                }
+                catch {}
+            }
+            catch (Exception ex)
+            {
+                string message = $"An error has occurred: {ex.Message}";
+                string title = "AutoDive";
+                string btn1 = "Exit";
+
+                var w = new MessageUI(title, message, btn1);
+                if (w.ShowDialog() == false)
+                {
+                    string summary = w.Summary;
+                    if (summary == "Btn1")
+                    {
+                        Environment.Exit(1);
+                    }
+                }
+            }
+
         }
 
-        private void IdentifyImage(string imagePath, int imageIndex)
+        private void ExceptionMessage(string v)
+        {
+            string message = v;
+            string title = "AutoDive";
+            string btn1 = "Exit";
+
+            var w = new MessageUI(title, message, btn1);
+            if (w.ShowDialog() == false)
+            {
+                string summary = w.Summary;
+                if (summary == "Btn1")
+                {
+                    Environment.Exit(1);
+                }
+            }
+        }
+
+        private bool IdentifyImage(string imagePath, string imageIndex)
         {
             try
             {
@@ -170,18 +226,25 @@ namespace deployaUI
                     if (product_name.ToLower().Contains("blue"))
                         imageVersion = "windows-10";
 
-                    if (product_id == _imageIndex)
+                    if (product_id == imageIndex)
                     {
                         Common.ApplyDetails.Name = product_name;
                         Common.ApplyDetails.IconPath = $"pack://application:,,,/assets/icon-{imageVersion}-40.png";
                         Common.ApplyDetails.FileName = _imageFile;
+                        return true;
                     }
                 }
+
+                return false;
             }
-            catch (Exception ex) { Common.Debug.WriteLine(ex.Message, ConsoleColor.Red); }
+            catch (Exception ex) 
+            { 
+                Common.Debug.WriteLine(ex.Message, ConsoleColor.Red);
+                return false;
+            }
         }
 
-        private void LoadDisks(string diskSN)
+        private bool LoadDisks(string diskSN)
         {
             try
             {
@@ -213,18 +276,20 @@ namespace deployaUI
                     {
                         _diskId = DeviceID;
                         _diskName = Model;
+                        return true;
                     }
                     Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }
-            catch (Exception)
+            catch
             {
-#warning TODO: Better error handling
-                throw;
+                return false;
             }
+
+            return false;
         }
 
-        private String convertSize(double size)
+        private string convertSize(double size)
         {
             String[] units = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
 

@@ -22,6 +22,12 @@ namespace deployaUI
             MessageText.Text = message;
             this.Btn1.Content = Btn1;
             this.Btn2.Content = Btn2;
+
+            if (Btn1 == null)
+                this.Btn1.Visibility = Visibility.Hidden;
+            if (Btn2 == null)
+                this.Btn2.Visibility = Visibility.Hidden;
+
             MainThread = IsMainThread;
         }
 
