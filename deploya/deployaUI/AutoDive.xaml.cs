@@ -295,6 +295,8 @@ namespace deployaUI
 
         private void ApplyWim(object? sender, DoWorkEventArgs e)
         {
+            #region Environment definition
+
             BackgroundWorker worker = sender as BackgroundWorker;
 
             Entities.Firmware firmware = new Entities.Firmware();
@@ -304,19 +306,81 @@ namespace deployaUI
             // UI definition
             ui = Entities.UI.Graphical;
 
-            // Firmware definition
-            if (Common.ApplyDetails.UseEFI) { firmware = Entities.Firmware.EFI; }
-            if (!Common.ApplyDetails.UseEFI) { firmware = Entities.Firmware.BIOS; }
+            firmware = Common.ApplyDetails.UseEFI switch
+            {
+                // Firmware definition
+                true => Entities.Firmware.EFI,
+                false => Entities.Firmware.BIOS
+            };
 
-            // Bootloader definition
-            if (Common.ApplyDetails.UseNTLDR) { bootloader = Entities.Bootloader.NTLDR; }
-            if (!Common.ApplyDetails.UseNTLDR) { bootloader = Entities.Bootloader.BOOTMGR; }
+            bootloader = Common.ApplyDetails.UseNTLDR switch
+            {
+                // Bootloader definition
+                true => Entities.Bootloader.NTLDR,
+                false => Entities.Bootloader.BOOTMGR,
+            };
 
+            // Partition layout definition
+            char[] letters;
+            Entities.PartitionStyle partStyle;
+
+            // Letters definition:
+            // [0] = Windows drive
+            // [1] = Boot drive
+            // [2] = Recovery
+
+            switch (Common.ApplyDetails.UseNTLDR)
+            {
+                // pre-Vista
+                case true:
+                    letters = Actions.GetSystemLetters(Entities.PartitionStyle.Single);
+                    partStyle = Entities.PartitionStyle.Single;
+                    break;
+
+                case false:
+                    {
+                        switch (Common.ApplyDetails.UseRecovery)
+                        {
+                            case true:
+                                letters = Actions.GetSystemLetters(Entities.PartitionStyle.Full);
+                                partStyle = Entities.PartitionStyle.Full;
+                                break;
+
+                            case false:
+                                letters = Actions.GetSystemLetters(Entities.PartitionStyle.SeparateBoot);
+                                partStyle = Entities.PartitionStyle.SeparateBoot;
+                                break;
+                        }
+                        break;
+                    }
+            }
+
+            string windowsDrive = "\0", bootDrive = "\0", recoveryDrive = "\0";
+            switch (partStyle)
+            {
+                case Entities.PartitionStyle.Single:
+                    windowsDrive = $"{letters[0]}:\\";
+                    break;
+                case Entities.PartitionStyle.SeparateBoot:
+                    windowsDrive = $"{letters[0]}:\\";
+                    bootDrive = $"{letters[1]}:\\";
+                    break;
+                case Entities.PartitionStyle.Full:
+                    windowsDrive = $"{letters[0]}:\\";
+                    bootDrive = $"{letters[1]}:\\";
+                    recoveryDrive = $"{letters[2]}:\\";
+                    break;
+            }
+
+            #endregion
+
+
+            // Initialize worker progress
             worker.ReportProgress(0, "");       // Value 0
 
             // Prepare disk
             worker.ReportProgress(201, "");     // Prepare Disk Text
-            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, Common.ApplyDetails.UseRecovery, worker);
+            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -326,7 +390,7 @@ namespace deployaUI
             // Apply image
             worker.ReportProgress(202, "");     // Applying Image Text
             worker.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWIM(ui, "W:\\", Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            Actions.ApplyWIM(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -335,11 +399,15 @@ namespace deployaUI
 
             // Install Bootloader
             worker.ReportProgress(203, "");     // Installing Bootloader Text
-            if (bootloader == Entities.Bootloader.BOOTMGR)
-                Actions.InstallBootloader(firmware, bootloader, ui, "W:\\Windows", "S:\\", worker);
-
-            if (bootloader == Entities.Bootloader.NTLDR)
-                Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "W:\\", worker);
+            switch (bootloader)
+            {
+                case Entities.Bootloader.BOOTMGR:
+                    Actions.InstallBootloader(firmware, bootloader, ui, $"{windowsDrive}Windows", bootDrive, worker);
+                    break;
+                case Entities.Bootloader.NTLDR:
+                    Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, windowsDrive, worker);
+                    break;
+            }
 
             if (IsCanceled)
             {
@@ -351,7 +419,7 @@ namespace deployaUI
             if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
                 worker.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery(ui, "W:\\Windows", "R:\\", worker);
+                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, worker);
 
                 if (IsCanceled)
                 {
@@ -387,7 +455,7 @@ namespace deployaUI
 
                 Console.WriteLine(config);
 
-                Actions.InstallUnattend(ui, "W:\\Windows", config, worker);
+                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, worker);
 
                 if (IsCanceled)
                 {

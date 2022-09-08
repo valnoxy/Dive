@@ -158,6 +158,9 @@ namespace deployaUI
 
         private static void Run(Options options)
         {
+            throw new NotImplementedException("The CLI is not working in this version.");
+#warning CLI version is not working.
+
             Entities.Firmware firmware = new Entities.Firmware();
             Entities.Bootloader bootloader = new Entities.Bootloader();
             Entities.UI ui = new Entities.UI();
@@ -236,7 +239,7 @@ namespace deployaUI
 
 #endregion
 
-            Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
+            //Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
             Actions.ApplyWIM(ui, "W:\\", options.wimfile, options.index);
 
             if (bootloader == Entities.Bootloader.BOOTMGR)

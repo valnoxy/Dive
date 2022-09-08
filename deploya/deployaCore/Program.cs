@@ -12,9 +12,11 @@
 
 using Microsoft.Wim;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+
 
 namespace deploya_core
 {
@@ -37,9 +39,16 @@ namespace deploya_core
             Graphical,
             Command,
         }
+
+        public enum PartitionStyle
+        {
+            Single,
+            SeparateBoot,
+            Full
+        }
     }
 
-    public static class Output
+    public class Output
     {
         public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
         {
@@ -74,12 +83,32 @@ namespace deploya_core
     {
         public static BackgroundWorker progBar = null;
 
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, bool UseRecovery, BackgroundWorker worker = null)
+        /// <summary>
+        /// Prepare and format the specified disk for Windows deployment
+        /// </summary>
+        /// <param name="firmware">Firmware type of the device</param>
+        /// <param name="bootloader">Windows Bootloader</param>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="disk">Disk Identifier</param>
+        /// <param name="useRecovery">Install native recovery partition</param>
+        /// <param name="windowsDrive">Drive letter of the Windows partition</param>
+        /// <param name="bootDrive">Drive letter of the Boot partition</param>
+        /// <param name="recoveryDrive">Drive letter of the Recovery partition</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
         {
+            // General message
             Output.Write("Partitioning disk ...         ");
             ConsoleUtility.WriteProgressBar(0);
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); }
 
+            // Validate parsed arguments
+            if (useRecovery && (windowsDrive == "\0" || bootDrive == "\0" || recoveryDrive == "\0"))
+                throw new ArgumentException("Invalid arguments");
+            if (bootloader == Entities.Bootloader.BOOTMGR && firmware == Entities.Firmware.EFI && (windowsDrive == "\0" || bootDrive == "\0"))
+                throw new ArgumentException("Invalid arguments");
+
+            // Start Diskpart tool
             Process partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
             partDest.StartInfo.UseShellExecute = false;
@@ -88,6 +117,7 @@ namespace deploya_core
             partDest.StartInfo.RedirectStandardOutput = true;
             partDest.Start();
 
+            // Partition information
             if (firmware == Entities.Firmware.BIOS)
             {
                 if (bootloader == Entities.Bootloader.NTLDR)
@@ -97,27 +127,27 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
                     partDest.StandardInput.WriteLine("active");
-                    partDest.StandardInput.WriteLine("assign letter=W");
+                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
                     partDest.StandardInput.WriteLine("exit");
                     partDest.WaitForExit();
                 }
                 if (bootloader == Entities.Bootloader.BOOTMGR)
                 {
-                    if (UseRecovery)
+                    if (useRecovery)
                     {
                         partDest.StandardInput.WriteLine("select disk " + disk);
                         partDest.StandardInput.WriteLine("clean");
                         partDest.StandardInput.WriteLine("create partition primary size=100");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                        partDest.StandardInput.WriteLine("assign letter=S");
+                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive);
                         partDest.StandardInput.WriteLine("active");
                         partDest.StandardInput.WriteLine("create partition primary");
                         partDest.StandardInput.WriteLine("shrink minimum=650");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                        partDest.StandardInput.WriteLine("assign letter=W");
+                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
                         partDest.StandardInput.WriteLine("create partition primary");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                        partDest.StandardInput.WriteLine("assign letter=R");
+                        partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive);
                         partDest.StandardInput.WriteLine("set id=27");
                         partDest.StandardInput.WriteLine("exit");
                         partDest.WaitForExit();
@@ -128,11 +158,11 @@ namespace deploya_core
                         partDest.StandardInput.WriteLine("clean");
                         partDest.StandardInput.WriteLine("create partition primary size=100");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                        partDest.StandardInput.WriteLine("assign letter=S");
+                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive);
                         partDest.StandardInput.WriteLine("active");
                         partDest.StandardInput.WriteLine("create partition primary");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                        partDest.StandardInput.WriteLine("assign letter=W");
+                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
                         partDest.StandardInput.WriteLine("exit");
                         partDest.WaitForExit();
                     }
@@ -154,22 +184,22 @@ namespace deploya_core
                     return;
                 }
 
-                if (UseRecovery)
+                if (useRecovery)
                 {
                     partDest.StandardInput.WriteLine("select disk " + disk);
                     partDest.StandardInput.WriteLine("clean");
                     partDest.StandardInput.WriteLine("convert gpt");
                     partDest.StandardInput.WriteLine("create partition efi size=100");
                     partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
-                    partDest.StandardInput.WriteLine("assign letter=S");
+                    partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                     partDest.StandardInput.WriteLine("create partition msr size=16");
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("shrink minimum=650");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("assign letter=W");
+                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                    partDest.StandardInput.WriteLine("assign letter=R");
+                    partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
                     partDest.StandardInput.WriteLine("set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac");
                     partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
                     partDest.StandardInput.WriteLine("exit");
@@ -181,11 +211,11 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("convert gpt");
                     partDest.StandardInput.WriteLine("create partition efi size=100");
                     partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
-                    partDest.StandardInput.WriteLine("assign letter=S");
+                    partDest.StandardInput.WriteLine("assign letter=" + bootDrive);
                     partDest.StandardInput.WriteLine("create partition msr size=16");
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("assign letter=W");
+                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
                     partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
                     partDest.StandardInput.WriteLine("exit");
                 }
@@ -411,13 +441,40 @@ namespace deploya_core
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
 
-
         public static string GetInfo(string ImagePath)
         {
             using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
             {
                 string a = WimgApi.GetImageInformationAsString(file);
                 return a;
+            }
+        }
+
+        public static char[] GetSystemLetters(Entities.PartitionStyle style)
+        {
+            // Search for non used drive letters
+            char[] getDrives = Management.GetAvailableDriveLetters();
+            List<char> arr = new List<char>();
+
+            switch (style)
+            {
+                case Entities.PartitionStyle.Single when getDrives.Length >= 1:
+                    arr.Add(getDrives[0]);
+                    return arr.ToArray();
+
+                case Entities.PartitionStyle.SeparateBoot when getDrives.Length >= 2:
+                    arr.Add(getDrives[0]);
+                    arr.Add(getDrives[1]);
+                    return arr.ToArray();
+
+                case Entities.PartitionStyle.Full when getDrives.Length >= 3:
+                    arr.Add(getDrives[0]);
+                    arr.Add(getDrives[1]);
+                    arr.Add(getDrives[2]);
+                    return arr.ToArray();
+
+                default:
+                    return null;
             }
         }
     }
@@ -473,6 +530,23 @@ namespace deploya_core
                     break;
             }
             return WimMessageResult.Success;
+        }
+    }
+
+    internal class Management
+    {
+        internal static char[] GetAvailableDriveLetters()
+        {
+            List<char> availableDriveLetters = new List<char>() { 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+
+            DriveInfo[] drives = DriveInfo.GetDrives();
+
+            foreach (var t in drives)
+            {
+                availableDriveLetters.Remove(t.Name.ToLower()[0]);
+            }
+
+            return availableDriveLetters.ToArray();
         }
     }
 }
