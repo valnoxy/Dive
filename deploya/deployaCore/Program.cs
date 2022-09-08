@@ -127,7 +127,7 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
                     partDest.StandardInput.WriteLine("active");
-                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
+                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                     partDest.StandardInput.WriteLine("exit");
                     partDest.WaitForExit();
                 }
@@ -139,15 +139,15 @@ namespace deploya_core
                         partDest.StandardInput.WriteLine("clean");
                         partDest.StandardInput.WriteLine("create partition primary size=100");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive);
+                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                         partDest.StandardInput.WriteLine("active");
                         partDest.StandardInput.WriteLine("create partition primary");
                         partDest.StandardInput.WriteLine("shrink minimum=650");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
+                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                         partDest.StandardInput.WriteLine("create partition primary");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                        partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive);
+                        partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
                         partDest.StandardInput.WriteLine("set id=27");
                         partDest.StandardInput.WriteLine("exit");
                         partDest.WaitForExit();
@@ -158,11 +158,11 @@ namespace deploya_core
                         partDest.StandardInput.WriteLine("clean");
                         partDest.StandardInput.WriteLine("create partition primary size=100");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive);
+                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                         partDest.StandardInput.WriteLine("active");
                         partDest.StandardInput.WriteLine("create partition primary");
                         partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
+                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                         partDest.StandardInput.WriteLine("exit");
                         partDest.WaitForExit();
                     }
@@ -211,11 +211,11 @@ namespace deploya_core
                     partDest.StandardInput.WriteLine("convert gpt");
                     partDest.StandardInput.WriteLine("create partition efi size=100");
                     partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
-                    partDest.StandardInput.WriteLine("assign letter=" + bootDrive);
+                    partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                     partDest.StandardInput.WriteLine("create partition msr size=16");
                     partDest.StandardInput.WriteLine("create partition primary");
                     partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive);
+                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                     partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
                     partDest.StandardInput.WriteLine("exit");
                 }
