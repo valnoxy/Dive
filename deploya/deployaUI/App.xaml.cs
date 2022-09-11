@@ -55,7 +55,7 @@ namespace deployaUI
             public bool ntldr { get; set; }
 
 
-            [Usage(ApplicationAlias = "deploya")]
+            [Usage(ApplicationAlias = "Dive")]
             public static IEnumerable<Example> Examples
             {
                 get
@@ -116,6 +116,7 @@ namespace deployaUI
 #else
             ShowWindow(handle, SW_HIDE);
 #endif
+            
             Console.Title = $"{codename} - Debug Console";
             Console.WriteLine($"{codename} [Version: {ver}]"); // Header
             Console.WriteLine(copyright + "\n"); // Copyright text
@@ -128,12 +129,15 @@ namespace deployaUI
                 {
                     if (File.Exists(Path.Combine(d.Name, ".diveconfig")))
                     {
-                        string message = "Auto deployment config detected. Do you want to debug AutoDive?";
+#if RELEASE
+                        if (!File.Exists("X:\\Windows\\System32\\wpeinit.exe")) ShowGUI();
+#endif
+                        string message = "Auto deployment config detected. Do you want to perform the deployment now?";
                         string title = "AutoDive";
                         string btn1 = "No";
                         string btn2 = "Yes";
 
-                        var w = new MessageUI(title, message, btn1, btn2, true);
+                        var w = new MessageUI(title, message, btn1, btn2, true, 5);
                         if (w.ShowDialog() == false)
                         {
                             string summary = w.Summary;

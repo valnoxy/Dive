@@ -84,7 +84,7 @@ namespace deploya_core
         public static BackgroundWorker progBar = null;
 
         /// <summary>
-        /// Prepare and format the specified disk for Windows deployment
+        /// Prepare and format the specified disk for Windows deployment.
         /// </summary>
         /// <param name="firmware">Firmware type of the device</param>
         /// <param name="bootloader">Windows Bootloader</param>
@@ -240,6 +240,14 @@ namespace deploya_core
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
 
+        /// <summary>
+        /// Installs the specified Windows image.
+        /// </summary>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="path">Target path</param>
+        /// <param name="wimfile">Path to image file</param>
+        /// <param name="index">Index identifier of the SKU</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
         public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index, BackgroundWorker worker = null)
         {
             Output.Write("Applying Image ...            ");
@@ -250,6 +258,15 @@ namespace deploya_core
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Installs the bootloader to the specified disk.
+        /// </summary>
+        /// <param name="firmware">Firmware type of the device</param>
+        /// <param name="bootloader">Windows Bootloader</param>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="WindowsPath">Path to the Windows directory</param>
+        /// <param name="BootloaderLetter">Drive letter of the boot partition</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter, BackgroundWorker worker = null)
         {
             Output.Write("Installing Bootloader ...     ");
@@ -304,6 +321,13 @@ namespace deploya_core
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
 
+        /// <summary>
+        /// Install and register the recovery partition.
+        /// </summary>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="WindowsPath">Path to the Windows directory</param>
+        /// <param name="RecoveryLetter">Drive letter of the recovery partition</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallRecovery(Entities.UI ui, string WindowsPath, string RecoveryLetter, BackgroundWorker worker = null)
         {
             Output.Write("Installing Recovery ...       ");
@@ -394,6 +418,13 @@ namespace deploya_core
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
 
+        /// <summary>
+        /// Installs the unattended configuration file to the Windows installation (only Vista and higher).
+        /// </summary>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="WindowsPath">Path to the Windows directory</param>
+        /// <param name="Configuration">Content of the configuration file</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallUnattend(Entities.UI ui, string WindowsPath, string Configuration, BackgroundWorker worker = null)
         {
             Output.Write("Installing unattend file ...  ");
@@ -441,6 +472,11 @@ namespace deploya_core
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
         }
 
+        /// <summary>
+        /// Get information about an Windows deployment image (WIM).
+        /// </summary>
+        /// <param name="ImagePath">Path to image file</param>
+        /// <returns>Information about the image file as XML</returns>
         public static string GetInfo(string ImagePath)
         {
             using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
@@ -450,6 +486,11 @@ namespace deploya_core
             }
         }
 
+        /// <summary>
+        /// Get array of unused Drive letters for deployment.
+        /// </summary>
+        /// <param name="style">Partition style</param>
+        /// <returns>Array of unused Drive letters. Length depends on the partition style.</returns>
         public static char[] GetSystemLetters(Entities.PartitionStyle style)
         {
             // Search for non used drive letters

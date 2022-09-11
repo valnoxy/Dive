@@ -27,22 +27,27 @@
                     Message.Title
                 </TextBlock>
 
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="MessageText">
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="MessageText" TextWrapping="Wrap">
                     Message.Text
                 </TextBlock>
             </StackPanel>
 
-            <Grid Grid.Row="1" HorizontalAlignment="Right">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Grid Grid.Column="0" Margin="15,0,0,0">
+                <Grid Grid.Column="0" HorizontalAlignment="Left">
+                    <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="LbTimer" VerticalAlignment="Center" TextAlignment="Right"/>
+                </Grid>
+
+                <Grid Grid.Column="1" Margin="15,0,0,0" HorizontalAlignment="Right">
                     <ui:Button x:Name="Btn2" Content="Btn2" Click="Btn2_OnClick"/>
                 </Grid>
 
-                <Grid Grid.Column="1" Margin="15,0,0,0">
+                <Grid Grid.Column="2" Margin="15,0,0,0" HorizontalAlignment="Right">
                     <ui:Button x:Name="Btn1" Content="Btn1" Click="Btn1_OnClick"/>
                 </Grid>
             </Grid>
