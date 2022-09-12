@@ -46,6 +46,23 @@ namespace deployaUI.Common
     <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
 </unattend>";
 
+        public static string PreConfigOnlyUser = $@"<?xml version=""1.0"" encoding=""utf-8""?>
+<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
+    <settings pass=""oobeSystem"">
+        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+            <UserAccounts>
+                <LocalAccounts>
+                    <LocalAccount wcm:action=""add"">
+                        <Name>{Common.DeploymentInfo.Username}</Name>
+                        <Group>Administratoren</Group>
+                    </LocalAccount>
+                </LocalAccounts>
+            </UserAccounts>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
+</unattend>";
+
         public static string PreConfigAdminPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <unattend xmlns=""urn:schemas-microsoft-com:unattend"">
     <settings pass=""oobeSystem"">
