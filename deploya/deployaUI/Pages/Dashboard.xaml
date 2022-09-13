@@ -132,6 +132,22 @@
                             Text="Install Windows directly from the Internet." />
                     </StackPanel>
                 </wpfui:CardAction>
+                <wpfui:CardAction
+                    IsEnabled="false"
+                    Margin="0,0,0,8"
+                    Click="SwitchToRepairPage"
+                    Icon="Toolbox24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="Repair &amp; Tweaks (WIP)"/>
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Repair or tweak your existing Windows installation." />
+                    </StackPanel>
+                </wpfui:CardAction>
 
                 <Grid>
                     <Grid.ColumnDefinitions>

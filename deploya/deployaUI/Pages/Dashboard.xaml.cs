@@ -24,5 +24,9 @@ namespace deployaUI.Pages
             (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("cloud");
         }
 
+        private void SwitchToRepairPage(object sender, RoutedEventArgs e)
+        {
+            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("dashboard");
+        }
     }
 }

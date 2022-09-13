@@ -85,32 +85,22 @@ namespace deployaUI
                 ImageFile.Text = Common.ApplyDetails.FileName;
                 HDDName.Text = _diskName;
 
-                if (_defaultUsername != null || _defaultPassword != null)
-                    UseDeploymentInfo.Text = "Using Deployment Info";
-                else
-                    UseDeploymentInfo.Text = "Standard Installation";
-
-                if (_useAutoInit)
-                    UseAutoInit.Text = "Using AutoInit";
-                else
-                    UseAutoInit.Text = "No AutoInit";
-
-                if (Common.ApplyDetails.UseEFI)
-                    Firmware.Text = "EFI";
-                else
-                    Firmware.Text = "BIOS";
-
-                if (Common.ApplyDetails.UseNTLDR)
-                    Bootloader.Text = "NTLDR";
-                else
-                    Bootloader.Text = "BOOTMGR";
+                UseDeploymentInfo.Text = _defaultUsername != null || _defaultPassword != null
+                    ? "Using Deployment Info"
+                    : "Standard Installation";
+                UseAutoInit.Text = _useAutoInit ? "Using AutoInit" : "No AutoInit";
+                Firmware.Text = Common.ApplyDetails.UseEFI ? "EFI" : "BIOS";
+                Bootloader.Text = Common.ApplyDetails.UseNTLDR ? "NTLDR" : "BOOTMGR";
 
                 try
                 {
                     ImageSourceConverter img = new ImageSourceConverter();
-                    ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
+                    ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath)!;
                 }
-                catch {}
+                catch
+                {
+                    // ignored
+                }
             }
             catch (Exception ex)
             {

@@ -53,6 +53,11 @@
                         Icon="Cloud24"
                         PageType="{x:Type pages:CloudContent}"
                         PageTag="cloud"/>
+                    <ui:NavigationItem
+                        Content="Repair"
+                        Icon="Toolbox28"
+                        PageType="{x:Type pages:CloudContent}"
+                        PageTag="repair"/>
                 </ui:NavigationStore.Items>
                 <ui:NavigationStore.Footer>
                     <ui:NavigationItem

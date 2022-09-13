@@ -54,7 +54,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="Deployment Settings (unattend.xml)" />
+                            Text="Deployment Settings" />
                     </Grid>
                 </Expander.Header>
 
