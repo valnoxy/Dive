@@ -122,8 +122,15 @@ namespace deployaUI.Pages.ApplyPages
             ImageName.Text = Common.ApplyDetails.Name;
             ImageFile.Text = Common.ApplyDetails.FileName;
             ImageSourceConverter img = new ImageSourceConverter();
-            ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
-            
+            try
+            {
+                ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
+            }
+            catch
+            {
+                // ignored
+            }
+
             // Backgrond worker for deployment
             applyBackgroundWorker = new BackgroundWorker();
             applyBackgroundWorker.WorkerReportsProgress = true;
