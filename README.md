@@ -29,9 +29,9 @@ Dive (formally deploya) is a little application for deploying Windows on a machi
 
 ## 🔧 Usage
 1. Download the latest version from [GitHub](https://github.com/valnoxy/dive/releases).
-2. Use Rufus to extract the Dive-ISO to your USB flash drive.
-3. Create a new Folder called "WIMs" on your USB flash drive.
-4. Copy your WIM-Files to the "WIMs" Folder. You can extract the WIM file from every Windows iso between Windows Vista and higher. 
+2. Use Rufus to extract the Dive ISO to your USB flash drive.
+3. Create a new folder called "WIMs" on your USB flash drive.
+4. Copy your WIM-Files to the "WIMs" folder. You can extract the WIM file from every Windows iso between Windows Vista and higher. The wim file is located in ```Windows ISO > sources > install.wim```.
 
 > **Note** In some cases, you will only find a ESD file instead. In that case, you'll need to convert the ESD file to a WIM file. You can follow [this guide](https://community.spiceworks.com/how_to/163540-convert-esd-to-wim) to do so.
 
