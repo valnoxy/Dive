@@ -183,11 +183,41 @@
 
                         </StackPanel>
                     </wpfui:CardExpander>
+
+                    <wpfui:CardControl Icon="BoxMultipleArrowRight24" Margin="0,5,0,0">
+                        <wpfui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Settings Import &amp; Export" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Save and load the current settings." />
+                                </StackPanel>
+                                <wpfui:Button Grid.Column="1" Margin="0,0,16,0" Content="Import" Click="Import_OnClicked" />
+                                <wpfui:Button Grid.Column="2" Margin="0,0,16,0" Content="Export" Click="Export_OnClicked" />
+                            </Grid>
+                        </wpfui:CardControl.Header>
+                    </wpfui:CardControl>
                 </StackPanel>
             </ScrollViewer>
-            
+            <wpfui:Snackbar
+                x:Name="RootSnackbar"
+                Title="Hello World!"
+                MaxWidth="600"
+                Appearance="Danger"
+                Icon="Warning24"
+                Message="Remember that the Heat Death of Universe is coming someday, no time to explain - let's go!"
+                Timeout="15000" />
         </Grid>
-
     </Grid>
 
 </UserControl>
