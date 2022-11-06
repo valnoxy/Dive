@@ -12,7 +12,8 @@ namespace deployaUI.Pages
         public static ApplyContent? ContentWindow;
 
         SKUSelectStep SKUSS = new SKUSelectStep();
-
+        DeploymentSettingsStep deploymentSettingsStep = new DeploymentSettingsStep();
+        
         public ApplyContent()
         {
             InitializeComponent();
@@ -27,7 +28,11 @@ namespace deployaUI.Pages
         {
             switch (FrameWindow.Content)
             {
-                case SKUSelectStep:
+                case SKUSelectStep:                    
+                    FrameWindow.Content = deploymentSettingsStep;
+                    BackBtn.IsEnabled = true;
+                    break;
+                case DeploymentSettingsStep:
                     DiskSelectStep DiskSS = new DiskSelectStep();
                     FrameWindow.Content = DiskSS;
                     break;
@@ -50,10 +55,15 @@ namespace deployaUI.Pages
         {
             switch (FrameWindow.Content)
             {
-                case DiskSelectStep:
+                case DeploymentSettingsStep:
                     FrameWindow.Content = SKUSS;
                     NextBtn.IsEnabled = true;
                     BackBtn.IsEnabled = false;
+                    break;
+                case DiskSelectStep:
+                    FrameWindow.Content = deploymentSettingsStep;
+                    NextBtn.IsEnabled = true;
+                    BackBtn.IsEnabled = true;
                     break;
                 default:
                     break;

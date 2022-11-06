@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
+using deployaUI.Common;
 
 namespace deployaUI.Pages.ApplyPages
 {
@@ -43,80 +44,28 @@ namespace deployaUI.Pages.ApplyPages
             else
                 Common.ApplyDetails.UseRecovery = false;
 
-            // Update unattend.xml config
-            Common.DeploymentInfo.PreConfigUserPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <UserAccounts>
-                <LocalAccounts>
-                    <LocalAccount wcm:action=""add"">
-                        <Password>
-                            <Value>{Common.DeploymentInfo.Password}</Value>
-                            <PlainText>true</PlainText>
-                        </Password>
-                        <Name>{Common.DeploymentInfo.Username}</Name>
-                        <Group>Administratoren</Group>
-                    </LocalAccount>
-                </LocalAccounts>
-            </UserAccounts>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>";
+            // Validate deployment settings
+            switch (Common.OemInfo.UseOemInfo)
+            {
+                case true:
+                    if (Common.OemInfo.SupportPhone == null
+                        && Common.OemInfo.LogoPath == null
+                        && Common.OemInfo.Manufacturer == null
+                        && Common.OemInfo.Model == null
+                        && Common.OemInfo.SupportHours == null
+                        && Common.OemInfo.SupportURL == null)
+                        Common.OemInfo.UseOemInfo = false;
+                    break;
+            }
 
-            Common.DeploymentInfo.PreConfigOnlyUser = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <UserAccounts>
-                <LocalAccounts>
-                    <LocalAccount wcm:action=""add"">
-                        <Name>{Common.DeploymentInfo.Username}</Name>
-                        <Group>Administratoren</Group>
-                    </LocalAccount>
-                </LocalAccounts>
-            </UserAccounts>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>";
-
-            Common.DeploymentInfo.PreConfigAdminPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <UserAccounts>
-                <AdministratorPassword>
-                    <Value>{Common.DeploymentInfo.Password}</Value>
-                    <PlainText>true</PlainText>
-                </AdministratorPassword>
-            </UserAccounts>
-            <AutoLogon>
-                <Username>Administrator</Username>
-                <Password>
-                    <Value>{Common.DeploymentInfo.Password}</Value>
-                    <PlainText>true</PlainText>
-                </Password>
-            </AutoLogon>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>
-";
-
-            Common.DeploymentInfo.PreConfigAdminWithoutPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <AutoLogon>
-                <Username>Administrator</Username>
-            </AutoLogon>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>
-";
+            switch (Common.DeploymentInfo.UseUserInfo)
+            {
+                case true:
+                    if (Common.DeploymentInfo.Username == null
+                        && Common.DeploymentInfo.Password == null)
+                        Common.DeploymentInfo.UseUserInfo = false;
+                    break;
+            }
 
             // Set active Image to card
             ImageName.Text = Common.ApplyDetails.Name;
@@ -163,6 +112,7 @@ namespace deployaUI.Pages.ApplyPages
             //   303: Failed at installing bootloader
             //   304: Failed at installing recovery
             //   305: Failed at installing unattend.xml
+            //   306: Failed at copying oem logo
             //
             // Range 0-100 -> Progressbar percentage
             //
@@ -276,6 +226,23 @@ namespace deployaUI.Pages.ApplyPages
                     break;
                 case 305:                           // 305: Failed at installing unattend.xml
                     ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image or config and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                case 306:                           // 306: Failed at copying oem logo
+                    ProgrText.Text = "Failed at copying oem logo to disk. Please check your config and try again.";
                     ProgrBar.Value = 0;
                     if (ApplyContent.ContentWindow != null)
                     {
@@ -440,35 +407,58 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Install unattend file (only for Vista and higher)
-            if (Common.DeploymentInfo.Username != null || Common.DeploymentInfo.CustomFilePath != null)
+            if (Common.DeploymentInfo.UseUserInfo || Common.OemInfo.UseOemInfo)
             {
-                worker.ReportProgress(205, "");     // Installing unattend file Text
+                worker.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
                 string config = "";
-                if (Common.DeploymentInfo.Username != null && Common.DeploymentInfo.Password != null)
+                Common.UnattendMode? um = null;
+
+                // Administrator / User with OEM infos
+                if (Common.DeploymentInfo.Username != null
+                    && Common.DeploymentInfo.Password != null
+                    && Common.OemInfo.UseOemInfo)
                 {
-                    config = Common.DeploymentInfo.PreConfigUserPass;
+                    um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
                 }
 
-                if (Common.DeploymentInfo.Username != null && Common.DeploymentInfo.Password == null)
+                // Administrator / User with OEM infos, but without password
+                if (Common.DeploymentInfo.Username != null
+                    && Common.DeploymentInfo.Password == null
+                    && Common.OemInfo.UseOemInfo)
                 {
-                    config = Common.DeploymentInfo.PreConfigOnlyUser;
+                    um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
                 }
 
-                if (Common.DeploymentInfo.Username == "Administrator")
+                // Administrator / User without OEM infos
+                if (Common.DeploymentInfo.Username == "Administrator"
+                    && Common.DeploymentInfo.Password != null
+                    && Common.OemInfo.UseOemInfo == false)
                 {
-                    config = Common.DeploymentInfo.Password != null ? Common.DeploymentInfo.PreConfigAdminWithoutPass : Common.DeploymentInfo.PreConfigAdminPass;
+                    um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
                 }
 
+                // Administrator without OEM infos and password
+                if (Common.DeploymentInfo.Username == "Administrator"
+                    && Common.DeploymentInfo.Password == null
+                    && Common.OemInfo.UseOemInfo == false)
+                {
+                    um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;
+                }
+
+                // Custom file
                 if (File.Exists(Common.DeploymentInfo.CustomFilePath))
                 {
                     config = File.ReadAllText(Common.DeploymentInfo.CustomFilePath);
                 }
 
-                Console.WriteLine(config);
+                if (config == "")
+                    config = Common.UnattendBuilder.Build(um);
 
-                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, worker);
+                Debug.WriteLine(config);
+
+                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, "", worker);
 
                 if (IsCanceled)
                 {

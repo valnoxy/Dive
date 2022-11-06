@@ -424,8 +424,9 @@ namespace deploya_core
         /// <param name="ui">User Interface type</param>
         /// <param name="WindowsPath">Path to the Windows directory</param>
         /// <param name="Configuration">Content of the configuration file</param>
+        /// <param name="OemLogoPath">Path to the OEM logo</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallUnattend(Entities.UI ui, string WindowsPath, string Configuration, BackgroundWorker worker = null)
+        public static void InstallUnattend(Entities.UI ui, string WindowsPath, string Configuration, string OemLogoPath = null, BackgroundWorker worker = null)
         {
             Output.Write("Installing unattend file ...  ");
             ConsoleUtility.WriteProgressBar(0);
@@ -464,6 +465,24 @@ namespace deploya_core
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
                 if (ui == Entities.UI.Graphical) { worker.ReportProgress(305, ""); }
+                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+            }
+
+            // Copy OEM logo to Windows\System32 directory
+            try
+            {
+                System.IO.File.Copy(OemLogoPath, Path.Combine(WindowsPath, "System32", "logo.bmp"), true);
+            }
+            catch
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("");
+                Console.WriteLine("   An Error has occurred.");
+                Console.WriteLine("   Error: Cannot copy OEM logo to the disk!");
+                if (ui == Entities.UI.Command)
+                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                Console.ResetColor();
+                if (ui == Entities.UI.Graphical) { worker.ReportProgress(306, ""); }
                 if (ui == Entities.UI.Command) { Environment.Exit(1); }
             }
             

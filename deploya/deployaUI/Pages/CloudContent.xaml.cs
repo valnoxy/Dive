@@ -12,6 +12,7 @@ namespace deployaUI.Pages
         public static CloudContent? ContentWindow;
 
         CloudSelectStep CSS = new CloudSelectStep();
+        DeploymentSettingsStep deploymentSettingsStep = new DeploymentSettingsStep();
 
         public CloudContent()
         {
@@ -28,6 +29,10 @@ namespace deployaUI.Pages
             switch (FrameWindow.Content)
             {
                 case CloudSelectStep:
+                    FrameWindow.Content = deploymentSettingsStep;
+                    BackBtn.IsEnabled = true;
+                    break;
+                case DeploymentSettingsStep:
                     DiskSelectStep DiskSS = new DiskSelectStep();
                     FrameWindow.Content = DiskSS;
                     break;
@@ -50,8 +55,13 @@ namespace deployaUI.Pages
         {
             switch (FrameWindow.Content)
             {
-                case DiskSelectStep:
+                case DeploymentSettingsStep:
                     FrameWindow.Content = CSS;
+                    NextBtn.IsEnabled = true;
+                    BackBtn.IsEnabled = false;
+                    break;
+                case DiskSelectStep:
+                    FrameWindow.Content = deploymentSettingsStep;
                     NextBtn.IsEnabled = true;
                     BackBtn.IsEnabled = false;
                     break;

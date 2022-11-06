@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace deployaUI.Common
 {
@@ -21,86 +17,34 @@ namespace deployaUI.Common
 
     public static class DeploymentInfo
     {
+        public static bool UseUserInfo { get; set; }
         public static string Username { get; set; }
         public static string Password { get; set; }
         public static string CustomFilePath { get; set; }
-
-        public static string PreConfigUserPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <UserAccounts>
-                <LocalAccounts>
-                    <LocalAccount wcm:action=""add"">
-                        <Password>
-                            <Value>{Password}</Value>
-                            <PlainText>true</PlainText>
-                        </Password>
-                        <Name>{Username}</Name>
-                        <Group>Administrators</Group>
-                    </LocalAccount>
-                </LocalAccounts>
-            </UserAccounts>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>";
-
-        public static string PreConfigOnlyUser = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <UserAccounts>
-                <LocalAccounts>
-                    <LocalAccount wcm:action=""add"">
-                        <Name>{Common.DeploymentInfo.Username}</Name>
-                        <Group>Administratoren</Group>
-                    </LocalAccount>
-                </LocalAccounts>
-            </UserAccounts>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>";
-
-        public static string PreConfigAdminPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <UserAccounts>
-                <AdministratorPassword>
-                    <Value>{Password}</Value>
-                    <PlainText>true</PlainText>
-                </AdministratorPassword>
-            </UserAccounts>
-            <AutoLogon>
-                <Username>Administrator</Username>
-                <Password>
-                    <Value>{Password}</Value>
-                    <PlainText>true</PlainText>
-                </Password>
-            </AutoLogon>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>
-";
-
-        public static string PreConfigAdminWithoutPass = $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<unattend xmlns=""urn:schemas-microsoft-com:unattend"">
-    <settings pass=""oobeSystem"">
-        <component name=""Microsoft-Windows-Shell-Setup"" processorArchitecture=""amd64"" publicKeyToken=""31bf3856ad364e35"" language=""neutral"" versionScope=""nonSxS"" xmlns:wcm=""http://schemas.microsoft.com/WMIConfig/2002/State"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-            <AutoLogon>
-                <Username>Administrator</Username>
-            </AutoLogon>
-        </component>
-    </settings>
-    <cpi:offlineImage cpi:source=""wim:e:/wims/win11-beta.wim#Windows 11 Pro"" xmlns:cpi=""urn:schemas-microsoft-com:cpi"" />
-</unattend>
-";
-
     }
 
+    public static class OemInfo
+    {
+        public static bool UseOemInfo { get; set; }
+        public static string LogoPath { get; set; }
+        public static string Manufacturer { get; set; }
+        public static string Model { get; set; }
+        public static string SupportHours { get; set; }
+        public static string SupportPhone { get; set; }
+        public static string SupportURL { get; set; }
+    }
+
+    public enum UnattendMode
+    {
+        Admin,
+        User,
+        AdminWithoutOem,
+        UserWithoutOem,
+        AdminWithoutPassword,
+        AdminWithoutPasswordAndOem,
+        UserWithoutPassword,
+        UserWithoutPasswordAndOem,
+    }
 
     public static class Debug
     {
