@@ -435,7 +435,7 @@ namespace deployaUI
 
                 Debug.WriteLine(config);
 
-                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, null, worker);
+                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, worker);
 
                 if (IsCanceled)
                 {

@@ -52,7 +52,9 @@ namespace deployaUI.Pages.ApplyPages
 
         private void TbPassword_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.DeploymentInfo.Password = TbPassword.Password;
+            Common.DeploymentInfo.Password = TbPassword.Text;
+            Console.WriteLine("Config: " + Common.DeploymentInfo.Password);
+            Console.WriteLine("Object (Text): " + TbPassword.Text);
         }
 
         private void OEMLogo_OpenFileClick(object sender, RoutedEventArgs e)

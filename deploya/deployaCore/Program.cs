@@ -469,23 +469,26 @@ namespace deploya_core
             }
 
             // Copy OEM logo to Windows\System32 directory
-            try
+            if (OemLogoPath != null || OemLogoPath != "")
             {
-                System.IO.File.Copy(OemLogoPath, Path.Combine(WindowsPath, "System32", "logo.bmp"), true);
+                try
+                {
+                    System.IO.File.Copy(OemLogoPath, Path.Combine(WindowsPath, "System32", "logo.bmp"), true);
+                }
+                catch
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("");
+                    Console.WriteLine("   An Error has occurred.");
+                    Console.WriteLine("   Error: Cannot copy OEM logo to the disk!");
+                    if (ui == Entities.UI.Command)
+                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                    Console.ResetColor();
+                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(306, ""); }
+                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                }
             }
-            catch
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot copy OEM logo to the disk!");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(306, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
-            }
-            
+
             ConsoleUtility.WriteProgressBar(100, true);
             Console.WriteLine();
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }

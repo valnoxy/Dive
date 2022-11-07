@@ -72,7 +72,7 @@
                                     FontSize="14"
                                     Margin="0,6,0,0"
                                     Text="Password" />
-                                <wpfui:PasswordBox x:Name="TbPassword" Grid.Column="1" Icon="Key24" PlaceholderText="Password of Local User" IsEnabled="false" TextChanged="TbPassword_OnTextChanged" />
+                                <wpfui:TextBox x:Name="TbPassword" Grid.Column="1" Icon="Key24" PlaceholderText="Password of Local User" IsEnabled="false" TextChanged="TbPassword_OnTextChanged" />
                             </Grid>
 
                         </StackPanel>
