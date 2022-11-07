@@ -932,12 +932,17 @@ namespace deployaUI.Common
 
             //Create the serializer
             XmlSerializer slz = new XmlSerializer(typeof(UnattendXmlClass.unattend), "urn:schemas-microsoft-com:unattend");
-            
-            using (StringWriter textWriter = new StringWriter())
+
+            using (StringWriter textWriter = new Utf8StringWriter())
             {
                 slz.Serialize(textWriter, uc, ns);
                 return textWriter.ToString();
             }
+        }
+        
+        public class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }
