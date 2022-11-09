@@ -1,6 +1,7 @@
 ﻿using deploya_core;
 using System;
 using System.IO;
+using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -121,25 +122,29 @@ namespace deployaUI.Pages.ApplyPages
                     Common.Debug.WriteLine($"Size: {Size}", ConsoleColor.White);
                     Common.Debug.WriteLine($"Size in GB: {SizeInGB}", ConsoleColor.White);
 
-                    if (Interface != "USB")
+                    var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 1));
+
+                    if (Interface != "USB" && DeviceID != $"\\\\.\\PHYSICALDRIVE{ret}")
                     {
                         // Add to list
                         string driveid = DeviceID;
                         driveid = Regex.Match(driveid, @"\d+").Value;
-                        string drive = $"{Model} | {Interface} | {SizeInGB} GB | Disk {driveid}";
+                        string drive = $"{Model} | {SizeInGB} GB | Disk {driveid}";
                         DiskListView.Items.Add(drive);
                     }
                     else
                     {
-                        Common.Debug.WriteLine("Skipping as this is a USB Device ...", ConsoleColor.Yellow);
+                        Common.Debug.WriteLine("Skipping as this is a USB Device or the main disk ...", ConsoleColor.Yellow);
                     }
+
+
                     Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }
             catch (Exception)
             {
 #warning TODO: Better error handling
-                throw;
+                // throw;
             }
         }
 
@@ -148,6 +153,23 @@ namespace deployaUI.Pages.ApplyPages
             double gb = bytes / Math.Pow(10, 9);
             int i = (int)Math.Round(gb);
             return i;
+        }
+
+        public string GetDiskNumber(string letter)
+        {
+            var ret = "";
+            var scope = new ManagementScope("\\\\.\\ROOT\\cimv2");
+            var query = new ObjectQuery("Associators of {Win32_LogicalDisk.DeviceID='" + letter + ":'} WHERE ResultRole=Antecedent");
+            var searcher = new ManagementObjectSearcher(scope, query);
+            var queryCollection = searcher.Get();
+            foreach (ManagementObject m in queryCollection)
+            {
+                string input = m["Name"].ToString().Replace("Disk #", "");
+                ret = new string(input.SkipWhile(c => !char.IsDigit(c))
+                    .TakeWhile(c => char.IsDigit(c))
+                    .ToArray());
+            }
+            return ret;
         }
 
         private void DiskListView_Selected(object sender, RoutedEventArgs e)

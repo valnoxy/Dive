@@ -16,15 +16,23 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Select the operating system you want to install
-            </TextBlock>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
+            <StackPanel Grid.Column="0">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
+                    Select the operating system you want to install
+                </TextBlock>
+
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
                     Please select from one of the available options to continue.
-            </TextBlock>
-        </StackPanel>
+                </TextBlock>
+            </StackPanel>
+            <wpfui:Button Grid.Column="1" Visibility="Hidden" HorizontalAlignment="Right" Content="Reload" Icon="ArrowReset24" Margin="0,0,0,0"/>
+        </Grid>
 
         <ListBox Grid.Row="1" Name="SKUListView" VerticalAlignment="Center" SelectionChanged="SKUListView_Selected" Height="335"
                  ItemsSource="{Binding ImageList}">
