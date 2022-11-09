@@ -78,7 +78,7 @@ namespace deployaUI.Pages.ApplyPages
                                 Common.Debug.WriteLine($"Size : {sizeInGB}", ConsoleColor.White);
                                 Common.Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
 
-                                string imageVersion = "";
+                                string imageVersion = "windows";
 
                                 // Windows Client
                                 if (product_name.ToLower().Contains("windows 2000"))
@@ -90,7 +90,7 @@ namespace deployaUI.Pages.ApplyPages
                                 if (product_name.ToLower().Contains("windows 7"))
                                     imageVersion = "windows-7";
                                 if (product_name.ToLower().Contains("windows 8") || product_name.ToLower().Contains("windows 8.1"))
-                                    imageVersion = "windows-10";
+                                    imageVersion = "windows-8";
                                 if (product_name.ToLower().Contains("windows 10"))
                                     imageVersion = "windows-10";
                                 if (product_name.ToLower().Contains("windows 11"))

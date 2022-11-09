@@ -4,7 +4,9 @@
 <p align="center">
     Easy Deployment for Windows
     <br />
-    <strong>Version: </strong>1.0.0.249 (Beta 2)
+    <strong>Version: </strong>1.0.0.278 (Beta 3)
+    <br/>
+    <strong>Core: </strong>12.0.0.401
     <br />
     <br />
     <a href="https://github.com/valnoxy/dive/releases"><strong>Download now »</strong></a>
@@ -21,10 +23,10 @@
 ## 🔔 Information
 Dive (formally deploya) is a little application for deploying Windows on a machine. 
 
-- Deploy WIM-Files on any drive.
-- Mass deploy Windows with AutoDive.
+- Deploy WIM-Files on any drive
+- Mass deploy Windows with AutoDive (W.I.P)
 - Bypass Windows 11 Microsoft-Account compulsion
-- Capture Windows installation
+- Capture Windows installation (W.I.P)
 - Install Windows from the Cloud
 
 ## 🔧 Usage
@@ -48,4 +50,10 @@ Clone this source and restore the NUGET Packages.
 ## 🧾 License
 Dive is licensed under [GNU GENERAL PUBLIC LICENSE](https://github.com/valnoxy/dive/blob/main/LICENSE). So you are allowed to use freely and modify the application. I will not be responsible for any outcome. Proceed with any action at your own risk.
 
-```Copyright (c) 2018 - 2022 valnoxy. By Jonas Günner <jonas@exploitox.de> ```
+<hr>
+<h6 align="center">© 2018 - 2022 valnoxy. All Rights Reserved. 
+<br>
+By Jonas Günner &lt;jonas@exploitox.de&gt;</h6>
+<p align="center">
+	<a href="https://github.com/valnoxy/Dive/blob/main/LICENSE"><img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=GNU%20GENERAL%20PUBLIC%20%20LICENSE&logoColor=d9e0ee&colorA=363a4f&colorB=b7bdf8"/></a>
+</p

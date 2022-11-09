@@ -27,11 +27,17 @@
     <None Remove="Assets\icon-windows-11-40.png" />
     <None Remove="Assets\icon-windows-2000-40.png" />
     <None Remove="Assets\icon-windows-240.png" />
+    <None Remove="Assets\icon-windows-40.png" />
     <None Remove="Assets\icon-windows-7-40.png" />
+    <None Remove="Assets\icon-windows-8-40.png" />
     <None Remove="Assets\icon-windows-server-2012-40.png" />
     <None Remove="Assets\icon-windows-vista-40.png" />
     <None Remove="Assets\icon-windows-xp-40.png" />
     <None Remove="Dive.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon-windows-8-40.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,7 +49,7 @@
     <Resource Include="Assets\icon-windows-10-40.png" />
     <Resource Include="Assets\icon-windows-11-40.png" />
     <Resource Include="Assets\icon-windows-2000-40.png" />
-    <Resource Include="Assets\icon-windows-240.png" />
+    <Resource Include="Assets\icon-windows-40.png" />
     <Resource Include="Assets\icon-windows-7-40.png" />
     <Resource Include="Assets\icon-windows-server-2012-40.png" />
     <Resource Include="Assets\icon-windows-vista-40.png" />
