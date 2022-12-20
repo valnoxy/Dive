@@ -103,14 +103,14 @@
                     </StackPanel>
                 </wpfui:CardAction>
                 <wpfui:CardAction
-                    IsEnabled="false"
                     Margin="0,0,0,8"
+                    Click="SwitchToCapturePage"
                     Icon="Copy24">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,4"
                             FontWeight="Medium"
-                            Text="Capture Windows (WIP)" />
+                            Text="Capture Windows" />
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"

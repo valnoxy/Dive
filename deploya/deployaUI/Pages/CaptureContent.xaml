@@ -1,12 +1,11 @@
-﻿<Page x:Class="deploya_setup.Pages.ContentPage"
+﻿<UserControl x:Class="deployaUI.Pages.CaptureContent"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:deploya_setup.Pages"
+      xmlns:local="clr-namespace:deployaUI.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="ContentPage">
+      d:DesignHeight="450" d:DesignWidth="800">
 
     <Grid Margin="19,20,19,20">
         <Grid.RowDefinitions>
@@ -24,7 +23,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
 
             <Button Content="Cancel"
@@ -33,6 +33,13 @@
                     Width="80"
                     Click="CancelBtn_Click"/>
             <Button Grid.Column="2"
+                    Content="Back"
+                    x:Name="BackBtn"
+                    Margin="-8,0,0,0"
+                    Width="80"
+                    Click="Back_Click"
+                    IsEnabled="False"/>
+            <Button Grid.Column="3"
                     Content="Next"
                     x:Name="NextBtn"
                     Width="80"
@@ -40,4 +47,4 @@
                     IsDefault="True"/>
         </Grid>
     </Grid>
-</Page>
+</UserControl>

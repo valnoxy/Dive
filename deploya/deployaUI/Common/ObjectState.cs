@@ -23,6 +23,15 @@ namespace deployaUI.Common
         public static string CustomFilePath { get; set; }
     }
 
+    public static class CaptureInfo
+    {
+        public static string Name { get; set; }
+        public static string Description { get; set; }
+        public static string PathToCapture { get; set; }
+        public static string PathToImage { get; set;}
+        public static string ImageFileName { get; set; }
+    }
+
     public static class OemInfo
     {
         public static bool UseOemInfo { get; set; }

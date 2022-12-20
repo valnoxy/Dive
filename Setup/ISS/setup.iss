@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Dive"
-#define MyAppVersion "1.0.0.278 b3"
+#define MyAppVersion "1.0.0.289 b4"
 #define MyAppPublisher "Exploitox"
 #define MyAppURL "https://exploitox.de/dive"
 #define MyAppExeName "Dive.exe"
@@ -36,8 +36,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\deploya\deployaUI\bin\Release\net6.0-windows10.0.18362.0\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\deploya\deployaUI\bin\Release\net6.0-windows10.0.18362.0\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "..\..\deploya\deployaUI\bin\x64\Release\net6.0-windows10.0.18362.0\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\deploya\deployaUI\bin\x64\Release\net6.0-windows10.0.18362.0\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

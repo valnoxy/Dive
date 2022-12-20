@@ -47,7 +47,8 @@
                     <ui:NavigationItem
                         Content="Capture"
                         Icon="Copy24"
-                        PageTag="capture"/>
+                        PageTag="capture"
+                        PageType="{x:Type pages:CaptureContent}"/>
                     <ui:NavigationItem
                         Content="Cloud"
                         Icon="Cloud24"
@@ -56,7 +57,6 @@
                     <ui:NavigationItem
                         Content="Repair"
                         Icon="Toolbox28"
-                        PageType="{x:Type pages:CloudContent}"
                         PageTag="repair"/>
                 </ui:NavigationStore.Items>
                 <ui:NavigationStore.Footer>
@@ -100,22 +100,6 @@
             Icon="pack://application:,,,/Dive.ico"
             ShowMinimize="False"
             Grid.Row="0">
-            <ui:TitleBar.Tray>
-                <ui:NotifyIcon
-                    Icon="pack://application:,,,/Dive.ico"
-                    FocusOnLeftClick="True"
-                    MenuOnRightClick="True"
-                    TooltipText="Dive">
-                    <ui:NotifyIcon.Menu>
-                        <ContextMenu>
-                            <ui:MenuItem
-                                Header="Home"
-                                SymbolIcon="Home24"
-                                Tag="home" />
-                        </ContextMenu>
-                    </ui:NotifyIcon.Menu>
-                </ui:NotifyIcon>
-            </ui:TitleBar.Tray>
         </ui:TitleBar>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>

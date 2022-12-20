@@ -10,13 +10,19 @@
  * Source code: https://github.com/valnoxy/deploya
  */
 
+using deployaCore.Common;
 using Microsoft.Wim;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-
+using System.IO.Compression;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using static deployaCore.Common.WIMDescription;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace deploya_core
 {
@@ -540,6 +546,44 @@ namespace deploya_core
                     return null;
             }
         }
+
+        /// <summary>
+        /// Installs the specified Windows image.
+        /// </summary>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="name">Image Name</param>
+        /// <param name="description">Description of the image</param>
+        /// <param name="pathToCapture">Path of the captured dir</param>
+        /// <param name="pathToImage">Path of the output file</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
+        public static void CaptureToWIM(Entities.UI ui, string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
+        {
+            Output.Write("Capture Image ...            ");
+            ConsoleUtility.WriteProgressBar(0);
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
+
+            Capture.CreateWim(name, description, pathToCapture, pathToImage, worker);
+            Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Tests the info building algorithm for the capture function. 
+        /// </summary>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="name">Image Name</param>
+        /// <param name="description">Description of the image</param>
+        /// <param name="pathToCapture">Path of the captured dir</param>
+        /// <param name="pathToImage">Path of the output file</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
+        public static void TestBuildInfo(Entities.UI ui, string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
+        {
+            Output.WriteLine("Building test information ...            ");
+            //ConsoleUtility.WriteProgressBar(0);
+            //if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
+
+            var imageInfo = Capture.BuildImageInfo(name, description);
+            Console.WriteLine(imageInfo);
+        }
     }
 
     internal class Apply
@@ -596,20 +640,136 @@ namespace deploya_core
         }
     }
 
+    internal class Capture
+    {
+        internal static BackgroundWorker BW = null;
+        public static void CreateWim(string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker)
+        {
+            BW = worker;
+
+            using (WimHandle wimHandle = WimgApi.CreateFile(pathToImage, 
+                       WimFileAccess.Write, 
+                       WimCreationDisposition.CreateAlways, 
+                       WimCreateFileOptions.None, 
+                       WimCompressionType.None))
+            {
+
+                WimgApi.SetTemporaryPath(wimHandle, Environment.GetEnvironmentVariable("TEMP"));
+                WimgApi.RegisterMessageCallback(wimHandle, CaptureCallbackMethod);
+                try
+                {
+                    using (WimHandle imageHandle = WimgApi.CaptureImage(wimHandle, pathToCapture, WimCaptureImageOptions.None))
+                    {
+                        var xmlDocument = BuildImageInfo(name, description);
+                        WimgApi.SetImageInformation(imageHandle, xmlDocument);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("CaptureImage error: " + ex.Message);
+                }
+                finally
+                {
+                    // Be sure to unregister the callback method
+                    //
+                    WimgApi.UnregisterMessageCallback(wimHandle, CaptureCallbackMethod);
+                }
+            }
+        }
+
+        internal static string BuildImageInfo(string name, string description)
+        {
+            var wimDescription = new deployaCore.Common.WIMDescription.WIMIMAGE()
+            {
+                NAME = name,
+                DESCRIPTION = description,
+                INDEX = 1
+            };
+
+            var emptyNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+            var serializer = new XmlSerializer(typeof(WIMDescription.WIMIMAGE));
+            var settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.OmitXmlDeclaration = true;
+
+            using var stream = new StringWriter();
+            using var writer = XmlWriter.Create(stream, settings);
+            serializer.Serialize(writer, wimDescription, emptyNamespaces);
+            return stream.ToString();
+        }
+
+        private static WimMessageResult CaptureCallbackMethod(WimMessageType messageType, object message, object userData)
+        {
+            switch (messageType)
+            {
+                case WimMessageType.Progress:
+                    WimMessageProgress wimMessageProgress = (WimMessageProgress)message;
+                    if (BW != null)
+                    {
+                        BW.ReportProgress(wimMessageProgress.PercentComplete, ""); // Update progress bar
+                        //BW.ReportProgress(201, ""); // Update progress text
+                    }
+                    ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
+                    break;
+
+                case WimMessageType.Process:
+                    WimMessageProcess processMessage = (WimMessageProcess)message;
+                    if (BW != null)
+                    {
+                        BW.ReportProgress(202, ""); // Update progress text
+                        Output.WriteLine("Copying: " + processMessage.Path);
+                    }
+                    break;
+              
+                case WimMessageType.Scanning:
+                    WimMessageScanning wimMessageScanning = (WimMessageScanning)message;
+                    if (BW != null)
+                    {
+                        BW.ReportProgress(203, ""); // Update progress text
+                        Output.WriteLine("Scanning: " + wimMessageScanning.Count);
+                    }
+                    break;
+
+                case WimMessageType.Compress:
+                    WimMessageCompress wimMessageCompress = (WimMessageCompress)message;
+                    if (BW != null)
+                    {
+                        BW.ReportProgress(204, ""); // Update progress text
+                        Output.WriteLine("Compress: " + wimMessageCompress.Path + " " + wimMessageCompress.Compress.ToString());
+                    }
+                    break;
+                
+                case WimMessageType.Error:
+                    WimMessageError wimMessageError = (WimMessageError)message;
+                    Console.WriteLine($"Error: {0} ({1})", (object)wimMessageError.Path, (object)wimMessageError.Win32ErrorCode);
+                    if (BW != null) { BW.ReportProgress(301, ""); }
+                    break;
+
+                case WimMessageType.Warning:
+                    WimMessageWarning wimMessageWarning = (WimMessageWarning)message;
+                    Console.WriteLine($"Warning: {0} ({1})", (object)wimMessageWarning.Path, (object)wimMessageWarning.Win32ErrorCode);
+                    break;
+            }
+            return WimMessageResult.Success;
+        }
+    }
+
     internal class Management
     {
         internal static char[] GetAvailableDriveLetters()
         {
-            List<char> availableDriveLetters = new List<char>() { 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
-
-            DriveInfo[] drives = DriveInfo.GetDrives();
-
+            var availableDriveLetters = new List<char>() { 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+            var drives = DriveInfo.GetDrives();
             foreach (var t in drives)
             {
                 availableDriveLetters.Remove(t.Name.ToLower()[0]);
             }
 
             return availableDriveLetters.ToArray();
+        }
+        public class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
         }
     }
 }

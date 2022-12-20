@@ -45,8 +45,8 @@
             <Grid Grid.Row="2">
                 <StackPanel>
                     <Label x:Name="labelTitle" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="About this App" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" FontWeight="Bold" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="valueVersion" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive V. 2.1.0" FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="valueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © 2018 - 2022 Exploitox. All rights reserved." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                    <Label x:Name="valueVersion" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                    <Label x:Name="valueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
                     <TextBlock x:Name="licenseText" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" FontSize="15" TextWrapping="WrapWithOverflow" FontFamily="Segoe UI Variable Display" Height="100">
                         This program is free software: you can redistribute it and/or modify
                         it under the terms of the GNU General Public License as published by

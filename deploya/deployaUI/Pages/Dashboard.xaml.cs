@@ -19,6 +19,11 @@ namespace deployaUI.Pages
             (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("apply");
         }
 
+        private void SwitchToCapturePage(object sender, RoutedEventArgs e)
+        {
+            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("capture");
+        }
+
         private void SwitchToCloudPage(object sender, RoutedEventArgs e)
         {
             (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("cloud");

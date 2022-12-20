@@ -1,90 +1,91 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-	<SelfContained>true</SelfContained>
-	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-	<Platforms>AnyCPU;x64</Platforms>
-	<ApplicationManifest>app.manifest</ApplicationManifest>
-	<ApplicationIcon>Dive.ico</ApplicationIcon>
-	<AssemblyName>Dive</AssemblyName>
-	<Company>Exploitox</Company>
-	<Authors>valnoxy</Authors>
-	<Version>1.0.0.278</Version>
-	<Copyright>Copyright (c) 2018 - 2022 Exploitox. All rights reserved.</Copyright>
-	<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
-	<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<SelfContained>true</SelfContained>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<Platforms>x64</Platforms>
+		<Prefer32Bit>false</Prefer32Bit>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<ApplicationIcon>Dive.ico</ApplicationIcon>
+		<AssemblyName>Dive</AssemblyName>
+		<Company>Exploitox</Company>
+		<Authors>valnoxy</Authors>
+		<Version>1.0.0.289</Version>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Assets\icon-aios-40.png" />
-    <None Remove="Assets\icon-hdd-40.png" />
-    <None Remove="Assets\icon-windows-10-40.png" />
-    <None Remove="Assets\icon-windows-11-40.png" />
-    <None Remove="Assets\icon-windows-2000-40.png" />
-    <None Remove="Assets\icon-windows-240.png" />
-    <None Remove="Assets\icon-windows-40.png" />
-    <None Remove="Assets\icon-windows-7-40.png" />
-    <None Remove="Assets\icon-windows-8-40.png" />
-    <None Remove="Assets\icon-windows-server-2012-40.png" />
-    <None Remove="Assets\icon-windows-vista-40.png" />
-    <None Remove="Assets\icon-windows-xp-40.png" />
-    <None Remove="Dive.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Assets\icon-aios-40.png" />
+		<None Remove="Assets\icon-hdd-40.png" />
+		<None Remove="Assets\icon-windows-10-40.png" />
+		<None Remove="Assets\icon-windows-11-40.png" />
+		<None Remove="Assets\icon-windows-2000-40.png" />
+		<None Remove="Assets\icon-windows-40.png" />
+		<None Remove="Assets\icon-windows-7-40.png" />
+		<None Remove="Assets\icon-windows-8-40.png" />
+		<None Remove="Assets\icon-windows-server-2012-40.png" />
+		<None Remove="Assets\icon-windows-vista-40.png" />
+		<None Remove="Assets\icon-windows-xp-40.png" />
+		<None Remove="Dive.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\icon-windows-8-40.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Assets\icon-hdd-40.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\icon-hdd-40.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Assets\icon-aios-40.png" />
+		<Resource Include="Assets\icon-windows-10-40.png" />
+		<Resource Include="Assets\icon-windows-11-40.png" />
+		<Resource Include="Assets\icon-windows-2000-40.png" />
+		<Resource Include="Assets\icon-windows-40.png" />
+		<Resource Include="Assets\icon-windows-7-40.png" />
+		<Resource Include="Assets\icon-windows-8-40.png" />
+		<Resource Include="Assets\icon-windows-server-2012-40.png" />
+		<Resource Include="Assets\icon-windows-vista-40.png" />
+		<Resource Include="Assets\icon-windows-xp-40.png" />
+		<Resource Include="dive.ico" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\icon-aios-40.png" />
-    <Resource Include="Assets\icon-windows-10-40.png" />
-    <Resource Include="Assets\icon-windows-11-40.png" />
-    <Resource Include="Assets\icon-windows-2000-40.png" />
-    <Resource Include="Assets\icon-windows-40.png" />
-    <Resource Include="Assets\icon-windows-7-40.png" />
-    <Resource Include="Assets\icon-windows-server-2012-40.png" />
-    <Resource Include="Assets\icon-windows-vista-40.png" />
-    <Resource Include="Assets\icon-windows-xp-40.png" />
-    <Resource Include="dive.ico" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="System.Management" Version="6.0.0" />
+		<PackageReference Include="WPF-UI" Version="2.0.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="System.Management" Version="6.0.0" />
-    <PackageReference Include="WPF-UI" Version="2.0.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\deployaCore\deployaCore.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\deployaCore\deployaCore.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="Pages\ApplyPages\CloudSelectStep.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\CapturePages\CaptureStep.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\CloudContent.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\ApplyPages\ApplySelectStep.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\ApplyPages\DiskSelectStep.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Pages\ApplyPages\CloudSelectStep.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Pages\CloudContent.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Pages\ApplyPages\ApplySelectStep.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Pages\ApplyPages\DiskSelectStep.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe&quot; sign /sha1 &quot;35f4e53a88751bbe67eaa097513e3db1ad2f49e3&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64\signtool.exe&quot; sign /sha1 &quot;35f4e53a88751bbe67eaa097513e3db1ad2f49e3&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
+	</Target>
 
 </Project>

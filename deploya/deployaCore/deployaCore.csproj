@@ -13,18 +13,19 @@
 		<AssemblyName>deployaCore</AssemblyName>
 		<ApplicationIcon>deploya.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<Platforms>AnyCPU;x64</Platforms>
+		<Platforms>x64</Platforms>
+		<Prefer32Bit>false</Prefer32Bit>
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PackageId>deploya</PackageId>
-		<Version>12.0.0.401</Version>
+		<Version>12.0.0.426</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>
 		<Product>deploya</Product>
-		<Title>CLI version of deploya</Title>
-		<Copyright>Copyright (c) 2018 - 2022 Exploitox.</Copyright>
-		<PackageProjectUrl>https://github.com/valnoxy/deploya</PackageProjectUrl>
-		<PackageReleaseNotes>CLI version of deploya</PackageReleaseNotes>
+		<Title>Dive Core</Title>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+		<PackageReleaseNotes>Dive Core</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>

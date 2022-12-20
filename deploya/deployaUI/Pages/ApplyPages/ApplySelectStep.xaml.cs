@@ -12,7 +12,7 @@ namespace deployaUI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für ApplySelectStep.xaml
     /// </summary>
-    public partial class ApplySelectStep : UserControl
+    public partial class ApplySelectStep : System.Windows.Controls.UserControl
     {
         private BackgroundWorker applyBackgroundWorker;
         bool IsCanceled = false;
@@ -343,6 +343,8 @@ namespace deployaUI.Pages.ApplyPages
                     bootDrive = $"{letters[1]}:\\";
                     recoveryDrive = $"{letters[2]}:\\";
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             Output.WriteLine($"Windows drive: {windowsDrive}");

@@ -27,7 +27,7 @@ namespace deployaUI
             DebugString.Text = "Debug build - This is not a production ready build.";
 #else
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Beta build [B3 Public]";
+            DebugString.Text = "Beta build [B4 Public]";
 #endif
             // Get version
             System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();

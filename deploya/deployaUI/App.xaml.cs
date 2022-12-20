@@ -29,9 +29,8 @@ namespace deployaUI
     /// </summary>
     public partial class App : Application
     {
+        public static FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
         public static string ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static string codename = "Dive";
-        public static string copyright = "Copyright (c) 2018 - 2022 Exploitox. All rights reserved.";
 
         #region Parser options
         class Options
@@ -75,8 +74,8 @@ namespace deployaUI
             var helpText = HelpText.AutoBuild(result, h =>
             {
                 h.AdditionalNewLineAfterOption = false; // Remove the extra newline between options
-                h.Heading = $"{codename} [Version: {ver}]"; // Header
-                h.Copyright = App.copyright; // Copyright text
+                h.Heading = $"{VersionInfo.InternalName} [Version: {ver}]"; // Header
+                h.Copyright = VersionInfo.LegalCopyright; // Copyright text
                 return HelpText.DefaultParsingErrorsHandler(result, h);
             }, e => e);
             Console.WriteLine(helpText);
@@ -117,9 +116,9 @@ namespace deployaUI
             ShowWindow(handle, SW_HIDE);
 #endif
             
-            Console.Title = $"{codename} - Debug Console";
-            Console.WriteLine($"{codename} [Version: {ver}]"); // Header
-            Console.WriteLine(copyright + "\n"); // Copyright text
+            Console.Title = $"{VersionInfo.ProductName} - Debug Console";
+            Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
+            Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
             Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
 
             if (args.Length == 1)
@@ -150,6 +149,24 @@ namespace deployaUI
                 }
 
                 ShowGUI();
+            }
+
+            if (args.Contains("--capture-test"))
+            {
+                const string name = "Windows 7 (Captured with Dive)";
+                const string description = "This image was captured with Dive.";
+                const string pathToCapture = @"F:\\";
+                const string pathToImage = @"C:\\Users\\jonas\\Desktop\\myImage.wim";
+
+                Common.Debug.WriteLine("Running capture test ...");
+                Common.Debug.WriteLine("Name: " + name);
+                Common.Debug.WriteLine("Description: " + description);
+                Common.Debug.WriteLine("Target drive: " + pathToCapture); 
+                Common.Debug.WriteLine("Save image to: " + pathToImage);
+                Common.Debug.WriteLine("[CALL deploya_core.Actions.TestBuildInfo()] Building WIM Information ...");
+
+                deploya_core.Actions.TestBuildInfo(Entities.UI.Command, name, description, pathToCapture, pathToImage);
+                Environment.Exit(0);
             }
 
             var parser = new CommandLine.Parser(with => with.HelpWriter = null);
