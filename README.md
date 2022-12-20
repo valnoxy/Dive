@@ -4,9 +4,9 @@
 <p align="center">
     Easy Deployment for Windows
     <br />
-    <strong>Version: </strong>1.0.0.278 (Beta 3)
+    <strong>Version: </strong>1.0.0.289 (Beta 4)
     <br/>
-    <strong>Core: </strong>12.0.0.401
+    <strong>Core: </strong>12.0.0.426
     <br />
     <br />
     <a href="https://github.com/valnoxy/dive/releases"><strong>Download now »</strong></a>
@@ -51,7 +51,7 @@ Clone this source and restore the NUGET Packages.
 Dive is licensed under [GNU GENERAL PUBLIC LICENSE](https://github.com/valnoxy/dive/blob/main/LICENSE). So you are allowed to use freely and modify the application. I will not be responsible for any outcome. Proceed with any action at your own risk.
 
 <hr>
-<h6 align="center">© 2018 - 2022 valnoxy. All Rights Reserved. 
+<h6 align="center">© 2018 - 2023 valnoxy. All Rights Reserved. 
 <br>
 By Jonas Günner &lt;jonas@exploitox.de&gt;</h6>
 <p align="center">
