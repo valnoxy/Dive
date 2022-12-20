@@ -26,7 +26,7 @@ Dive (formally deploya) is a little application for deploying Windows on a machi
 - Deploy WIM-Files on any drive
 - Mass deploy Windows with AutoDive (W.I.P)
 - Bypass Windows 11 Microsoft-Account compulsion
-- Capture Windows installation (W.I.P)
+- Capture Windows installation
 - Install Windows from the Cloud
 
 ## 🔧 Usage
