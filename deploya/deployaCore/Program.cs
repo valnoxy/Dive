@@ -1,6 +1,6 @@
-﻿/* 
+/* 
  * deploya - Fast and Easy way to deploy Windows
- * Copyright (c) 2018 - 2022 Exploitox.
+ * Copyright (c) 2018 - 2023 Exploitox.
  * 
  * deploya is licensed under MIT License (https://github.com/valnoxy/deploya/blob/main/LICENSE). 
  * So you are allowed to use freely and modify the application. 
@@ -101,7 +101,7 @@ namespace deploya_core
         /// <param name="bootDrive">Drive letter of the Boot partition</param>
         /// <param name="recoveryDrive">Drive letter of the Recovery partition</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, Entities.PartitionStyle partitionStyle, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
         {
             // General message
             Output.Write("Partitioning disk ...         ");
@@ -124,109 +124,108 @@ namespace deploya_core
             partDest.Start();
 
             // Partition information
-            if (firmware == Entities.Firmware.BIOS)
+            switch (partitionStyle)
             {
-                if (bootloader == Entities.Bootloader.NTLDR)
-                {
-                    partDest.StandardInput.WriteLine("select disk " + disk);
-                    partDest.StandardInput.WriteLine("clean");
-                    partDest.StandardInput.WriteLine("create partition primary");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("active");
-                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
-                    partDest.StandardInput.WriteLine("exit");
-                    partDest.WaitForExit();
-                }
-                if (bootloader == Entities.Bootloader.BOOTMGR)
-                {
-                    if (useRecovery)
+                case Entities.PartitionStyle.Full:
+                    switch (firmware)
                     {
-                        partDest.StandardInput.WriteLine("select disk " + disk);
-                        partDest.StandardInput.WriteLine("clean");
-                        partDest.StandardInput.WriteLine("create partition primary size=100");
-                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
-                        partDest.StandardInput.WriteLine("active");
-                        partDest.StandardInput.WriteLine("create partition primary");
-                        partDest.StandardInput.WriteLine("shrink minimum=650");
-                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
-                        partDest.StandardInput.WriteLine("create partition primary");
-                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                        partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
-                        partDest.StandardInput.WriteLine("set id=27");
-                        partDest.StandardInput.WriteLine("exit");
-                        partDest.WaitForExit();
+                        case Entities.Firmware.BIOS: // Windows + Recovery + Boot on BIOS
+                            partDest.StandardInput.WriteLine("select disk " + disk);
+                            partDest.StandardInput.WriteLine("clean");
+                            partDest.StandardInput.WriteLine("create partition primary size=100");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
+                            partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("active");
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("shrink minimum=650");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                            partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
+                            partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("set id=27");
+                            partDest.StandardInput.WriteLine("exit");
+                            break;
+                        case Entities.Firmware.EFI: // Windows + Recovery + Boot on EFI
+                            partDest.StandardInput.WriteLine("select disk " + disk);
+                            partDest.StandardInput.WriteLine("clean");
+                            partDest.StandardInput.WriteLine("convert gpt");
+                            partDest.StandardInput.WriteLine("create partition efi size=100");
+                            partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
+                            partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("create partition msr size=16");
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("shrink minimum=650");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                            partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
+                            partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac");
+                            partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
+                            partDest.StandardInput.WriteLine("exit");
+                            break;
                     }
-                    else
+                    break;
+                
+                case Entities.PartitionStyle.SeparateBoot:
+                    switch (firmware)
                     {
-                        partDest.StandardInput.WriteLine("select disk " + disk);
-                        partDest.StandardInput.WriteLine("clean");
-                        partDest.StandardInput.WriteLine("create partition primary size=100");
-                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
-                        partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
-                        partDest.StandardInput.WriteLine("active");
-                        partDest.StandardInput.WriteLine("create partition primary");
-                        partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                        partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
-                        partDest.StandardInput.WriteLine("exit");
-                        partDest.WaitForExit();
+                        case Entities.Firmware.BIOS: // Windows + Boot on BIOS
+                            partDest.StandardInput.WriteLine("select disk " + disk);
+                            partDest.StandardInput.WriteLine("clean");
+                            partDest.StandardInput.WriteLine("create partition primary size=100");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=System");
+                            partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("active");
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                            partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("exit");
+                            break;
+                        case Entities.Firmware.EFI: // Windows + Boot on EFI
+                            partDest.StandardInput.WriteLine("select disk " + disk);
+                            partDest.StandardInput.WriteLine("clean");
+                            partDest.StandardInput.WriteLine("convert gpt");
+                            partDest.StandardInput.WriteLine("create partition efi size=100");
+                            partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
+                            partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("create partition msr size=16");
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                            partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
+                            partDest.StandardInput.WriteLine("exit");
+                            break;
                     }
-                }
+                    break;
+                
+                case Entities.PartitionStyle.Single:
+                    switch (firmware)
+                    {
+                        case Entities.Firmware.BIOS: // Windows on BIOS
+                            partDest.StandardInput.WriteLine("select disk " + disk);
+                            partDest.StandardInput.WriteLine("clean");
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                            partDest.StandardInput.WriteLine("active");
+                            partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("exit");
+                            break;
+                        case Entities.Firmware.EFI: // Windows on EFI
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("");
+                            Console.WriteLine("   An Error has occurred.");
+                            Console.WriteLine("   Error: You cannot use Single Partition layout on a System with EFI Firmware.");
+                            if (ui == Entities.UI.Command)
+                                Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                            Console.ResetColor();
+                            if (ui == Entities.UI.Graphical) { worker.ReportProgress(301, ""); }
+                            return;
+                    }
+                    break;
             }
-
-            if (firmware == Entities.Firmware.EFI)
-            {
-                if (bootloader == Entities.Bootloader.NTLDR)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: You cannot use NTLDR as bootloader on EFI.");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(301, ""); }
-                    return;
-                }
-
-                if (useRecovery)
-                {
-                    partDest.StandardInput.WriteLine("select disk " + disk);
-                    partDest.StandardInput.WriteLine("clean");
-                    partDest.StandardInput.WriteLine("convert gpt");
-                    partDest.StandardInput.WriteLine("create partition efi size=100");
-                    partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
-                    partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
-                    partDest.StandardInput.WriteLine("create partition msr size=16");
-                    partDest.StandardInput.WriteLine("create partition primary");
-                    partDest.StandardInput.WriteLine("shrink minimum=650");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
-                    partDest.StandardInput.WriteLine("create partition primary");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
-                    partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
-                    partDest.StandardInput.WriteLine("set id=de94bba4-06d1-4d40-a16a-bfd50179d6ac");
-                    partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
-                    partDest.StandardInput.WriteLine("exit");
-                }
-                else
-                {
-                    partDest.StandardInput.WriteLine("select disk " + disk);
-                    partDest.StandardInput.WriteLine("clean");
-                    partDest.StandardInput.WriteLine("convert gpt");
-                    partDest.StandardInput.WriteLine("create partition efi size=100");
-                    partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
-                    partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
-                    partDest.StandardInput.WriteLine("create partition msr size=16");
-                    partDest.StandardInput.WriteLine("create partition primary");
-                    partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
-                    partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
-                    partDest.StandardInput.WriteLine("gpt attributes=0x8000000000000001");
-                    partDest.StandardInput.WriteLine("exit");
-                }
-                partDest.WaitForExit();                    
-            }
+            partDest.WaitForExit();
 
             if (partDest.ExitCode != 0)
             {
@@ -270,10 +269,10 @@ namespace deploya_core
         /// <param name="firmware">Firmware type of the device</param>
         /// <param name="bootloader">Windows Bootloader</param>
         /// <param name="ui">User Interface type</param>
-        /// <param name="WindowsPath">Path to the Windows directory</param>
-        /// <param name="BootloaderLetter">Drive letter of the boot partition</param>
+        /// <param name="windowsPath">Path to the Windows directory</param>
+        /// <param name="bootloaderLetter">Drive letter of the boot partition</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string WindowsPath, string BootloaderLetter, BackgroundWorker worker = null)
+        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string windowsPath, string bootloaderLetter, BackgroundWorker worker = null)
         {
             Output.Write("Installing Bootloader ...     ");
             ConsoleUtility.WriteProgressBar(0);
@@ -284,7 +283,7 @@ namespace deploya_core
             #region Legacy check
             if (bootloader == Entities.Bootloader.NTLDR)
             {
-                string StrBl = BootloaderLetter.Substring(0, 2);
+                string StrBl = bootloaderLetter.Substring(0, 2);
                 bootld.StartInfo.FileName = "bootsect.exe";
                 bootld.StartInfo.Arguments = $"/nt52 {StrBl} /force /mbr";
             }
@@ -296,10 +295,10 @@ namespace deploya_core
                 bootld.StartInfo.FileName = "bcdboot.exe";
 
                 if (firmware == Entities.Firmware.BIOS) // BIOS
-                    bootld.StartInfo.Arguments = $"{WindowsPath} /s {BootloaderLetter} /f BIOS";
+                    bootld.StartInfo.Arguments = $"{windowsPath} /s {bootloaderLetter} /f BIOS";
 
                 if (firmware == Entities.Firmware.EFI) // EFI
-                    bootld.StartInfo.Arguments = $"{WindowsPath} /s {BootloaderLetter} /f UEFI";
+                    bootld.StartInfo.Arguments = $"{windowsPath} /s {bootloaderLetter} /f UEFI";
             }
             #endregion
 
@@ -331,10 +330,10 @@ namespace deploya_core
         /// Install and register the recovery partition.
         /// </summary>
         /// <param name="ui">User Interface type</param>
-        /// <param name="WindowsPath">Path to the Windows directory</param>
-        /// <param name="RecoveryLetter">Drive letter of the recovery partition</param>
+        /// <param name="windowsPath">Path to the Windows directory</param>
+        /// <param name="recoveryLetter">Drive letter of the recovery partition</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallRecovery(Entities.UI ui, string WindowsPath, string RecoveryLetter, BackgroundWorker worker = null)
+        public static void InstallRecovery(Entities.UI ui, string windowsPath, string recoveryLetter, BackgroundWorker worker = null)
         {
             Output.Write("Installing Recovery ...       ");
             ConsoleUtility.WriteProgressBar(0);
@@ -343,7 +342,7 @@ namespace deploya_core
             // Create Recovery directory
             try
             {
-                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(RecoveryLetter, "Recovery", "WindowsRE"));
+                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(recoveryLetter, "Recovery", "WindowsRE"));
             }
             catch 
             {
@@ -361,11 +360,11 @@ namespace deploya_core
             // Copy WinRE image to Recovery partition
             try
             {
-                if (System.IO.File.Exists(System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim")))
+                if (System.IO.File.Exists(System.IO.Path.Combine(windowsPath, "System32", "Recovery", "Winre.wim")))
                 {
                     System.IO.File.Copy(
-                        System.IO.Path.Combine(WindowsPath, "System32", "Recovery", "Winre.wim"),
-                        System.IO.Path.Combine(RecoveryLetter, "Recovery", "WindowsRE", "Winre.wim"),
+                        System.IO.Path.Combine(windowsPath, "System32", "Recovery", "Winre.wim"),
+                        System.IO.Path.Combine(recoveryLetter, "Recovery", "WindowsRE", "Winre.wim"),
                         true
                     );
                 }
@@ -399,8 +398,8 @@ namespace deploya_core
             try
             {
                 Process p = new Process();
-                p.StartInfo.FileName = System.IO.Path.Combine(WindowsPath, "System32", "Reagentc.exe");
-                p.StartInfo.Arguments = $"/Setreimage /Path {RecoveryLetter}\\Recovery\\WindowsRE /Target {WindowsPath}";
+                p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Reagentc.exe");
+                p.StartInfo.Arguments = $"/Setreimage /Path {recoveryLetter}\\Recovery\\WindowsRE /Target {windowsPath}";
                 p.StartInfo.RedirectStandardOutput = true;
                 p.StartInfo.CreateNoWindow = true;
                 p.Start();
@@ -425,14 +424,14 @@ namespace deploya_core
         }
 
         /// <summary>
-        /// Installs the unattended configuration file to the Windows installation (only Vista and higher).
+        /// Installs the unattended configuration file to the Windows Installation (only Vista and higher).
         /// </summary>
         /// <param name="ui">User Interface type</param>
-        /// <param name="WindowsPath">Path to the Windows directory</param>
-        /// <param name="Configuration">Content of the configuration file</param>
-        /// <param name="OemLogoPath">Path to the OEM logo</param>
+        /// <param name="windowsPath">Path to the Windows directory</param>
+        /// <param name="configuration">Content of the configuration file</param>
+        /// <param name="oemLogoPath">Path to the OEM logo</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallUnattend(Entities.UI ui, string WindowsPath, string Configuration, string OemLogoPath = null, BackgroundWorker worker = null)
+        public static void InstallUnattend(Entities.UI ui, string windowsPath, string configuration, string oemLogoPath = null, BackgroundWorker worker = null)
         {
             Output.Write("Installing unattend file ...  ");
             ConsoleUtility.WriteProgressBar(0);
@@ -441,7 +440,7 @@ namespace deploya_core
             // Create Recovery directory
             try
             {
-                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(WindowsPath, "Panther"));
+                System.IO.Directory.CreateDirectory(System.IO.Path.Combine(windowsPath, "Panther"));
             }
             catch
             {
@@ -459,7 +458,7 @@ namespace deploya_core
             // Write config to disk as unattend.xml
             try
             {
-                System.IO.File.WriteAllText(System.IO.Path.Combine(WindowsPath, "Panther", "unattend.xml"), Configuration);
+                System.IO.File.WriteAllText(System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml"), configuration);
             }
             catch
             {
@@ -475,11 +474,11 @@ namespace deploya_core
             }
 
             // Copy OEM logo to Windows\System32 directory
-            if (OemLogoPath != null || OemLogoPath != "")
+            if (oemLogoPath != null || oemLogoPath != "")
             {
                 try
                 {
-                    System.IO.File.Copy(OemLogoPath, Path.Combine(WindowsPath, "System32", "logo.bmp"), true);
+                    System.IO.File.Copy(oemLogoPath, Path.Combine(windowsPath, "System32", "logo.bmp"), true);
                 }
                 catch
                 {
@@ -503,11 +502,11 @@ namespace deploya_core
         /// <summary>
         /// Get information about an Windows deployment image (WIM).
         /// </summary>
-        /// <param name="ImagePath">Path to image file</param>
+        /// <param name="imagePath">Path to image file</param>
         /// <returns>Information about the image file as XML</returns>
-        public static string GetInfo(string ImagePath)
+        public static string GetInfo(string imagePath)
         {
-            using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
+            using (WimHandle file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
             {
                 string a = WimgApi.GetImageInformationAsString(file);
                 return a;
@@ -565,43 +564,24 @@ namespace deploya_core
             Capture.CreateWim(name, description, pathToCapture, pathToImage, worker);
             Console.WriteLine();
         }
-
-        /// <summary>
-        /// Tests the info building algorithm for the capture function. 
-        /// </summary>
-        /// <param name="ui">User Interface type</param>
-        /// <param name="name">Image Name</param>
-        /// <param name="description">Description of the image</param>
-        /// <param name="pathToCapture">Path of the captured dir</param>
-        /// <param name="pathToImage">Path of the output file</param>
-        /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void TestBuildInfo(Entities.UI ui, string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
-        {
-            Output.WriteLine("Building test information ...            ");
-            //ConsoleUtility.WriteProgressBar(0);
-            //if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
-
-            var imageInfo = Capture.BuildImageInfo(name, description);
-            Console.WriteLine(imageInfo);
-        }
     }
 
     internal class Apply
     {
         internal static BackgroundWorker BW = null;
 
-        internal static void WriteToDisk(string ImagePath, int Index, string Drive, BackgroundWorker worker = null)
+        internal static void WriteToDisk(string imagePath, int index, string drive, BackgroundWorker worker = null)
         {
             BW = worker;
 
-            string path = Drive;
-            using (WimHandle file = WimgApi.CreateFile(ImagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
+            string path = drive;
+            using (WimHandle file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
             {
                 WimgApi.SetTemporaryPath(file, Environment.GetEnvironmentVariable("TEMP"));
                 WimgApi.RegisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
                 try
                 {
-                    using (WimHandle imageHandle = WimgApi.LoadImage(file, Index))
+                    using (WimHandle imageHandle = WimgApi.LoadImage(file, index))
                         WimgApi.ApplyImage(imageHandle, path, WimApplyImageOptions.None);
                 }
                 finally

@@ -315,7 +315,7 @@ namespace deployaUI
 
             // Prepare disk
             worker.ReportProgress(201, "");     // Prepare Disk Text
-            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
+            //Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
