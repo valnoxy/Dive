@@ -72,6 +72,11 @@ namespace deployaUI.Pages.ApplyPages
                 BIOSRadio.IsChecked = true;
                 UseRecoveryBtn.IsChecked = false;
             }
+            else if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
+            {
+                UseRecoveryBtn.IsChecked = false;
+                UseNTLDRBtn.IsChecked = false;
+            }
             else
             {
                 UseNTLDRBtn.IsChecked = false;
@@ -124,17 +129,17 @@ namespace deployaUI.Pages.ApplyPages
 
                     var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 1));
 
-                    if (Interface != "USB" && DeviceID != $"\\\\.\\PHYSICALDRIVE{ret}")
+                    if (DeviceID != $"\\\\.\\PHYSICALDRIVE{ret}")
                     {
                         // Add to list
-                        string driveid = DeviceID;
+                        var driveid = DeviceID;
                         driveid = Regex.Match(driveid, @"\d+").Value;
-                        string drive = $"{Model} | {SizeInGB} GB | Disk {driveid}";
+                        var drive = $"{Model} | {SizeInGB} GB | Disk {driveid}";
                         DiskListView.Items.Add(drive);
                     }
                     else
                     {
-                        Common.Debug.WriteLine("Skipping as this is a USB Device or the main disk ...", ConsoleColor.Yellow);
+                        Common.Debug.WriteLine("Skipping as this is the main disk ...", ConsoleColor.Yellow);
                     }
 
 
@@ -143,7 +148,6 @@ namespace deployaUI.Pages.ApplyPages
             }
             catch (Exception)
             {
-#warning TODO: Better error handling
                 // throw;
             }
         }

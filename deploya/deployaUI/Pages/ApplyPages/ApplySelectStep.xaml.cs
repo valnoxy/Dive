@@ -1,4 +1,4 @@
-﻿using deploya_core;
+using deploya_core;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -320,8 +320,17 @@ namespace deployaUI.Pages.ApplyPages
                                 break;
 
                             case false:
-                                letters = Actions.GetSystemLetters(Entities.PartitionStyle.SeparateBoot);
-                                partStyle = Entities.PartitionStyle.SeparateBoot;
+                                // If Vista is used, we need to use the Single partition layout
+                                if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
+                                {
+                                    letters = Actions.GetSystemLetters(Entities.PartitionStyle.Single);
+                                    partStyle = Entities.PartitionStyle.Single;
+                                }
+                                else
+                                {
+                                    letters = Actions.GetSystemLetters(Entities.PartitionStyle.SeparateBoot);
+                                    partStyle = Entities.PartitionStyle.SeparateBoot;
+                                }
                                 break;
                     }
                     break;
