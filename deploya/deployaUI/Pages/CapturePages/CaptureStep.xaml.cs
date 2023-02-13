@@ -1,11 +1,8 @@
-﻿using deploya_core;
-using System;
+﻿using deployaCore;
+using deployaCore.Common;
 using System.ComponentModel;
 using System.IO;
-using System.Threading;
-using System.Windows.Controls;
 using System.Windows.Media;
-using deployaUI.Common;
 using System.Text.RegularExpressions;
 
 namespace deployaUI.Pages.CapturePages

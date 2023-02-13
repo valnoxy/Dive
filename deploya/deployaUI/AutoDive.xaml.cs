@@ -1,9 +1,10 @@
-﻿using System;
+﻿using deployaCore;
+using deployaCore.Common;
+using deployaUI.Common;
+using System;
 using System.IO;
 using System.Windows.Media;
-using deploya_core;
 using System.Xml;
-using deployaUI.Common;
 using System.Management;
 using System.ComponentModel;
 

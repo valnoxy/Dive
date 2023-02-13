@@ -1,13 +1,9 @@
-﻿using deploya_core;
+﻿using deployaCore.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace deployaUI.Pages.CapturePages
 {

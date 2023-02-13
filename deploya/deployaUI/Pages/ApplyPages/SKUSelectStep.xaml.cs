@@ -1,11 +1,9 @@
-﻿using deploya_core;
+﻿using deployaCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Xml;
 
 namespace deployaUI.Pages.ApplyPages
@@ -24,14 +22,6 @@ namespace deployaUI.Pages.ApplyPages
         }
 
         private List<Image> images;
-
-        public List<Image> ImageList
-        {
-            get
-            {
-                return images;
-            }
-        }
 
         public SKUSelectStep()
         {

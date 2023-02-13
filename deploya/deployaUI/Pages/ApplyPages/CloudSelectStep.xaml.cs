@@ -1,4 +1,4 @@
-﻿using deploya_core;
+﻿using deployaCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,14 +24,6 @@ namespace deployaUI.Pages.ApplyPages
 
         private List<Image> images;
 
-        public List<Image> ImageList
-        {
-            get
-            {
-                return images;
-            }
-        }
-
         public CloudSelectStep()
         {
             InitializeComponent();
@@ -43,7 +35,6 @@ namespace deployaUI.Pages.ApplyPages
             images = new List<Image>();
             int counter = 0;
 
-           
             // Initialize network on Windows PE
             if (File.Exists("X:\\Windows\\System32\\wpeinit.exe"))
             {

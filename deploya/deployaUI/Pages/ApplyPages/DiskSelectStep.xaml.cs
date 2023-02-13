@@ -1,13 +1,10 @@
-﻿using deploya_core;
-using System;
-using System.IO;
+﻿using System;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
 
 namespace deployaUI.Pages.ApplyPages
 {

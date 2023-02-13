@@ -1,11 +1,10 @@
-﻿using deploya_core;
+﻿using deployaCore;
+using deployaCore.Common;
+using deployaUI.Common;
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Threading;
-using System.Windows.Controls;
 using System.Windows.Media;
-using deployaUI.Common;
 
 namespace deployaUI.Pages.ApplyPages
 {

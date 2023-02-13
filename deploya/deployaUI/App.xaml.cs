@@ -20,7 +20,8 @@ using CommandLine;
 using CommandLine.Text;
 using System.Reflection;
 using System.IO;
-using deploya_core;
+using deployaCore;
+using deployaCore.Common;
 
 namespace deployaUI
 {

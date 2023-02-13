@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace deployaCore.Common
+﻿namespace deployaCore.Common
 {
     public class WIMDescription
     {
@@ -15,7 +9,6 @@ namespace deployaCore.Common
         [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
         public partial class WIM
         {
-
             private WIMIMAGE iMAGEField;
 
             /// <remarks/>
@@ -38,7 +31,6 @@ namespace deployaCore.Common
         [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
         public partial class WIMIMAGE
         {
-
             private string nAMEField;
 
             private string dESCRIPTIONField;
@@ -85,8 +77,5 @@ namespace deployaCore.Common
                 }
             }
         }
-
-
     }
-
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace deploya_core
+namespace deployaCore
 {
     static class ConsoleUtility
     {

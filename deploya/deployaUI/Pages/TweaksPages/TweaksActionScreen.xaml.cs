@@ -1,13 +1,11 @@
-﻿using deploya_core;
+﻿using deployaCore;
+using deployaCore.Common;
+using deployaUI.Common;
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Threading;
-using System.Windows.Controls;
 using System.Windows.Media;
-using deployaUI.Common;
 using System.Diagnostics;
-using static deployaUI.Pages.CapturePages.SaveToStep;
 using System.Management;
 
 namespace deployaUI.Pages.TweaksPages
@@ -133,7 +131,7 @@ namespace deployaUI.Pages.TweaksPages
                     ProgrText.Text = "Copying unattend.xml to disk ...";
                     break;
                 case 206:                           // 206: ProgText -> Injecting drivers
-                    ProgrText.Text = $"Injecting drivers ({currentDriver} of {driverCount}) ...";
+                    //ProgrText.Text = $"Injecting drivers ({currentDriver} of {driverCount}) ...";
                     break;
                 case 250:                           // 250: Installation complete
                     ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
@@ -495,7 +493,7 @@ namespace deployaUI.Pages.TweaksPages
                 if (config == "")
                     config = Common.UnattendBuilder.Build(um);
 
-                Debug.WriteLine(config);
+                Common.Debug.WriteLine(config);
                  
                 Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
 

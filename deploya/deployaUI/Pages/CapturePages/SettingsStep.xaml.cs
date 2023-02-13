@@ -1,15 +1,8 @@
-﻿using deploya_core;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Forms;
-using System.Xml;
 
 namespace deployaUI.Pages.CapturePages
 {
