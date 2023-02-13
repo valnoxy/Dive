@@ -6,45 +6,30 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 using deployaUI.Common;
+using System.Diagnostics;
+using static deployaUI.Pages.CapturePages.SaveToStep;
+using System.Management;
 
-namespace deployaUI.Pages.ApplyPages
+namespace deployaUI.Pages.TweaksPages
 {
     /// <summary>
-    /// Interaktionslogik für ApplySelectStep.xaml
+    /// Interaktionslogik für TweaksActionScreen.xaml
     /// </summary>
-    public partial class ApplySelectStep : System.Windows.Controls.UserControl
+    public partial class TweaksActionScreen : System.Windows.Controls.UserControl
     {
-        private BackgroundWorker applyBackgroundWorker;
+        private BackgroundWorker applyBackgroundWorker = new();
         bool IsCanceled = false;
-        private int currentDriver = 0;
-        private int driverCount = 0;
 
-        public ApplySelectStep()
+        public TweaksActionScreen()
         {
             InitializeComponent();
 
-            if (ApplyContent.ContentWindow != null)
+            if (TweaksContent.ContentWindow != null)
             {
-                ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                ApplyContent.ContentWindow.CancelBtn.IsEnabled = false;
+                TweaksContent.ContentWindow.NextBtn.IsEnabled = false;
+                TweaksContent.ContentWindow.BackBtn.IsEnabled = false;
+                TweaksContent.ContentWindow.CancelBtn.IsEnabled = false;
             }
-            if (CloudContent.ContentWindow != null)
-            {
-                CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                CloudContent.ContentWindow.CancelBtn.IsEnabled = false;
-            }
-
-            if (DiskSelectStep.ContentWindow.IsNTLDRChecked())
-                Common.ApplyDetails.UseNTLDR = true;
-            else 
-                Common.ApplyDetails.UseNTLDR = false;
-
-            if (DiskSelectStep.ContentWindow.IsRecoveryChecked())
-                Common.ApplyDetails.UseRecovery = true;
-            else
-                Common.ApplyDetails.UseRecovery = false;
 
             // Validate deployment settings
             switch (Common.OemInfo.UseOemInfo)
@@ -70,12 +55,13 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Set active Image to card
-            ImageName.Text = Common.ApplyDetails.Name;
-            ImageFile.Text = Common.ApplyDetails.FileName;
-            ImageSourceConverter img = new ImageSourceConverter();
+            ImageName.Text = $"Disk {Common.Tweaks.DiskIndex}";
+            
+            // ImageFile.Text = Common.ApplyDetails.FileName;
+            var img = new ImageSourceConverter();
             try
             {
-                ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
+                ImageIcon.Source = (ImageSource)img.ConvertFromString("null");
             }
             catch
             {
@@ -83,10 +69,9 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Backgrond worker for deployment
-            applyBackgroundWorker = new BackgroundWorker();
             applyBackgroundWorker.WorkerReportsProgress = true;
             applyBackgroundWorker.WorkerSupportsCancellation = true;
-            applyBackgroundWorker.DoWork += ApplyWim;
+            applyBackgroundWorker.DoWork += MigrateWindows;
             applyBackgroundWorker.ProgressChanged += applyBackgroundWorker_ProgressChanged;
             applyBackgroundWorker.RunWorkerAsync();
         }
@@ -269,6 +254,36 @@ namespace deployaUI.Pages.ApplyPages
             // Progressbar percentage
             if (e.ProgressPercentage <= 100)
                 this.ProgrBar.Value = e.ProgressPercentage;
+        }
+
+        private static void MigrateWindows(object? sender, DoWorkEventArgs e)
+        {
+            #region Environment definition
+
+            var worker = sender as BackgroundWorker;
+
+            #endregion
+
+            // Validate Windows Disk
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskPartition WHERE DiskIndex = " + Common.Tweaks.DiskIndex);
+
+            foreach (ManagementObject partition in searcher.Get())
+            {
+                Console.WriteLine("Type: " + partition["Type"]);
+                Console.WriteLine("Size: " + partition["Size"] + " bytes");
+                Console.WriteLine("Name: " + partition["Name"]);
+                Console.WriteLine("DeviceID: " + partition["DeviceID"]);
+            }
+
+            // Identify installed Windows Version
+            const string ntKernel = "E:\\Windows\\System32\\ntoskrnl.exe";
+            var kernelVersionInfo = FileVersionInfo.GetVersionInfo(ntKernel);
+            var windowsVersion = GetWindowsName(kernelVersionInfo.ToString());
+
+            if (windowsVersion is not WindowsVersion.Windows10 or WindowsVersion.Windows81 or WindowsVersion.Windows8)
+            {
+                // Failed -> System does not support UEFI
+            }
         }
 
         private void ApplyWim(object? sender, DoWorkEventArgs e)
@@ -506,6 +521,60 @@ namespace deployaUI.Pages.ApplyPages
 
             // Installation complete
             worker.ReportProgress(250, "");     // Installation complete Text
+        }
+
+        private enum WindowsVersion
+        {
+            Windows2000,
+            WindowsXP,
+            WindowsVista,
+            Windows7,
+            Windows8,
+            Windows81,
+            Windows10,
+            Unknown
+        }
+
+        private static WindowsVersion GetWindowsName(string productVersion)
+        {
+            var versionParts = productVersion.Split('.');
+
+            if (versionParts[0] == "10")
+            {
+                return WindowsVersion.Windows10;
+            }
+            else
+            {
+                switch (versionParts[0])
+                {
+                    case "6":
+                        switch (versionParts[1])
+                        {
+                            case "0":
+                                return WindowsVersion.WindowsVista;
+                            case "1":
+                                return WindowsVersion.Windows7;
+                            case "2":
+                                return WindowsVersion.Windows8;
+                            case "3":
+                                return WindowsVersion.Windows81;
+                        }
+                        break;
+                    case "5":
+                        switch (versionParts[1])
+                        {
+                            case "0":
+                                return WindowsVersion.Windows2000;
+                            case "1":
+                            case "2":
+                                return WindowsVersion.WindowsXP;
+                        }
+                        break;
+                    default:
+                        return WindowsVersion.Unknown;
+                }
+            }
+            return WindowsVersion.Unknown;
         }
     }
 }

@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * deploya - Fast and Easy way to deploy Windows
  * Copyright (c) 2018 - 2023 Exploitox.
  * 
@@ -18,11 +18,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using static deployaCore.Common.WIMDescription;
-using static System.Net.Mime.MediaTypeNames;
+using Microsoft.Dism;
 
 namespace deploya_core
 {
@@ -87,8 +87,6 @@ namespace deploya_core
 
     public class Actions
     {
-        public static BackgroundWorker progBar = null;
-
         /// <summary>
         /// Prepare and format the specified disk for Windows deployment.
         /// </summary>
@@ -292,6 +290,7 @@ namespace deploya_core
             #region BIOS / EFI check
             if (bootloader == Entities.Bootloader.BOOTMGR)
             {
+                windowsPath = $"{windowsPath}Windows";
                 bootld.StartInfo.FileName = "bcdboot.exe";
 
                 if (firmware == Entities.Firmware.BIOS) // BIOS
@@ -430,8 +429,9 @@ namespace deploya_core
         /// <param name="windowsPath">Path to the Windows directory</param>
         /// <param name="configuration">Content of the configuration file</param>
         /// <param name="oemLogoPath">Path to the OEM logo</param>
+        /// <param name="performDismApply">Whether to perform a DISM Apply-Unattend</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallUnattend(Entities.UI ui, string windowsPath, string configuration, string oemLogoPath = null, BackgroundWorker worker = null)
+        public static void InstallUnattend(Entities.UI ui, string windowsPath, string configuration, string oemLogoPath = null, bool performDismApply = false, BackgroundWorker worker = null)
         {
             Output.Write("Installing unattend file ...  ");
             ConsoleUtility.WriteProgressBar(0);
@@ -493,6 +493,57 @@ namespace deploya_core
                     if (ui == Entities.UI.Command) { Environment.Exit(1); }
                 }
             }
+
+            // Perform DISM Apply Unattend Task
+            if (performDismApply)
+            {
+                try
+                {
+                    Output.Write("Applying DISM Unattend ...  ");
+                    FileInfo f = new FileInfo(windowsPath);
+                    string drive = Path.GetPathRoot(f.FullName);
+                    
+                    Process p = new Process();
+                    p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Dism.exe");
+                    p.StartInfo.Arguments = $"/Image:{drive} /Apply-Unattend:{System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml")}";
+                    p.StartInfo.RedirectStandardOutput = true;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.Start();
+                    p.WaitForExit();
+                }
+                catch
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("");
+                    Console.WriteLine("   An Error has occurred.");
+                    Console.WriteLine("   Error: Cannot apply unattend.xml!");
+                    if (ui == Entities.UI.Command)
+                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                    Console.ResetColor();
+                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(306, ""); }
+                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                }
+            }
+
+            ConsoleUtility.WriteProgressBar(100, true);
+            Console.WriteLine();
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+        }
+
+        /// <summary>
+        /// Installs the specific driver to the Windows Installation (only Vista and higher).
+        /// </summary>
+        /// <param name="ui">User Interface type</param>
+        /// <param name="windowsPath">Path to the Windows directory</param>
+        /// <param name="driverPath">List of driver paths</param>
+        /// <param name="worker">Background worker for Graphical user interface</param>
+        public static void InstallDriver(Entities.UI ui, string windowsPath, List<string> driverPath, BackgroundWorker worker = null)
+        {
+            Output.Write("Installing drivers ...  ");
+            ConsoleUtility.WriteProgressBar(0);
+            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
+
+            Apply.AddDriverToDisk(windowsPath, driverPath, worker);
 
             ConsoleUtility.WriteProgressBar(100, true);
             Console.WriteLine();
@@ -591,6 +642,26 @@ namespace deploya_core
             }
         }
 
+        internal static void AddDriverToDisk(string windowsPath, List<string> driverPath, BackgroundWorker worker = null)
+        {
+            BW = worker;
+
+            foreach (var driver in driverPath.Where(File.Exists))
+            {
+                using var session = DismApi.OpenOfflineSession(windowsPath);
+
+                try
+                {
+                    DismApi.AddDriver(session, driver, true);
+                    BW.ReportProgress(202, ""); // Update progress text
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
         private static WimMessageResult ApplyCallbackMethod(WimMessageType messageType, object message, object userData)
         {
             switch (messageType)
@@ -626,12 +697,21 @@ namespace deploya_core
         public static void CreateWim(string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker)
         {
             BW = worker;
+            List<string> excludedPaths = new List<string>() {
+                "C:\\$ntfs.log",
+                "C:\\hiberfil.sys",
+                "C:\\pagefile.sys",
+                "C:\\swapfile.sys",
+                "C:\\System Volume Information",
+                "C:\\RECYCLER",
+                "C:\\Windows\\CSC"
+            };
 
             using (WimHandle wimHandle = WimgApi.CreateFile(pathToImage, 
                        WimFileAccess.Write, 
                        WimCreationDisposition.CreateAlways, 
                        WimCreateFileOptions.None, 
-                       WimCompressionType.None))
+                       WimCompressionType.Xpress))
             {
 
                 WimgApi.SetTemporaryPath(wimHandle, Environment.GetEnvironmentVariable("TEMP"));

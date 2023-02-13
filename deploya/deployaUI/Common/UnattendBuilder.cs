@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using static deployaUI.Common.XMLSetting;
 
 namespace deployaUI.Common
 {
@@ -18,10 +19,11 @@ namespace deployaUI.Common
         public partial class unattend
         {
 
-            private unattendSettings settingsField;
+            private unattendSettings[] settingsField;
 
             /// <remarks/>
-            public unattendSettings settings
+            [System.Xml.Serialization.XmlElementAttribute("settings")]
+            public unattendSettings[] settings
             {
                 get
                 {
@@ -80,9 +82,17 @@ namespace deployaUI.Common
         public partial class unattendSettingsComponent
         {
 
-            private unattendSettingsComponentAutoLogon autoLogonField;
+            private bool copyProfileField;
+
+            private bool copyProfileFieldSpecified;
+
+            private byte skuPolicyRequiredField;
+
+            private bool skuPolicyRequiredFieldSpecified;
 
             private unattendSettingsComponentOEMInformation oEMInformationField;
+
+            private unattendSettingsComponentAutoLogon autoLogonField;
 
             private unattendSettingsComponentUserAccounts userAccountsField;
 
@@ -97,15 +107,56 @@ namespace deployaUI.Common
             private string versionScopeField;
 
             /// <remarks/>
-            public unattendSettingsComponentAutoLogon AutoLogon
+            public bool CopyProfile
             {
                 get
                 {
-                    return this.autoLogonField;
+                    return this.copyProfileField;
                 }
                 set
                 {
-                    this.autoLogonField = value;
+                    this.copyProfileField = value;
+                }
+            }
+
+            /// <remarks/>
+            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            public bool CopyProfileSpecified
+            {
+                get
+                {
+                    return this.copyProfileFieldSpecified;
+                }
+                set
+                {
+                    this.copyProfileFieldSpecified = value;
+                }
+            }
+
+            /// <remarks/>
+            public byte SkuPolicyRequired
+            {
+                get
+                {
+                    return this.skuPolicyRequiredField;
+                }
+                set
+                {
+                    this.skuPolicyRequiredField = value;
+                }
+            }
+
+            /// <remarks/>
+            [System.Xml.Serialization.XmlIgnoreAttribute()]
+            public bool SkuPolicyRequiredSpecified
+            {
+                get
+                {
+                    return this.skuPolicyRequiredFieldSpecified;
+                }
+                set
+                {
+                    this.skuPolicyRequiredFieldSpecified = value;
                 }
             }
 
@@ -119,6 +170,19 @@ namespace deployaUI.Common
                 set
                 {
                     this.oEMInformationField = value;
+                }
+            }
+
+            /// <remarks/>
+            public unattendSettingsComponentAutoLogon AutoLogon
+            {
+                get
+                {
+                    return this.autoLogonField;
+                }
+                set
+                {
+                    this.autoLogonField = value;
                 }
             }
 
@@ -202,112 +266,6 @@ namespace deployaUI.Common
                 set
                 {
                     this.versionScopeField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentAutoLogon
-        {
-
-            private bool enabledField;
-
-            private byte logonCountField;
-
-            private string usernameField;
-
-            private unattendSettingsComponentAutoLogonPassword passwordField;
-
-            /// <remarks/>
-            public bool Enabled
-            {
-                get
-                {
-                    return this.enabledField;
-                }
-                set
-                {
-                    this.enabledField = value;
-                }
-            }
-
-            /// <remarks/>
-            public byte LogonCount
-            {
-                get
-                {
-                    return this.logonCountField;
-                }
-                set
-                {
-                    this.logonCountField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Username
-            {
-                get
-                {
-                    return this.usernameField;
-                }
-                set
-                {
-                    this.usernameField = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentAutoLogonPassword Password
-            {
-                get
-                {
-                    return this.passwordField;
-                }
-                set
-                {
-                    this.passwordField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentAutoLogonPassword
-        {
-
-            private string valueField;
-
-            private bool plainTextField;
-
-            /// <remarks/>
-            public string Value
-            {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool PlainText
-            {
-                get
-                {
-                    return this.plainTextField;
-                }
-                set
-                {
-                    this.plainTextField = value;
                 }
             }
         }
@@ -406,6 +364,112 @@ namespace deployaUI.Common
                 set
                 {
                     this.supportURLField = value;
+                }
+            }
+        }
+
+        /// <remarks/>
+        [System.SerializableAttribute()]
+        [System.ComponentModel.DesignerCategoryAttribute("code")]
+        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
+        public partial class unattendSettingsComponentAutoLogon
+        {
+
+            private unattendSettingsComponentAutoLogonPassword passwordField;
+
+            private byte logonCountField;
+
+            private bool enabledField;
+
+            private string usernameField;
+
+            /// <remarks/>
+            public unattendSettingsComponentAutoLogonPassword Password
+            {
+                get
+                {
+                    return this.passwordField;
+                }
+                set
+                {
+                    this.passwordField = value;
+                }
+            }
+
+            /// <remarks/>
+            public byte LogonCount
+            {
+                get
+                {
+                    return this.logonCountField;
+                }
+                set
+                {
+                    this.logonCountField = value;
+                }
+            }
+
+            /// <remarks/>
+            public bool Enabled
+            {
+                get
+                {
+                    return this.enabledField;
+                }
+                set
+                {
+                    this.enabledField = value;
+                }
+            }
+
+            /// <remarks/>
+            public string Username
+            {
+                get
+                {
+                    return this.usernameField;
+                }
+                set
+                {
+                    this.usernameField = value;
+                }
+            }
+        }
+
+        /// <remarks/>
+        [System.SerializableAttribute()]
+        [System.ComponentModel.DesignerCategoryAttribute("code")]
+        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
+        public partial class unattendSettingsComponentAutoLogonPassword
+        {
+
+            private string valueField;
+
+            private bool plainTextField;
+
+            /// <remarks/>
+            public string Value
+            {
+                get
+                {
+                    return this.valueField;
+                }
+                set
+                {
+                    this.valueField = value;
+                }
+            }
+
+            /// <remarks/>
+            public bool PlainText
+            {
+                get
+                {
+                    return this.plainTextField;
+                }
+                set
+                {
+                    this.plainTextField = value;
                 }
             }
         }
@@ -622,315 +686,147 @@ namespace deployaUI.Common
         public static string Build(Common.UnattendMode? mode)
         {
             var uc = new UnattendXmlClass.unattend();
+            uc.settings = new UnattendXmlClass.unattendSettings[3];
+            uc.settings[0] = new UnattendXmlClass.unattendSettings();
+            uc.settings[0].pass = "oobeSystem";
 
-            switch (mode)
+            uc.settings[0].component = new UnattendXmlClass.unattendSettingsComponent
             {
-                case Common.UnattendMode.Admin:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
+                name = "Microsoft-Windows-Shell-Setup",
+                processorArchitecture = "amd64",
+                publicKeyToken = "31bf3856ad364e35",
+                language = "neutral",
+                versionScope = "nonSxS"
+            };
+
+            // Auto Logon for Administrator account
+            if (mode == Common.UnattendMode.Admin || 
+                mode == Common.UnattendMode.AdminWithoutOem || 
+                mode == Common.UnattendMode.AdminWithoutPassword ||
+                mode == Common.UnattendMode.AdminWithoutPasswordAndOem)
+            {
+                uc.settings[0].component.AutoLogon = new UnattendXmlClass.unattendSettingsComponentAutoLogon
+                {
+                    Enabled = true,
+                    LogonCount = 1,
+                    Username = "Administrator"
+                };
+
+                if (mode != Common.UnattendMode.AdminWithoutPassword ||
+                    mode != Common.UnattendMode.AdminWithoutPasswordAndOem)
+                {
+                    uc.settings[0].component.AutoLogon.Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword();
+                    uc.settings[0].component.AutoLogon.Password.Value = Common.DeploymentInfo.Password;
+                    uc.settings[0].component.AutoLogon.Password.PlainText = true;
+                }
+
+            }
+
+            // User Account
+            if (mode != Common.UnattendMode.OnlyOem)
+            {
+                uc.settings[0].component.UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts();
+                
+                // Administrator Password
+                if (mode == Common.UnattendMode.Admin ||
+                    mode == Common.UnattendMode.AdminWithoutOem)
+                {
+                    uc.settings[0].component.UserAccounts.AdministratorPassword =
+                        new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
                         {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // AutoLogin
-                                AutoLogon = new UnattendXmlClass.unattendSettingsComponentAutoLogon
+                            Value = Common.DeploymentInfo.Password,
+                            PlainText = true
+                        };
+                }
+
+                // Local account
+                if (mode == Common.UnattendMode.User ||
+                    mode == Common.UnattendMode.UserWithoutOem ||
+                    mode == Common.UnattendMode.UserWithoutPassword ||
+                    mode == Common.UnattendMode.UserWithoutPasswordAndOem)
+                {
+                    uc.settings[0].component.UserAccounts.LocalAccounts =
+                        new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
+                        {
+                            LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
                                 {
-                                    Enabled = true,
-                                    LogonCount = 1,
-                                    Username = "Administrator",
-                                    Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
-                                    {
-                                        Value = Common.DeploymentInfo.Password,
-                                        PlainText = true
-                                    }
-                                },
-                                // Oem Information
-                                OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
-                                {
-                                    Logo = "C:\\Windows\\System32\\logo.bmp",
-                                    Manufacturer = Common.OemInfo.Manufacturer,
-                                    Model = Common.OemInfo.Model,
-                                    SupportHours = Common.OemInfo.SupportHours,
-                                    SupportPhone = Common.OemInfo.SupportPhone,
-                                    SupportURL = Common.OemInfo.SupportURL
-                                },
-                                // Administrator Password
-                                UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts
-                                {
-                                    AdministratorPassword = new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
-                                    {
-                                        Value = Common.DeploymentInfo.Password,
-                                        PlainText = true
-                                    }
+                                    action = "add"
                                 }
-                            }
-                        }
+                        };
+
+                    // Password
+                    if (mode != Common.UnattendMode.UserWithoutPassword ||
+                        mode != Common.UnattendMode.UserWithoutPasswordAndOem)
+                    {
+                        uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Password =
+                            new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
+                                {
+                                    Value = Common.DeploymentInfo.Password,
+                                    PlainText = true
+                                };
+                    }
+
+                    uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Name = Common.DeploymentInfo.Username;
+                    uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Group = "Administrators";
+                }
+            }
+
+            // OEM Information
+            if (mode != Common.UnattendMode.AdminWithoutOem ||
+                mode != Common.UnattendMode.AdminWithoutPasswordAndOem ||
+                mode != Common.UnattendMode.UserWithoutOem ||
+                mode != Common.UnattendMode.UserWithoutPasswordAndOem)
+            {
+                uc.settings[0].component.OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
+                    {
+                        Logo = "%WINDIR%\\System32\\logo.bmp",
+                        Manufacturer = Common.OemInfo.Manufacturer,
+                        Model = Common.OemInfo.Model,
+                        SupportHours = Common.OemInfo.SupportHours,
+                        SupportPhone = Common.OemInfo.SupportPhone,
+                        SupportURL = Common.OemInfo.SupportURL
                     };
-                    break;
-                case UnattendMode.AdminWithoutOem:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // AutoLogin
-                                AutoLogon = new UnattendXmlClass.unattendSettingsComponentAutoLogon
-                                {
-                                    Enabled = true,
-                                    LogonCount = 1,
-                                    Username = "Administrator",
-                                    Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
-                                    {
-                                        Value = Common.DeploymentInfo.Password,
-                                        PlainText = true
-                                    }
-                                },
-                                // Administrator Password
-                                UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts
-                                {
-                                    AdministratorPassword = new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
-                                    {
-                                        Value = Common.DeploymentInfo.Password,
-                                        PlainText = true
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case UnattendMode.AdminWithoutPassword:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // AutoLogin
-                                AutoLogon = new UnattendXmlClass.unattendSettingsComponentAutoLogon
-                                {
-                                    Enabled = true,
-                                    LogonCount = 1,
-                                    Username = "Administrator"
-                                },
-                                // Oem Information
-                                OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
-                                {
-                                    Logo = "C:\\Windows\\System32\\logo.bmp",
-                                    Manufacturer = Common.OemInfo.Manufacturer,
-                                    Model = Common.OemInfo.Model,
-                                    SupportHours = Common.OemInfo.SupportHours,
-                                    SupportPhone = Common.OemInfo.SupportPhone,
-                                    SupportURL = Common.OemInfo.SupportURL
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case UnattendMode.AdminWithoutPasswordAndOem:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // AutoLogin
-                                AutoLogon = new UnattendXmlClass.unattendSettingsComponentAutoLogon
-                                {
-                                    Enabled = true,
-                                    LogonCount = 1,
-                                    Username = "Administrator"
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case UnattendMode.User:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // Oem Information
-                                OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
-                                {
-                                    Logo = "C:\\Windows\\System32\\logo.bmp",
-                                    Manufacturer = Common.OemInfo.Manufacturer,
-                                    Model = Common.OemInfo.Model,
-                                    SupportHours = Common.OemInfo.SupportHours,
-                                    SupportPhone = Common.OemInfo.SupportPhone,
-                                    SupportURL = Common.OemInfo.SupportURL
-                                },
-                                // User Accounts
-                                UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts
-                                {
-                                    // Local Account
-                                    LocalAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
-                                    {
-                                        LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
-                                        {
-                                            action = "add",
-                                            Password = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
-                                            {
-                                                Value = Common.DeploymentInfo.Password,
-                                                PlainText = true
-                                            },
-                                            Name = Common.DeploymentInfo.Username,
-                                            Group = "Administrators"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case UnattendMode.UserWithoutOem:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // User Accounts
-                                UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts
-                                {
-                                    // Local Account
-                                    LocalAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
-                                    {
-                                        LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
-                                        {
-                                            action = "add",
-                                            Password = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
-                                            {
-                                                Value = Common.DeploymentInfo.Password,
-                                                PlainText = true
-                                            },
-                                            Name = Common.DeploymentInfo.Username,
-                                            Group = "Administrators"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case UnattendMode.UserWithoutPassword:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // Oem Information
-                                OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
-                                {
-                                    Logo = "C:\\Windows\\System32\\logo.bmp",
-                                    Manufacturer = Common.OemInfo.Manufacturer,
-                                    Model = Common.OemInfo.Model,
-                                    SupportHours = Common.OemInfo.SupportHours,
-                                    SupportPhone = Common.OemInfo.SupportPhone,
-                                    SupportURL = Common.OemInfo.SupportURL
-                                },
-                                // User Accounts
-                                UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts
-                                {
-                                    // Local Account
-                                    LocalAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
-                                    {
-                                        LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
-                                        {
-                                            action = "add",
-                                            Name = Common.DeploymentInfo.Username,
-                                            Group = "Administrators"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    break;
-                case UnattendMode.UserWithoutPasswordAndOem:
-                    uc = new UnattendXmlClass.unattend
-                    {
-                        settings = new UnattendXmlClass.unattendSettings
-                        {
-                            pass = "oobeSystem",
-                            component = new UnattendXmlClass.unattendSettingsComponent
-                            {
-                                name = "Microsoft-Windows-Shell-Setup",
-                                processorArchitecture = "amd64",
-                                publicKeyToken = "31bf3856ad364e35",
-                                language = "neutral",
-                                versionScope = "nonSxS",
-                                // User Accounts
-                                UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts
-                                {
-                                    // Local Account
-                                    LocalAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
-                                    {
-                                        LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
-                                        {
-                                            action = "add",
-                                            Name = Common.DeploymentInfo.Username,
-                                            Group = "Administrators"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }; 
-                    break;
-                default:
-                    return "";
+            }
+
+            // S-Mode (Windows 10 1709 and up)
+            if (Common.DeploymentOption.UseSMode)
+            {
+                uc.settings[1] = new UnattendXmlClass.unattendSettings();
+                uc.settings[1].pass = "offlineServicing";
+                uc.settings[1].component = new UnattendXmlClass.unattendSettingsComponent
+                {
+                    name = "Microsoft-Windows-CodeIntegrity",
+                    processorArchitecture = "amd64",
+                    publicKeyToken = "31bf3856ad364e35",
+                    language = "neutral",
+                    versionScope = "nonSxS"
+                };
+                uc.settings[1].component.SkuPolicyRequired = 1;
+                uc.settings[1].component.SkuPolicyRequiredSpecified = true;
+            }
+
+            // Copy Profile (only for syspreped user profiles)
+            if (Common.DeploymentOption.UseCopyProfile)
+            {
+                int nextIndex = Common.DeploymentOption.UseSMode ? 2 : 1;
+                uc.settings[nextIndex] = new UnattendXmlClass.unattendSettings();
+                uc.settings[nextIndex].pass = "specialize";
+                uc.settings[nextIndex].component = new UnattendXmlClass.unattendSettingsComponent
+                {
+                    name = "Microsoft-Windows-Shell-Setup",
+                    processorArchitecture = "amd64",
+                    publicKeyToken = "31bf3856ad364e35",
+                    language = "neutral",
+                    versionScope = "nonSxS"
+                };
+                uc.settings[nextIndex].component.CopyProfile = true;
+                uc.settings[nextIndex].component.CopyProfileSpecified = true;
             }
 
             XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
             ns.Add("", "");
 
-            //Create the serializer
+            // Create the serializer
             XmlSerializer slz = new XmlSerializer(typeof(UnattendXmlClass.unattend), "urn:schemas-microsoft-com:unattend");
 
             using (StringWriter textWriter = new Utf8StringWriter())

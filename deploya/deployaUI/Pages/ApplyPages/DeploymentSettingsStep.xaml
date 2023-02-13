@@ -45,7 +45,7 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="Settings for the Administrator account." />
                                 </StackPanel>
-                                <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_OnChecked" x:Name="ToggleUser" />
+                                <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_Switch" Unchecked="User_Switch" x:Name="ToggleUser" />
                             </Grid>
                         </wpfui:CardExpander.Header>
                         <StackPanel>
@@ -95,7 +95,7 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="Set OEM Information about this device." />
                                 </StackPanel>
-                                <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6"  Checked="Oem_OnChecked" x:Name="ToggleOem"/>
+                                <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="Oem_Switch" Unchecked="Oem_Switch" x:Name="ToggleOem"/>
                             </Grid>
                         </wpfui:CardExpander.Header>
                         <StackPanel>

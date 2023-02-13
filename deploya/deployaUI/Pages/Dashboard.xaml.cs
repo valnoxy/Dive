@@ -31,7 +31,7 @@ namespace deployaUI.Pages
 
         private void SwitchToRepairPage(object sender, RoutedEventArgs e)
         {
-            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("dashboard");
+            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate("repair");
         }
     }
 }

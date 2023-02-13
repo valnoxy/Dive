@@ -13,6 +13,7 @@
             <!-- Title with button text -->
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
             <!-- Content -->
         </Grid.RowDefinitions>
 
@@ -55,7 +56,23 @@
                 <RadioButton Grid.Column="5" x:Name="EFIRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
             </Grid>
         </StackPanel>
-        
+
+        <StackPanel Grid.Row="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="75"/>
+                    <ColumnDefinition Width="75"/>
+                </Grid.ColumnDefinitions>
+                
+                <ToggleButton Grid.Column="2" x:Name="SModeToggle" Content="Windows Code Integrity Mode (S-Mode)" Click="SModeToggle_OnClick" Margin="0,15,15,0"/>
+                <ToggleButton Grid.Column="3" x:Name="CopyProfileToggle" Content="Copy Profile (for syspreped Images)" Click="CopyProfileToggle_OnClick" Margin="0,15,15,0"/>
+            </Grid>
+        </StackPanel>
+
     </Grid>
 
 </UserControl>

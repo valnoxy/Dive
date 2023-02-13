@@ -33,13 +33,11 @@ namespace deployaUI
         public static string ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         #region Parser options
-        class Options
+        [Verb("Apply", HelpText = "Add file contents to the index.")]
+        class ApplyOptions
         {
             [Option('w', "wim", Required = true, HelpText = "Input WIM-file to be processed.")]
             public string wimfile { get; set; }
-
-            [Option(Default = false, Hidden = true, HelpText = "Used for deploya GUI Installation")]
-            public bool uimode { get; set; }
 
             [Option('i', "index", Required = true, HelpText = "Index ID of the selected Windows-Installation.")]
             public int index { get; set; }
@@ -60,12 +58,26 @@ namespace deployaUI
                 get
                 {
                     return new List<Example>() {
-                         new Example("\nApply WIM file on a EFI system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = true, ntldr = false }),
-                         new Example("\nApply WIM file on a Legacy system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = false }),
-                         new Example("\nApply XP-based image on a Legacy system", new Options { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = true }),
+                         new Example("\nApply WIM file on a EFI system", new ApplyOptions { driveid = 0, wimfile = "file.wim", index = 1, efi = true, ntldr = false }),
+                         new Example("\nApply WIM file on a Legacy system", new ApplyOptions { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = false }),
+                         new Example("\nApply XP-based image on a Legacy system", new ApplyOptions { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = true }),
                     };
                 }
             }
+
+        }
+
+        [Verb("Capture", HelpText = "Captures a image")]
+        class CaptureOptions
+        {
+            [Option('c', "cap", Required = true, HelpText = "Input WIM-file to be processed.")]
+            public string capturedir { get; set; }
+
+            [Option(Default = false, Hidden = true, HelpText = "Used for deploya GUI Installation")]
+            public bool uimode { get; set; }
+
+            [Option('i', "index", Required = true, HelpText = "Index ID of the selected Windows-Installation.")]
+            public int index { get; set; }
 
         }
 
@@ -74,7 +86,7 @@ namespace deployaUI
             var helpText = HelpText.AutoBuild(result, h =>
             {
                 h.AdditionalNewLineAfterOption = false; // Remove the extra newline between options
-                h.Heading = $"{VersionInfo.InternalName} [Version: {ver}]"; // Header
+                h.Heading = $"{VersionInfo.ProductName} [Version: {ver}]"; // Header
                 h.Copyright = VersionInfo.LegalCopyright; // Copyright text
                 return HelpText.DefaultParsingErrorsHandler(result, h);
             }, e => e);
@@ -97,32 +109,32 @@ namespace deployaUI
         #endregion
 
         [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
+        public static extern IntPtr GetConsoleWindow();
 
         [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
+        public const int SW_HIDE = 0;
+        public const int SW_SHOW = 5;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();
             var handle = GetConsoleWindow();
 
-#if DEBUG
-            ShowWindow(handle, SW_SHOW);
-#else
-            ShowWindow(handle, SW_HIDE);
-#endif
-            
-            Console.Title = $"{VersionInfo.ProductName} - Debug Console";
-            Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-            Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
-            Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
-
             if (args.Length == 1)
             {
+#if DEBUG
+                ShowWindow(handle, SW_SHOW);
+#else
+                ShowWindow(handle, SW_HIDE);
+#endif
+
+                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
+                Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
+                Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+                Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
+
                 DriveInfo[] allDrives = DriveInfo.GetDrives();
                 foreach (DriveInfo d in allDrives)
                 {
@@ -139,7 +151,7 @@ namespace deployaUI
                         var w = new MessageUI(title, message, btn1, btn2, true, 5);
                         if (w.ShowDialog() == false)
                         {
-                            string summary = w.Summary;
+                            string? summary = w.Summary;
                             if (summary == "Btn2")
                             {
                                 ShowAutoDive();
@@ -151,33 +163,56 @@ namespace deployaUI
                 ShowGUI();
             }
 
-            if (args.Contains("--capture-test"))
+            if (args.Contains("--unattend-test"))
             {
-                const string name = "Windows 7 (Captured with Dive)";
-                const string description = "This image was captured with Dive.";
-                const string pathToCapture = @"F:\\";
-                const string pathToImage = @"C:\\Users\\jonas\\Desktop\\myImage.wim";
+                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
+                Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
+                Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+                Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
+                Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
-                Common.Debug.WriteLine("Running capture test ...");
-                Common.Debug.WriteLine("Name: " + name);
-                Common.Debug.WriteLine("Description: " + description);
-                Common.Debug.WriteLine("Target drive: " + pathToCapture); 
-                Common.Debug.WriteLine("Save image to: " + pathToImage);
-                Common.Debug.WriteLine("[CALL deploya_core.Actions.TestBuildInfo()] Building WIM Information ...");
+                var config = "";
+                Common.UnattendMode? um = Common.UnattendMode.Admin;
+                Common.DeploymentInfo.Username = "Administrator";
+                Common.DeploymentInfo.Password = "Pa$$w0rd";
+                Common.DeploymentOption.UseCopyProfile = true;
+                Common.DeploymentOption.UseSMode = true;
+                Common.OemInfo.UseOemInfo = true;
+                Common.OemInfo.Model = "Toaster";
+                Common.OemInfo.Manufacturer = "Fabrikam";
+                Common.OemInfo.SupportHours = "24/7";
+                Common.OemInfo.SupportURL = "https://fabrikam.com";
+                Common.OemInfo.SupportPhone = "+1 111 11111111";
 
-                deploya_core.Actions.TestBuildInfo(Entities.UI.Command, name, description, pathToCapture, pathToImage);
+                Common.Debug.WriteLine("Unattend Mode: Admin");
+                Common.Debug.WriteLine("Username: " + Common.DeploymentInfo.Username);
+                Common.Debug.WriteLine("Password: " + Common.DeploymentInfo.Password);
+                Common.Debug.WriteLine("Use S Mode: " + Common.DeploymentOption.UseSMode);
+                Common.Debug.WriteLine("Use Copy Path: " + Common.DeploymentOption.UseCopyProfile);
+                Common.Debug.WriteLine("Use OEM: " + Common.OemInfo.UseOemInfo);
+                Common.Debug.WriteLine("Manufacturer: " + Common.OemInfo.Manufacturer);
+                Common.Debug.WriteLine("Model: " + Common.OemInfo.Model);
+                Common.Debug.WriteLine("Support Tel.: " + Common.OemInfo.SupportPhone);
+                Common.Debug.WriteLine("Support Hours: " + Common.OemInfo.SupportHours);
+                Common.Debug.WriteLine("Support URL: " + Common.OemInfo.SupportURL);
+
+                Common.Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
+                config = Common.UnattendBuilder.Build(um);
+                Console.WriteLine(config);
+
                 Environment.Exit(0);
             }
 
             var parser = new CommandLine.Parser(with => with.HelpWriter = null);
-            var parserResult = parser.ParseArguments<Options>(args);
+            var parserResult = parser.ParseArguments<ApplyOptions, CaptureOptions>(args);
             parserResult
-             .WithParsed<Options>(options => Run(options))
-             .WithNotParsed(errs => DisplayHelp(parserResult, errs));
+                .WithParsed<ApplyOptions>(options => Run(options))
+                .WithParsed<CaptureOptions>(options => RunA(options))
+                .WithNotParsed(errs => DisplayHelp(parserResult, errs));
             Environment.Exit(0);
         }
 
-        private static void Run(Options options)
+        private static void Run(ApplyOptions options)
         {
             throw new NotImplementedException("The CLI is not working in this version.");
 #warning CLI version is not working.
@@ -195,8 +230,7 @@ namespace deployaUI
             if (!options.ntldr) { bootloader = Entities.Bootloader.BOOTMGR; }
 
             // UI definition
-            if (options.uimode) { ui = Entities.UI.Graphical; }
-            if (!options.uimode) { ui = Entities.UI.Command; }
+            ui = Entities.UI.Command;
 
             // CLI verify
             string image = options.wimfile.ToString();
@@ -270,7 +304,13 @@ namespace deployaUI
                 Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "W:\\");
         }
 
-#region Get Disk index
+        private static void RunA(CaptureOptions options)
+        {
+            throw new NotImplementedException("The CLI is not working in this version.");
+#warning CLI version is not working.
+        }
+
+        #region Get Disk index
         public static int GetDiskIndex(string diskId)
         {
             // string tempPath = Path.GetTempPath();

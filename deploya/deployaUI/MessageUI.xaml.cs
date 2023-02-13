@@ -10,62 +10,61 @@ namespace deployaUI
     /// </summary>
     public partial class MessageUI: Wpf.Ui.Controls.UiWindow
     {
-        public string Summary => ButtonPressed;
+        public virtual string? Summary => _buttonPressed;
 
-        public static string ButtonPressed;
-        private static bool MainThread;
-        DispatcherTimer _timer;
-        TimeSpan _time;
+        private static string? _buttonPressed;
+        private static bool _mainThread;
+        private readonly DispatcherTimer _timer;
 
-        public MessageUI(string title, string message, string Btn1 = null, string Btn2 = null, bool IsMainThread = false, int timer = 0)
+        public MessageUI(string title, string message, string btn1 = null, string btn2 = null, bool isMainThread = false, int timer = 0)
         {
             InitializeComponent();
 
             MessageTitle.Text = title;
             MessageText.Text = message;
-            this.Btn1.Content = Btn1;
-            this.Btn2.Content = Btn2;
+            this.Btn1.Content = btn1;
+            this.Btn2.Content = btn2;
 
-            if (Btn1 == null || Btn1 == "")
+            if (btn1 is null or "")
                 this.Btn1.Visibility = Visibility.Hidden;
-            if (Btn2 == null || Btn2 == "")
+            if (btn2 is null or "")
                 this.Btn2.Visibility = Visibility.Hidden;
 
             if (timer != 0)
             {
-                _time = TimeSpan.FromSeconds(timer);
+                var time = TimeSpan.FromSeconds(timer);
 
                 _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
                 {
-                    LbTimer.Text = $"{_time.ToString("%s")}s before auto-selecting '{this.Btn2.Content}'.";
-                    if (_time == TimeSpan.Zero)
+                    LbTimer.Text = $"{time.ToString("%s")}s before auto-selecting '{this.Btn2.Content}'.";
+                    if (time == TimeSpan.Zero)
                     {
-                        _timer.Stop();
-                        ButtonPressed = "Btn2";
-                        if (MainThread) this.Hide();
+                        _timer?.Stop();
+                        _buttonPressed = "Btn2";
+                        if (_mainThread) this.Hide();
                         else this.Close();
                     }
-                    _time = _time.Add(TimeSpan.FromSeconds(-1));
+                    time = time.Add(TimeSpan.FromSeconds(-1));
                 }, Application.Current.Dispatcher);
 
                 _timer.Start();
             }
             else LbTimer.Visibility = Visibility.Hidden;
 
-            MainThread = IsMainThread;
+            _mainThread = isMainThread;
         }
         
         private void Btn1_OnClick(object sender, RoutedEventArgs e)
         {
-            ButtonPressed = "Btn1";
-            if (MainThread) this.Hide();
+            _buttonPressed = "Btn1";
+            if (_mainThread) this.Hide();
             else this.Close();
         }
 
         private void Btn2_OnClick(object sender, RoutedEventArgs e)
         {
-            ButtonPressed = "Btn2";
-            if (MainThread) this.Hide();
+            _buttonPressed = "Btn2";
+            if (_mainThread) this.Hide();
             else this.Close();
         }
     }

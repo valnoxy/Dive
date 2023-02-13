@@ -76,6 +76,12 @@ namespace deployaUI.Pages.ApplyPages
             {
                 UseRecoveryBtn.IsChecked = false;
                 UseNTLDRBtn.IsChecked = false;
+                BIOSRadio.IsChecked = true;
+            }
+            else if (Common.ApplyDetails.Name.Contains("(") || Common.ApplyDetails.Name.Contains(")"))
+            {
+                CopyProfileToggle.IsChecked = true;
+                Common.DeploymentOption.UseCopyProfile = true;
             }
             else
             {
@@ -242,6 +248,34 @@ namespace deployaUI.Pages.ApplyPages
             {
                 Common.Debug.WriteLine("Using no Recovery partition", ConsoleColor.White);
                 return false;
+            }
+        }
+
+        private void SModeToggle_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (SModeToggle.IsChecked == true)
+            {
+                Common.DeploymentOption.UseSMode = true;
+                Common.Debug.WriteLine("Using S Mode");
+            }
+            else
+            {
+                Common.DeploymentOption.UseSMode = false;
+                Common.Debug.WriteLine("Not using S Mode");
+            }
+        }
+
+        private void CopyProfileToggle_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (CopyProfileToggle.IsChecked == true)
+            {
+                Common.DeploymentOption.UseCopyProfile = true;
+                Common.Debug.WriteLine("Enabled 'CopyProfile'");
+            }
+            else
+            {
+                Common.DeploymentOption.UseCopyProfile = false;
+                Common.Debug.WriteLine("Disabled 'CopyProfile'");
             }
         }
     }

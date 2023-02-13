@@ -9,6 +9,8 @@ namespace deployaUI
     /// </summary>
     public partial class MainWindow : Wpf.Ui.Controls.UiWindow
     {
+        private bool _displayDebugConsole = false;
+
         public MainWindow()
         {
             Wpf.Ui.Appearance.Background.Apply(
@@ -25,14 +27,15 @@ namespace deployaUI
 #if DEBUG
             DebugString.Visibility = Visibility.Visible;
             DebugString.Text = "Debug build - This is not a production ready build.";
+            _displayDebugConsole = true;
 #else
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Beta build [B4 Public]";
+            DebugString.Text = "Beta build [B5 Public]";
 #endif
             // Get version
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-            string version = fvi.FileVersion;
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            var version = fvi.FileVersion;
             VersionString.Text = $"[{version}]";
         }
 
@@ -43,11 +46,25 @@ namespace deployaUI
 
         private void CommandLine_Click(object sender, RoutedEventArgs e)
         {
-            Process p = new Process();
+            /*
+            var p = new Process();
             p.StartInfo.FileName = "cmd.exe";
             p.StartInfo.CreateNoWindow = false;
             p.StartInfo.UseShellExecute = true;
             p.Start();
+            */
+            var handle = App.GetConsoleWindow();
+
+            if (_displayDebugConsole == true)
+            {
+                App.ShowWindow(handle, App.SW_HIDE);
+                _displayDebugConsole = false;
+            }
+            else
+            {
+                App.ShowWindow(handle, App.SW_SHOW);
+                _displayDebugConsole = true;
+            }
         }        
     }
 }

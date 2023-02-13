@@ -133,7 +133,6 @@
                     </StackPanel>
                 </wpfui:CardAction>
                 <wpfui:CardAction
-                    IsEnabled="false"
                     Margin="0,0,0,8"
                     Click="SwitchToRepairPage"
                     Icon="Toolbox24">
@@ -141,7 +140,7 @@
                         <TextBlock
                             Margin="0,0,0,4"
                             FontWeight="Medium"
-                            Text="Repair &amp; Tweaks (WIP)"/>
+                            Text="Repair &amp; Tweaks"/>
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"

@@ -53,8 +53,6 @@ namespace deployaUI.Pages.ApplyPages
         private void TbPassword_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             Common.DeploymentInfo.Password = TbPassword.Text;
-            Console.WriteLine("Config: " + Common.DeploymentInfo.Password);
-            Console.WriteLine("Object (Text): " + TbPassword.Text);
         }
 
         private void OEMLogo_OpenFileClick(object sender, RoutedEventArgs e)
@@ -97,11 +95,13 @@ namespace deployaUI.Pages.ApplyPages
             Common.OemInfo.SupportURL = TbUrl.Text;
         }
 
-        private void User_OnChecked(object sender, RoutedEventArgs e)
+        private void User_Switch(object sender, RoutedEventArgs e)
         {
             Common.DeploymentInfo.UseUserInfo = ToggleUser.IsChecked.Value;
+            Debug.WriteLine(ToggleUser.IsChecked.Value ? "Use User Info: True" : "Use User Info: False");
         }
-        private void Oem_OnChecked(object sender, RoutedEventArgs e)
+
+        private void Oem_Switch(object sender, RoutedEventArgs e)
         {
             Common.OemInfo.UseOemInfo = ToggleOem.IsChecked.Value;
         }

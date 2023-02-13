@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows.Documents;
+using System.Collections.Generic;
 
 namespace deployaUI.Common
 {
@@ -13,6 +13,7 @@ namespace deployaUI.Common
         public static bool UseEFI { get; set; }
         public static bool UseNTLDR { get; set; }
         public static bool UseRecovery { get; set; }
+        public static List<string> DriverList { get; set; }
     }
 
     public static class DeploymentInfo
@@ -43,6 +44,19 @@ namespace deployaUI.Common
         public static string SupportURL { get; set; }
     }
 
+    public static class DeploymentOption
+    {
+        public static bool UseSMode { get; set; }
+        public static bool UseCopyProfile { get; set; }
+    }
+
+    public static class Tweaks
+    {
+        public static TweakMode CurrentMode { get; set; }
+        public static int DiskIndex { get; set; }
+        public static string ImageName { get; set; }
+    }
+
     public enum UnattendMode
     {
         Admin,
@@ -53,6 +67,13 @@ namespace deployaUI.Common
         AdminWithoutPasswordAndOem,
         UserWithoutPassword,
         UserWithoutPasswordAndOem,
+        OnlyOem
+    }
+
+    public enum TweakMode
+    {
+        Migrate,
+        RepairBootloader
     }
 
     public static class Debug

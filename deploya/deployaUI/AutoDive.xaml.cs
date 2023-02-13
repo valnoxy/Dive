@@ -111,7 +111,7 @@ namespace deployaUI
                 var w = new MessageUI(title, message, btn1);
                 if (w.ShowDialog() == false)
                 {
-                    string summary = w.Summary;
+                    string? summary = w.Summary;
                     if (summary == "Btn1")
                     {
                         Environment.Exit(1);
@@ -334,12 +334,14 @@ namespace deployaUI
 
             // Install Bootloader
             worker.ReportProgress(203, "");     // Installing Bootloader Text
-            switch (bootloader)
+
+            switch (partStyle)
             {
-                case Entities.Bootloader.BOOTMGR:
-                    Actions.InstallBootloader(firmware, bootloader, ui, $"{windowsDrive}Windows", bootDrive, worker);
+                case Entities.PartitionStyle.SeparateBoot:
+                case Entities.PartitionStyle.Full:
+                    Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, bootDrive, worker);
                     break;
-                case Entities.Bootloader.NTLDR:
+                case Entities.PartitionStyle.Single:
                     Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, windowsDrive, worker);
                     break;
             }
@@ -435,7 +437,7 @@ namespace deployaUI
 
                 Debug.WriteLine(config);
 
-                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, worker);
+                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
 
                 if (IsCanceled)
                 {
@@ -461,7 +463,7 @@ namespace deployaUI
             var w = new MessageUI(title, message, btn1);
             if (w.ShowDialog() == false)
             {
-                string summary = w.Summary;
+                string? summary = w.Summary;
                 if (summary == "Btn1")
                 {
                     Environment.Exit(1);
