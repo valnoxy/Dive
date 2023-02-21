@@ -57,6 +57,16 @@ namespace deployaUI.Common
         public static string ImageName { get; set; }
     }
 
+    public static class WindowsModification
+    {
+        public static bool InstallUefiSeven { get; set; }
+        public static bool UsToggleLog { get; set; }
+        public static bool UsToggleVerbose { get; set; }
+        public static bool UsToggleFakeVesa { get; set; }
+        public static bool UsToggleSkipErros { get; set; }
+
+    }
+
     public enum UnattendMode
     {
         Admin,

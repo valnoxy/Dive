@@ -13,7 +13,7 @@ namespace deployaUI
     /// <summary>
     /// Interaktionslogik für AutoDive.xaml
     /// </summary>
-    public partial class AutoDive : Wpf.Ui.Controls.UiWindow
+    public partial class AutoDiveOld : Wpf.Ui.Controls.UiWindow
     {
         // AutoDive config
         private static string _version = null;
@@ -31,7 +31,7 @@ namespace deployaUI
         private static string _defaultPassword = null;
         private static bool _useAutoInit = false;
 
-        public AutoDive()
+        public AutoDiveOld()
         {
             InitializeComponent();
 
@@ -326,7 +326,7 @@ namespace deployaUI
             // Apply image
             worker.ReportProgress(202, "");     // Applying Image Text
             worker.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWIM(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            Actions.ApplyWim(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;

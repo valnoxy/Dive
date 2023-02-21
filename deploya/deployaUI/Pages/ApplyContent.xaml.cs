@@ -1,4 +1,5 @@
 ﻿using deployaUI.Pages.ApplyPages;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -37,6 +38,28 @@ namespace deployaUI.Pages
                     FrameWindow.Content = DiskSS;
                     break;
                 case DiskSelectStep:
+                    if ((Common.ApplyDetails.Name.ToLower().Contains("windows 7") || Common.ApplyDetails.Name.ToLower().Contains("vista")) && Common.ApplyDetails.UseEFI)
+                    {
+                        Common.Debug.WriteLine("Detected Windows Vista / 7 with EFI - Showing UefiSeven Installation prompt ...");
+
+                        var message = "It looks like you're attempting to install Windows Vista/7 with EFI support. Normally Vista/7 does not natively support EFI, however an EFI module called UefiSeven can be installed to allow Vista/7 to boot on EFI machines.\n\nDo you want to install UefiSeven?";
+                        var title = "EFI Patch for Windows Vista / 7";
+                        var btn1 = "No";
+                        var btn2 = "Yes";
+
+                        var w = new MessageUI(title, message, btn1, btn2, true);
+                        if (w.ShowDialog() == false)
+                        {
+                            var summary = w.Summary;
+                            if (summary == "Btn2")
+                            {
+                                Common.Debug.WriteLine("Using UefiSeven for EFI boot loader");
+                                Common.WindowsModification.InstallUefiSeven = true;
+                                var uefiSevenSettings = new Extras.UefiSevenSettings();
+                                uefiSevenSettings.ShowDialog();
+                            }
+                        }
+                    }
                     ApplySelectStep ApplySS = new ApplySelectStep();
                     FrameWindow.Content = ApplySS;
                     break;
@@ -45,8 +68,6 @@ namespace deployaUI.Pages
                         System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
                     //else
                     //    System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
-                    break;
-                default:
                     break;
             }
         }

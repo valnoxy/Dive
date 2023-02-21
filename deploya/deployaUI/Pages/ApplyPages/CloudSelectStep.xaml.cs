@@ -23,6 +23,7 @@ namespace deployaUI.Pages.ApplyPages
         }
 
         private List<Image> images;
+        public List<Image> ImageList => images;
 
         public CloudSelectStep()
         {

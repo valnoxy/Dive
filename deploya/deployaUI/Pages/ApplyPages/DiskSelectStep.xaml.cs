@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
@@ -132,20 +134,35 @@ namespace deployaUI.Pages.ApplyPages
 
                     var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 1));
 
+                    // Check for Dive Medium
+                    var allDrives = DriveInfo.GetDrives();
+                    var blackListedDisks = new List<string>();
+                    foreach (var d in allDrives)
+                    {
+                        if (File.Exists(Path.Combine(d.Name, ".diveusb")))
+                        {
+                            blackListedDisks.Add(GetDiskNumber(d.Name.Substring(0, 1)));
+                        }
+                    }
+
                     if (DeviceID != $"\\\\.\\PHYSICALDRIVE{ret}")
                     {
                         // Add to list
-                        var driveid = DeviceID;
-                        driveid = Regex.Match(driveid, @"\d+").Value;
-                        var drive = $"{Model} | {SizeInGB} GB | Disk {driveid}";
+                        var driveId = DeviceID;
+                        driveId = Regex.Match(driveId, @"\d+").Value;
+                        var drive = $"{Model} | {SizeInGB} GB | Disk {driveId}";
+                        if (blackListedDisks.Contains(driveId))
+                        {
+                            Common.Debug.WriteLine("Skipping as this contains the Dive medium ...", ConsoleColor.Yellow);
+                            Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
+                            continue;
+                        }
                         DiskListView.Items.Add(drive);
                     }
                     else
                     {
                         Common.Debug.WriteLine("Skipping as this is the main disk ...", ConsoleColor.Yellow);
                     }
-
-
                     Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }

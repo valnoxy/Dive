@@ -23,7 +23,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" x:Name="MessageTitle">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" x:Name="MessageTitle" Margin="0,0,0,5">
                     Message.Title
                 </TextBlock>
 
@@ -52,6 +52,6 @@
                 </Grid>
             </Grid>
         </Grid>
-        <ui:TitleBar/>
+        <ui:TitleBar CanMaximize="False" ShowMinimize="false" ShowMaximize="false"/>
     </Grid>
 </ui:UiWindow>

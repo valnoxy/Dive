@@ -105,6 +105,7 @@ namespace deployaUI.Pages.ApplyPages
             //   203: ProgText -> Install Bootloader
             //   204: ProgText -> Install recovery
             //   205: ProgText -> Install unattend.xml
+            //   206: ProgText -> Install UefiSeven
             //   250: Installation complete
             //
             // Error message handling
@@ -114,6 +115,7 @@ namespace deployaUI.Pages.ApplyPages
             //   304: Failed at installing recovery
             //   305: Failed at installing unattend.xml
             //   306: Failed at copying oem logo
+            //   307: Failed at installing UefiSeven
             //
             // Range 0-100 -> Progressbar percentage
             //
@@ -148,6 +150,9 @@ namespace deployaUI.Pages.ApplyPages
                     break;
                 case 206:                           // 206: ProgText -> Injecting drivers
                     ProgrText.Text = $"Injecting drivers ({currentDriver} of {driverCount}) ...";
+                    break;
+                case 207:                           // 206: ProgText -> Injecting drivers
+                    ProgrText.Text = $"Installing UefiSeven ...";
                     break;
                 case 250:                           // 250: Installation complete
                     ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
@@ -383,7 +388,7 @@ namespace deployaUI.Pages.ApplyPages
             // Apply image
             worker.ReportProgress(202, "");     // Applying Image Text
             worker.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWIM(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            Actions.ApplyWim(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -495,6 +500,24 @@ namespace deployaUI.Pages.ApplyPages
             {
                 worker.ReportProgress(206, "");     // Installing Drivers Text
                 Actions.InstallDriver(ui, $"{windowsDrive}Windows", Common.ApplyDetails.DriverList, worker);
+
+                if (IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            // Install UefiSeven (only for Vista and 7 with EFI)
+            if (Common.WindowsModification.InstallUefiSeven)
+            {
+                worker.ReportProgress(207, "");     // Installing UefiSeven
+                deployaCore.Action.UefiSeven.InstallUefiSeven(ui, bootDrive, 
+                    Common.WindowsModification.UsToggleSkipErros, 
+                    Common.WindowsModification.UsToggleFakeVesa,
+                    Common.WindowsModification.UsToggleVerbose,
+                    Common.WindowsModification.UsToggleLog, 
+                    worker);
 
                 if (IsCanceled)
                 {

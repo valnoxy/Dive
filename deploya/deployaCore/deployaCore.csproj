@@ -18,7 +18,7 @@
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PackageId>deploya</PackageId>
-		<Version>12.0.0.426</Version>
+		<Version>12.0.0.435</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>
 		<Product>deploya</Product>
@@ -35,6 +35,21 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Dism" Version="2.5.2" />
 		<PackageReference Include="Microsoft.Wim" Version="1.2.11" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Assets\UefiSevenResources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>UefiSevenResources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Assets\UefiSevenResources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>UefiSevenResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 </Project>

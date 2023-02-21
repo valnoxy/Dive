@@ -49,7 +49,7 @@ namespace deployaCore
                 throw new ArgumentException("Invalid arguments");
 
             // Start Diskpart tool
-            Process partDest = new Process();
+            var partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
             partDest.StartInfo.UseShellExecute = false;
             partDest.StartInfo.CreateNoWindow = true;
@@ -176,7 +176,8 @@ namespace deployaCore
             
             ConsoleUtility.WriteProgressBar(100, true);
             Console.WriteLine();
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+            if (ui != Entities.UI.Graphical) return;
+            worker.ReportProgress(101, ""); worker.ReportProgress(100, "");
         }
 
         /// <summary>
@@ -184,16 +185,16 @@ namespace deployaCore
         /// </summary>
         /// <param name="ui">User Interface type</param>
         /// <param name="path">Target path</param>
-        /// <param name="wimfile">Path to image file</param>
+        /// <param name="wimFile">Path to image file</param>
         /// <param name="index">Index identifier of the SKU</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void ApplyWIM(Entities.UI ui, string path, string wimfile, int index, BackgroundWorker worker = null)
+        public static void ApplyWim(Entities.UI ui, string path, string wimFile, int index, BackgroundWorker worker = null)
         {
             Output.Write("Applying Image ...            ");
             ConsoleUtility.WriteProgressBar(0);
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
             
-            Apply.WriteToDisk(wimfile, index, path, worker);
+            Apply.WriteToDisk(wimFile, index, path, worker);
             Console.WriteLine();
         }
 
@@ -212,28 +213,33 @@ namespace deployaCore
             ConsoleUtility.WriteProgressBar(0);
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
 
-            Process bootld = new Process();
+            var bootld = new Process();
 
-            #region Legacy check
-            if (bootloader == Entities.Bootloader.NTLDR)
+            #region Bootloader check
+            switch (bootloader)
             {
-                string StrBl = bootloaderLetter.Substring(0, 2);
-                bootld.StartInfo.FileName = "bootsect.exe";
-                bootld.StartInfo.Arguments = $"/nt52 {StrBl} /force /mbr";
-            }
-            #endregion
+                case Entities.Bootloader.NTLDR:
+                {
+                    var strBl = bootloaderLetter.Substring(0, 2);
+                    bootld.StartInfo.FileName = "bootsect.exe";
+                    bootld.StartInfo.Arguments = $"/nt52 {strBl} /force /mbr";
+                    break;
+                }
+                case Entities.Bootloader.BOOTMGR:
+                {
+                    windowsPath = $"{windowsPath}Windows";
+                    bootld.StartInfo.FileName = "bcdboot.exe";
 
-            #region BIOS / EFI check
-            if (bootloader == Entities.Bootloader.BOOTMGR)
-            {
-                windowsPath = $"{windowsPath}Windows";
-                bootld.StartInfo.FileName = "bcdboot.exe";
-
-                if (firmware == Entities.Firmware.BIOS) // BIOS
-                    bootld.StartInfo.Arguments = $"{windowsPath} /s {bootloaderLetter} /f BIOS";
-
-                if (firmware == Entities.Firmware.EFI) // EFI
-                    bootld.StartInfo.Arguments = $"{windowsPath} /s {bootloaderLetter} /f UEFI";
+                    bootld.StartInfo.Arguments = firmware switch
+                    {
+                        // BIOS
+                        Entities.Firmware.BIOS => $"{windowsPath} /s {bootloaderLetter} /f BIOS",
+                        // EFI
+                        Entities.Firmware.EFI => $"{windowsPath} /s {bootloaderLetter} /f UEFI",
+                        _ => bootld.StartInfo.Arguments
+                    };
+                    break;
+                }
             }
             #endregion
 
@@ -252,8 +258,15 @@ namespace deployaCore
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(303, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(bootld.ExitCode); }
+                switch (ui)
+                {
+                    case Entities.UI.Graphical:
+                        worker.ReportProgress(303, "");
+                        break;
+                    case Entities.UI.Command:
+                        Environment.Exit(bootld.ExitCode);
+                        break;
+                }
             }
 
             ConsoleUtility.WriteProgressBar(100, true);
@@ -288,8 +301,15 @@ namespace deployaCore
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                switch (ui)
+                {
+                    case Entities.UI.Graphical:
+                        worker.ReportProgress(304, "");
+                        break;
+                    case Entities.UI.Command:
+                        Environment.Exit(1);
+                        break;
+                }
             }
 
             // Copy WinRE image to Recovery partition
@@ -312,8 +332,15 @@ namespace deployaCore
                     if (ui == Entities.UI.Command)
                         Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                     Console.ResetColor();
-                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
-                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                    switch (ui)
+                    {
+                        case Entities.UI.Graphical:
+                            worker.ReportProgress(304, "");
+                            break;
+                        case Entities.UI.Command:
+                            Environment.Exit(1);
+                            break;
+                    }
                 }
             }
             catch
@@ -325,14 +352,21 @@ namespace deployaCore
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                switch (ui)
+                {
+                    case Entities.UI.Graphical:
+                        worker.ReportProgress(304, "");
+                        break;
+                    case Entities.UI.Command:
+                        Environment.Exit(1);
+                        break;
+                }
             }
 
             // Register recovery partition
             try
             {
-                Process p = new Process();
+                var p = new Process();
                 p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Reagentc.exe");
                 p.StartInfo.Arguments = $"/Setreimage /Path {recoveryLetter}\\Recovery\\WindowsRE /Target {windowsPath}";
                 p.StartInfo.RedirectStandardOutput = true;
@@ -349,8 +383,15 @@ namespace deployaCore
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(304, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                switch (ui)
+                {
+                    case Entities.UI.Graphical:
+                        worker.ReportProgress(304, "");
+                        break;
+                    case Entities.UI.Command:
+                        Environment.Exit(1);
+                        break;
+                }
             }
 
             ConsoleUtility.WriteProgressBar(100, true);
@@ -387,8 +428,15 @@ namespace deployaCore
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(305, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                switch (ui)
+                {
+                    case Entities.UI.Graphical:
+                        worker.ReportProgress(305, "");
+                        break;
+                    case Entities.UI.Command:
+                        Environment.Exit(1);
+                        break;
+                }
             }
 
             // Write config to disk as unattend.xml
@@ -405,12 +453,19 @@ namespace deployaCore
                 if (ui == Entities.UI.Command)
                     Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                 Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(305, ""); }
-                if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                switch (ui)
+                {
+                    case Entities.UI.Graphical:
+                        worker.ReportProgress(305, "");
+                        break;
+                    case Entities.UI.Command:
+                        Environment.Exit(1);
+                        break;
+                }
             }
 
             // Copy OEM logo to Windows\System32 directory
-            if (oemLogoPath != null || oemLogoPath != "")
+            if (string.IsNullOrEmpty(oemLogoPath))
             {
                 try
                 {
@@ -436,10 +491,10 @@ namespace deployaCore
                 try
                 {
                     Output.Write("Applying DISM Unattend ...  ");
-                    FileInfo f = new FileInfo(windowsPath);
-                    string drive = Path.GetPathRoot(f.FullName);
+                    var f = new FileInfo(windowsPath);
+                    var drive = Path.GetPathRoot(f.FullName);
                     
-                    Process p = new Process();
+                    var p = new Process();
                     p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Dism.exe");
                     p.StartInfo.Arguments = $"/Image:{drive} /Apply-Unattend:{System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml")}";
                     p.StartInfo.RedirectStandardOutput = true;
@@ -456,8 +511,15 @@ namespace deployaCore
                     if (ui == Entities.UI.Command)
                         Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
                     Console.ResetColor();
-                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(306, ""); }
-                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                    switch (ui)
+                    {
+                        case Entities.UI.Graphical:
+                            worker.ReportProgress(306, "");
+                            break;
+                        case Entities.UI.Command:
+                            Environment.Exit(1);
+                            break;
+                    }
                 }
             }
 
@@ -493,11 +555,10 @@ namespace deployaCore
         /// <returns>Information about the image file as XML</returns>
         public static string GetInfo(string imagePath)
         {
-            using (WimHandle file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
-            {
-                string a = WimgApi.GetImageInformationAsString(file);
-                return a;
-            }
+            using var file = WimgApi.CreateFile(imagePath, 
+                WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None);
+            var a = WimgApi.GetImageInformationAsString(file);
+            return a;
         }
 
         /// <summary>
@@ -508,8 +569,8 @@ namespace deployaCore
         public static char[] GetSystemLetters(Entities.PartitionStyle style)
         {
             // Search for non used drive letters
-            char[] getDrives = Management.GetAvailableDriveLetters();
-            List<char> arr = new List<char>();
+            var getDrives = Management.GetAvailableDriveLetters();
+            var arr = new List<char>();
 
             switch (style)
             {
@@ -542,7 +603,7 @@ namespace deployaCore
         /// <param name="pathToCapture">Path of the captured dir</param>
         /// <param name="pathToImage">Path of the output file</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void CaptureToWIM(Entities.UI ui, string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
+        public static void CaptureToWim(Entities.UI ui, string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
         {
             Output.Write("Capture Image ...            ");
             ConsoleUtility.WriteProgressBar(0);

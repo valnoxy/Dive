@@ -397,7 +397,7 @@ namespace deployaUI.Pages.TweaksPages
             // Apply image
             worker.ReportProgress(202, "");     // Applying Image Text
             worker.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWIM(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            Actions.ApplyWim(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;

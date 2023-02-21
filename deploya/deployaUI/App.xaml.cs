@@ -22,6 +22,7 @@ using System.Reflection;
 using System.IO;
 using deployaCore;
 using deployaCore.Common;
+using deployaUI.AutoDive;
 
 namespace deployaUI
 {
@@ -103,7 +104,7 @@ namespace deployaUI
 
         static void ShowAutoDive()
         {
-            AutoDive wnd = new AutoDive();
+            AutoDiveUi wnd = new AutoDiveUi();
             wnd.ShowDialog();
             Environment.Exit(0);
         }
@@ -162,6 +163,7 @@ namespace deployaUI
                 }
 
                 ShowGUI();
+                //ShowAutoDive();
             }
 
             if (args.Contains("--unattend-test"))
@@ -296,7 +298,7 @@ namespace deployaUI
 #endregion
 
             //Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
-            Actions.ApplyWIM(ui, "W:\\", options.wimfile, options.index);
+            Actions.ApplyWim(ui, "W:\\", options.wimfile, options.index);
 
             if (bootloader == Entities.Bootloader.BOOTMGR)
                 Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "S:\\");

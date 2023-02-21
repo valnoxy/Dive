@@ -10,32 +10,29 @@ namespace deployaCore.Action
 {
     internal class Apply
     {
-        internal static BackgroundWorker BW = null;
+        internal static BackgroundWorker Bw = null;
 
         internal static void WriteToDisk(string imagePath, int index, string drive, BackgroundWorker worker = null)
         {
-            BW = worker;
+            Bw = worker;
 
-            string path = drive;
-            using (WimHandle file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None))
+            using var file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None);
+            WimgApi.SetTemporaryPath(file, Environment.GetEnvironmentVariable("TEMP"));
+            WimgApi.RegisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
+            try
             {
-                WimgApi.SetTemporaryPath(file, Environment.GetEnvironmentVariable("TEMP"));
-                WimgApi.RegisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
-                try
-                {
-                    using (WimHandle imageHandle = WimgApi.LoadImage(file, index))
-                        WimgApi.ApplyImage(imageHandle, path, WimApplyImageOptions.None);
-                }
-                finally
-                {
-                    WimgApi.UnregisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
-                }
+                using var imageHandle = WimgApi.LoadImage(file, index);
+                WimgApi.ApplyImage(imageHandle, drive, WimApplyImageOptions.None);
+            }
+            finally
+            {
+                WimgApi.UnregisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
             }
         }
 
         internal static void AddDriverToDisk(string windowsPath, List<string> driverPath, BackgroundWorker worker = null)
         {
-            BW = worker;
+            Bw = worker;
 
             foreach (var driver in driverPath.Where(File.Exists))
             {
@@ -44,7 +41,7 @@ namespace deployaCore.Action
                 try
                 {
                     DismApi.AddDriver(session, driver, true);
-                    BW.ReportProgress(202, ""); // Update progress text
+                    if (Bw != null) Bw.ReportProgress(202, ""); // Update progress text
                 }
                 catch
                 {
@@ -58,23 +55,24 @@ namespace deployaCore.Action
             switch (messageType)
             {
                 case WimMessageType.Progress:
-                    WimMessageProgress wimMessageProgress = (WimMessageProgress)message;
-                    if (BW != null)
+                    var wimMessageProgress = (WimMessageProgress)message;
+                    if (Bw != null)
                     {
-                        BW.ReportProgress(wimMessageProgress.PercentComplete, ""); // Update progress bar
-                        BW.ReportProgress(202, ""); // Update progress text
+                        Bw.ReportProgress(wimMessageProgress.PercentComplete, ""); // Update progress bar
+                        Bw.ReportProgress(202, ""); // Update progress text
                     }
                     ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
                     break;
 
                 case WimMessageType.Error:
-                    WimMessageError wimMessageError = (WimMessageError)message;
+                    var wimMessageError = (WimMessageError)message;
                     Console.WriteLine($"Error: {0} ({1})", (object)wimMessageError.Path, (object)wimMessageError.Win32ErrorCode);
-                    if (BW != null) { BW.ReportProgress(302, ""); }
+                    Bw?.ReportProgress(302, "");
+
                     break;
 
                 case WimMessageType.Warning:
-                    WimMessageWarning wimMessageWarning = (WimMessageWarning)message;
+                    var wimMessageWarning = (WimMessageWarning)message;
                     Console.WriteLine($"Warning: {0} ({1})", (object)wimMessageWarning.Path, (object)wimMessageWarning.Win32ErrorCode);
                     break;
             }
