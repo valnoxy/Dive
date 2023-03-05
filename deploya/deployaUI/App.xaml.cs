@@ -145,19 +145,17 @@ namespace deployaUI
 #if RELEASE
                         if (!File.Exists("X:\\Windows\\System32\\wpeinit.exe")) ShowGUI();
 #endif
-                        string message = "Auto deployment config detected. Do you want to perform the deployment now?";
-                        string title = "AutoDive";
-                        string btn1 = "No";
-                        string btn2 = "Yes";
+                        const string message = "Auto deployment config detected. Do you want to perform the deployment now?";
+                        const string title = "AutoDive";
+                        const string btn1 = "No";
+                        const string btn2 = "Yes";
 
                         var w = new MessageUI(title, message, btn1, btn2, true, 5);
-                        if (w.ShowDialog() == false)
+                        if (w.ShowDialog() != false) continue;
+                        var summary = w.Summary;
+                        if (summary == "Btn2")
                         {
-                            string? summary = w.Summary;
-                            if (summary == "Btn2")
-                            {
-                                ShowAutoDive();
-                            }
+                            ShowAutoDive();
                         }
                     }
                 }

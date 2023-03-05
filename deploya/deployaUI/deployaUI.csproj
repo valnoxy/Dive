@@ -16,7 +16,7 @@
 		<AssemblyName>Dive</AssemblyName>
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
-		<Version>1.0.0.334</Version>
+		<Version>1.0.0.347</Version>
 		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
@@ -57,7 +57,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
-		<PackageReference Include="System.Management" Version="6.0.0" />
+		<PackageReference Include="System.Management" Version="7.0.0" />
 		<PackageReference Include="WPF-UI" Version="2.0.3" />
 	</ItemGroup>
 

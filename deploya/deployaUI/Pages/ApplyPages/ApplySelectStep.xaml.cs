@@ -279,25 +279,15 @@ namespace deployaUI.Pages.ApplyPages
         {
             #region Environment definition
 
-            BackgroundWorker worker = sender as BackgroundWorker;
-
-            Entities.Firmware firmware = new Entities.Firmware();
-            Entities.Bootloader bootloader = new Entities.Bootloader();
-            Entities.UI ui = new Entities.UI();
-
-            // UI definition
-            ui = Entities.UI.Graphical;
-
-            firmware = Common.ApplyDetails.UseEFI switch
+            var worker = sender as BackgroundWorker;
+            var ui = Entities.UI.Graphical; // UI definition
+            var firmware = Common.ApplyDetails.UseEFI switch // Firmware definition
             {
-                // Firmware definition
                 true => Entities.Firmware.EFI,
                 false => Entities.Firmware.BIOS
             };
-
-            bootloader = Common.ApplyDetails.UseNTLDR switch
+            var bootloader = Common.ApplyDetails.UseNTLDR switch // Bootloader definition
             {
-                // Bootloader definition
                 true => Entities.Bootloader.NTLDR,
                 false => Entities.Bootloader.BOOTMGR,
             };
@@ -332,8 +322,17 @@ namespace deployaUI.Pages.ApplyPages
                                 // If Vista is used, we need to use the Single partition layout
                                 if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
                                 {
-                                    letters = Actions.GetSystemLetters(Entities.PartitionStyle.Single);
-                                    partStyle = Entities.PartitionStyle.Single;
+                                    // Except if EFI is used, then we need to use the SeparateBoot partition layout
+                                    if (Common.ApplyDetails.UseEFI)
+                                    {
+                                        letters = Actions.GetSystemLetters(Entities.PartitionStyle.SeparateBoot);
+                                        partStyle = Entities.PartitionStyle.SeparateBoot;
+                                    }
+                                    else
+                                    {
+                                        letters = Actions.GetSystemLetters(Entities.PartitionStyle.Single);
+                                        partStyle = Entities.PartitionStyle.Single;
+                                    }
                                 }
                                 else
                                 {
@@ -371,7 +370,6 @@ namespace deployaUI.Pages.ApplyPages
             Output.WriteLine($"Partition style: {partStyle}");
 
             #endregion
-
 
             // Initialize worker progress
             worker.ReportProgress(0, "");       // Value 0

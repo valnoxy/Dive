@@ -18,10 +18,6 @@ namespace deployaUI
               BackgroundType.Mica // Background type
             );
 
-            Theme.Apply(
-              ThemeType.Dark      // Theme type
-            );
-
             InitializeComponent();
             
 #if DEBUG

@@ -75,7 +75,6 @@ namespace deployaUI.Pages.ApplyPages
             {
                 UseRecoveryBtn.IsChecked = false;
                 UseNTLDRBtn.IsChecked = false;
-                BIOSRadio.IsChecked = true;
             }
             else if (Common.ApplyDetails.Name.Contains("(") || Common.ApplyDetails.Name.Contains(")"))
             {
