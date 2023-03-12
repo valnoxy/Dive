@@ -1,13 +1,16 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using deployaUI.Common;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using Path = System.IO.Path;
 using Wpf.Ui.Common;
 using System.Xml;
+using deployaUI.Pages.Extras;
 
 namespace deployaUI.Pages.ApplyPages
 {
@@ -234,6 +237,41 @@ namespace deployaUI.Pages.ApplyPages
                 using (TextWriter writer = new StreamWriter(saveFileDialog.FileName))
                 {
                     slz.Serialize(writer, settings);
+                }
+            }
+        }
+
+        private void Source_OpenFolderClick(object sender, RoutedEventArgs e)
+        {
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog
+            {
+                Description = "Select the source directory to capture.",
+                UseDescriptionForTitle = true,
+                SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+                ShowNewFolderButton = false
+            };
+
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                TbDrvPath.Text = dialog.SelectedPath;
+
+                List<string> infFiles = Directory.GetFiles(dialog.SelectedPath, "*.inf")
+                    .Select(Path.GetFileName)
+                    .ToList();
+
+                switch (infFiles.Count)
+                {
+                    case > 0:
+                        var driverWindow = new LoadDriversLiveSystem(infFiles);
+                        driverWindow.ShowDialog();
+                        Common.ApplyDetails.DriverList = infFiles;
+                        break;
+                    case 0:
+                        RootSnackbar.Appearance = ControlAppearance.Danger;
+                        RootSnackbar.Icon = SymbolRegular.Settings32;
+                        RootSnackbar.Show("An error has occurred.", $"No inf files found in the selected directory.");
+                        Common.ApplyDetails.DriverList = null;
+                        break;
                 }
             }
         }

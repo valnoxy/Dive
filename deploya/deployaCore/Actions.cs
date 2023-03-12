@@ -1,13 +1,13 @@
 ﻿/* 
- * deploya - Fast and Easy way to deploy Windows
+ * Dive - Deployment is very easy.
  * Copyright (c) 2018 - 2023 Exploitox.
  * 
- * deploya is licensed under MIT License (https://github.com/valnoxy/deploya/blob/main/LICENSE). 
+ * Dive (formally deploya) is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE). 
  * So you are allowed to use freely and modify the application. 
  * I will not be responsible for any outcome. 
  * Proceed with any action at your own risk.
  * 
- * Source code: https://github.com/valnoxy/deploya
+ * Source code: https://github.com/valnoxy/dive
  */
 
 using deployaCore.Action;
@@ -534,7 +534,7 @@ namespace deployaCore
             }
 
             // Copy OEM logo to Windows\System32 directory
-            if (string.IsNullOrEmpty(oemLogoPath))
+            if (!string.IsNullOrEmpty(oemLogoPath))
             {
                 try
                 {
@@ -559,7 +559,7 @@ namespace deployaCore
             {
                 try
                 {
-                    Output.Write("Applying DISM Unattend ...  ");
+                    Output.Write("Registering unattend file with DISM ...");
                     var f = new FileInfo(windowsPath);
                     var drive = Path.GetPathRoot(f.FullName);
                     
@@ -601,16 +601,16 @@ namespace deployaCore
         /// Installs the specific driver to the Windows Installation (only Vista and higher).
         /// </summary>
         /// <param name="ui">User Interface type</param>
-        /// <param name="windowsPath">Path to the Windows directory</param>
+        /// <param name="windowsDrive">Drive letter to the Windows disk</param>
         /// <param name="driverPath">List of driver paths</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallDriver(Entities.UI ui, string windowsPath, List<string> driverPath, BackgroundWorker worker = null)
+        public static void InstallDriver(Entities.UI ui, string windowsDrive, List<string> driverPath, BackgroundWorker worker = null)
         {
             Output.Write("Installing drivers ...  ");
             ConsoleUtility.WriteProgressBar(0);
             if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
 
-            Apply.AddDriverToDisk(windowsPath, driverPath, worker);
+            Apply.AddDriverToDisk(windowsDrive, driverPath, worker);
 
             ConsoleUtility.WriteProgressBar(100, true);
             Console.WriteLine();

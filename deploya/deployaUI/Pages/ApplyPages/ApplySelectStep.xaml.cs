@@ -15,8 +15,7 @@ namespace deployaUI.Pages.ApplyPages
     {
         private BackgroundWorker applyBackgroundWorker;
         bool IsCanceled = false;
-        private int currentDriver = 0;
-        private int driverCount = 0;
+        private int _driverCount = 0;
 
         public ApplySelectStep()
         {
@@ -35,15 +34,8 @@ namespace deployaUI.Pages.ApplyPages
                 CloudContent.ContentWindow.CancelBtn.IsEnabled = false;
             }
 
-            if (DiskSelectStep.ContentWindow.IsNTLDRChecked())
-                Common.ApplyDetails.UseNTLDR = true;
-            else 
-                Common.ApplyDetails.UseNTLDR = false;
-
-            if (DiskSelectStep.ContentWindow.IsRecoveryChecked())
-                Common.ApplyDetails.UseRecovery = true;
-            else
-                Common.ApplyDetails.UseRecovery = false;
+            Common.ApplyDetails.UseNTLDR = DiskSelectStep.ContentWindow.IsNTLDRChecked();
+            Common.ApplyDetails.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
 
             // Validate deployment settings
             switch (Common.OemInfo.UseOemInfo)
@@ -71,7 +63,7 @@ namespace deployaUI.Pages.ApplyPages
             // Set active Image to card
             ImageName.Text = Common.ApplyDetails.Name;
             ImageFile.Text = Common.ApplyDetails.FileName;
-            ImageSourceConverter img = new ImageSourceConverter();
+            var img = new ImageSourceConverter();
             try
             {
                 ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
@@ -81,7 +73,7 @@ namespace deployaUI.Pages.ApplyPages
                 // ignored
             }
 
-            // Backgrond worker for deployment
+            // Background worker for deployment
             applyBackgroundWorker = new BackgroundWorker();
             applyBackgroundWorker.WorkerReportsProgress = true;
             applyBackgroundWorker.WorkerSupportsCancellation = true;
@@ -106,6 +98,7 @@ namespace deployaUI.Pages.ApplyPages
             //   204: ProgText -> Install recovery
             //   205: ProgText -> Install unattend.xml
             //   206: ProgText -> Install UefiSeven
+            //   207: ProgText -> Inject drivers
             //   250: Installation complete
             //
             // Error message handling
@@ -116,6 +109,7 @@ namespace deployaUI.Pages.ApplyPages
             //   305: Failed at installing unattend.xml
             //   306: Failed at copying oem logo
             //   307: Failed at installing UefiSeven
+            //   308: Failed at injecting drivers
             //
             // Range 0-100 -> Progressbar percentage
             //
@@ -148,11 +142,14 @@ namespace deployaUI.Pages.ApplyPages
                 case 205:                           // 205: ProgText -> Installing unattend.xml
                     ProgrText.Text = "Copying unattend.xml to disk ...";
                     break;
-                case 206:                           // 206: ProgText -> Injecting drivers
-                    ProgrText.Text = $"Injecting drivers ({currentDriver} of {driverCount}) ...";
-                    break;
-                case 207:                           // 206: ProgText -> Injecting drivers
+                case 206:                           // 206: ProgText -> Installing UefiSeven
                     ProgrText.Text = $"Installing UefiSeven ...";
+                    break;
+                case 207:                           // 207: ProgText -> Injecting drivers
+                    if (e.UserState == "Initialize")
+                        ProgrText.Text = $"Opening Dism Session for Driver injection ...";
+                    else
+                        ProgrText.Text = $"Injecting drivers ({e.UserState} of {_driverCount}) ...";
                     break;
                 case 250:                           // 250: Installation complete
                     ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
@@ -267,7 +264,41 @@ namespace deployaUI.Pages.ApplyPages
                     }
                     IsCanceled = true;
                     break;
-                #endregion
+                case 307:                           // 307: Failed at installing UefiSeven
+                    ProgrText.Text = "Failed at installing UefiSeven to disk. Please check your disk and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                case 308:                           // 308: Failed at injecting drivers
+                    ProgrText.Text = "Failed at injecting drivers. Please check your drivers and try again.";
+                    ProgrBar.Value = 0;
+                    if (ApplyContent.ContentWindow != null)
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    if (CloudContent.ContentWindow != null)
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+                    IsCanceled = true;
+                    break;
+                    #endregion
             }
 
             // Progressbar percentage
@@ -372,10 +403,10 @@ namespace deployaUI.Pages.ApplyPages
             #endregion
 
             // Initialize worker progress
-            worker.ReportProgress(0, "");       // Value 0
+            worker?.ReportProgress(0, "");       // Value 0
 
             // Prepare disk
-            worker.ReportProgress(201, "");     // Prepare Disk Text
+            worker?.ReportProgress(201, "");     // Prepare Disk Text
             Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
             if (IsCanceled)
             {
@@ -384,8 +415,8 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Apply image
-            worker.ReportProgress(202, "");     // Applying Image Text
-            worker.ReportProgress(0, "");       // Value 0
+            worker?.ReportProgress(202, "");     // Applying Image Text
+            worker?.ReportProgress(0, "");       // Value 0
             Actions.ApplyWim(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
@@ -394,7 +425,7 @@ namespace deployaUI.Pages.ApplyPages
             }
             
             // Install Bootloader
-            worker.ReportProgress(203, "");     // Installing Bootloader Text
+            worker?.ReportProgress(203, "");     // Installing Bootloader Text
             switch (partStyle)
             {
                 case Entities.PartitionStyle.SeparateBoot:
@@ -415,7 +446,7 @@ namespace deployaUI.Pages.ApplyPages
             // Install Recovery (only for Vista and higher)
             if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
-                worker.ReportProgress(204, "");     // Installing Bootloader Text
+                worker?.ReportProgress(204, "");     // Installing Bootloader Text
                 Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
             
                 if (IsCanceled)
@@ -428,10 +459,10 @@ namespace deployaUI.Pages.ApplyPages
             // Install unattend file (only for Vista and higher)
             if (Common.DeploymentInfo.UseUserInfo || Common.OemInfo.UseOemInfo)
             {
-                worker.ReportProgress(205, "");     // Installing unattend file
+                worker?.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
-                string config = "";
+                var config = "";
                 Common.UnattendMode? um = null;
 
                 if (!Common.DeploymentInfo.UseUserInfo && Common.OemInfo.UseOemInfo)
@@ -496,8 +527,10 @@ namespace deployaUI.Pages.ApplyPages
             // Install Drivers (only for Vista and higher)
             if (Common.ApplyDetails.DriverList != null)
             {
-                worker.ReportProgress(206, "");     // Installing Drivers Text
-                Actions.InstallDriver(ui, $"{windowsDrive}Windows", Common.ApplyDetails.DriverList, worker);
+                worker?.ReportProgress(207, "");     // Installing Drivers Text
+
+                _driverCount = Common.ApplyDetails.DriverList.Count;
+                Actions.InstallDriver(ui, windowsDrive, Common.ApplyDetails.DriverList, worker);
 
                 if (IsCanceled)
                 {
@@ -509,7 +542,7 @@ namespace deployaUI.Pages.ApplyPages
             // Install UefiSeven (only for Vista and 7 with EFI)
             if (Common.WindowsModification.InstallUefiSeven)
             {
-                worker.ReportProgress(207, "");     // Installing UefiSeven
+                worker?.ReportProgress(206, "");     // Installing UefiSeven
                 deployaCore.Action.UefiSeven.InstallUefiSeven(ui, bootDrive, 
                     Common.WindowsModification.UsToggleSkipErros, 
                     Common.WindowsModification.UsToggleFakeVesa,
@@ -525,7 +558,7 @@ namespace deployaUI.Pages.ApplyPages
             }
 
             // Installation complete
-            worker.ReportProgress(250, "");     // Installation complete Text
+            worker?.ReportProgress(250, "");     // Installation complete Text
         }
     }
 }

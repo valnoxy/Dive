@@ -685,26 +685,31 @@ namespace deployaUI.Common
     {
         public static string Build(Common.UnattendMode? mode)
         {
-            var uc = new UnattendXmlClass.unattend();
-            uc.settings = new UnattendXmlClass.unattendSettings[3];
-            uc.settings[0] = new UnattendXmlClass.unattendSettings();
-            uc.settings[0].pass = "oobeSystem";
-
-            uc.settings[0].component = new UnattendXmlClass.unattendSettingsComponent
+            Common.Debug.WriteLine($"[UnattendBuilder] Entering Build process with mode {mode.Value} ...");
+            var uc = new UnattendXmlClass.unattend
             {
-                name = "Microsoft-Windows-Shell-Setup",
-                processorArchitecture = "amd64",
-                publicKeyToken = "31bf3856ad364e35",
-                language = "neutral",
-                versionScope = "nonSxS"
+                settings = new UnattendXmlClass.unattendSettings[3]
+            };
+            uc.settings[0] = new UnattendXmlClass.unattendSettings
+            {
+                pass = "oobeSystem",
+                component = new UnattendXmlClass.unattendSettingsComponent
+                {
+                    name = "Microsoft-Windows-Shell-Setup",
+                    processorArchitecture = "amd64",
+                    publicKeyToken = "31bf3856ad364e35",
+                    language = "neutral",
+                    versionScope = "nonSxS"
+                }
             };
 
             // Auto Logon for Administrator account
-            if (mode == Common.UnattendMode.Admin || 
-                mode == Common.UnattendMode.AdminWithoutOem || 
-                mode == Common.UnattendMode.AdminWithoutPassword ||
-                mode == Common.UnattendMode.AdminWithoutPasswordAndOem)
+            if (mode is Common.UnattendMode.Admin 
+                or Common.UnattendMode.AdminWithoutOem 
+                or Common.UnattendMode.AdminWithoutPassword 
+                or Common.UnattendMode.AdminWithoutPasswordAndOem)
             {
+                Common.Debug.WriteLine("[UnattendBuilder] AutoLogon for Admin account");
                 uc.settings[0].component.AutoLogon = new UnattendXmlClass.unattendSettingsComponentAutoLogon
                 {
                     Enabled = true,
@@ -712,9 +717,9 @@ namespace deployaUI.Common
                     Username = "Administrator"
                 };
 
-                if (mode != Common.UnattendMode.AdminWithoutPassword ||
-                    mode != Common.UnattendMode.AdminWithoutPasswordAndOem)
+                if (mode is not (Common.UnattendMode.AdminWithoutPassword and Common.UnattendMode.AdminWithoutPasswordAndOem))
                 {
+                    Common.Debug.WriteLine("[UnattendBuilder] Define Admin password");
                     uc.settings[0].component.AutoLogon.Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
                         {
                             Value = Common.DeploymentInfo.Password,
@@ -727,6 +732,7 @@ namespace deployaUI.Common
             // User Account
             if (mode != Common.UnattendMode.OnlyOem)
             {
+                Common.Debug.WriteLine("[UnattendBuilder] User Account creation");
                 uc.settings[0].component.UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts();
 
                 switch (mode)
@@ -734,6 +740,7 @@ namespace deployaUI.Common
                     // Administrator Password
                     case Common.UnattendMode.Admin:
                     case Common.UnattendMode.AdminWithoutOem:
+                        Common.Debug.WriteLine("[UnattendBuilder] Administrator Password");
                         uc.settings[0].component.UserAccounts.AdministratorPassword =
                             new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
                             {
@@ -748,6 +755,7 @@ namespace deployaUI.Common
                     case Common.UnattendMode.UserWithoutPassword:
                     case Common.UnattendMode.UserWithoutPasswordAndOem:
                     {
+                        Common.Debug.WriteLine("[UnattendBuilder] Local account");
                         uc.settings[0].component.UserAccounts.LocalAccounts =
                             new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
                             {
@@ -758,9 +766,9 @@ namespace deployaUI.Common
                             };
 
                         // Password
-                        if (mode != Common.UnattendMode.UserWithoutPassword ||
-                            mode != Common.UnattendMode.UserWithoutPasswordAndOem)
+                        if (mode is not (Common.UnattendMode.UserWithoutPassword and Common.UnattendMode.UserWithoutPasswordAndOem))
                         {
+                            Common.Debug.WriteLine("[UnattendBuilder] Local Account Password");
                             uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Password =
                                 new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
                                 {
@@ -778,15 +786,29 @@ namespace deployaUI.Common
 
             var oemLogo = "";
             if (!string.IsNullOrEmpty(Common.OemInfo.LogoPath))
+            {
+                Common.Debug.WriteLine("[UnattendBuilder] OEM Logo is not Null or Empty: " + Common.OemInfo.LogoPath);
                 oemLogo = "%WINDIR%\\System32\\logo.bmp";
+            }
 
             // OEM Information
-            if (mode != Common.UnattendMode.AdminWithoutOem ||
-                mode != Common.UnattendMode.AdminWithoutPasswordAndOem ||
-                mode != Common.UnattendMode.UserWithoutOem ||
-                mode != Common.UnattendMode.UserWithoutPasswordAndOem)
+            if (mode is UnattendMode.Admin or UnattendMode.AdminWithoutPassword or UnattendMode.User or UnattendMode.UserWithoutPassword)
             {
-                uc.settings[0].component.OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
+                Common.Debug.WriteLine("[UnattendBuilder] OEM Information");
+                if (string.IsNullOrEmpty(Common.OemInfo.LogoPath))
+                {
+                    uc.settings[0].component.OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
+                    {
+                        Manufacturer = Common.OemInfo.Manufacturer,
+                        Model = Common.OemInfo.Model,
+                        SupportHours = Common.OemInfo.SupportHours,
+                        SupportPhone = Common.OemInfo.SupportPhone,
+                        SupportURL = Common.OemInfo.SupportURL
+                    };
+                }
+                else
+                {
+                    uc.settings[0].component.OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
                     {
                         Logo = oemLogo,
                         Manufacturer = Common.OemInfo.Manufacturer,
@@ -795,11 +817,13 @@ namespace deployaUI.Common
                         SupportPhone = Common.OemInfo.SupportPhone,
                         SupportURL = Common.OemInfo.SupportURL
                     };
+                }
             }
 
             // S-Mode (Windows 10 1709 and up)
             if (Common.DeploymentOption.UseSMode)
             {
+                Common.Debug.WriteLine("[UnattendBuilder] Using S Mode");
                 uc.settings[1] = new UnattendXmlClass.unattendSettings
                 {
                     pass = "offlineServicing",
@@ -819,6 +843,7 @@ namespace deployaUI.Common
             // Copy Profile (only for syspreped user profiles)
             if (Common.DeploymentOption.UseCopyProfile)
             {
+                Common.Debug.WriteLine("[UnattendBuilder] Using CopyProfile");
                 var nextIndex = Common.DeploymentOption.UseSMode ? 2 : 1;
                 uc.settings[nextIndex] = new UnattendXmlClass.unattendSettings
                 {
@@ -844,6 +869,8 @@ namespace deployaUI.Common
 
             using StringWriter textWriter = new Utf8StringWriter();
             slz.Serialize(textWriter, uc, ns);
+
+            Common.Debug.WriteLine("[UnattendBuilder] Building completed.");
             return textWriter.ToString();
         }
         

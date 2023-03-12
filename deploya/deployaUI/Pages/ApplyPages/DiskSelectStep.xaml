@@ -12,8 +12,8 @@
             <RowDefinition Height="60"/>
             <!-- Title with button text -->
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <!-- Content -->
         </Grid.RowDefinitions>
 
@@ -39,21 +39,15 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="75"/>
                     <ColumnDefinition Width="75"/>
                 </Grid.ColumnDefinitions>
 
                 <wpfui:Button Grid.Column="0" Icon="ArrowReset24" Content="Reload" Margin="0,15,15,0" Click="ReloadBtn_Click"/>
-                <wpfui:Button Grid.Column="1" Icon="New24" Content="New" Margin="0,15,15,0" Visibility="Hidden"/>
-                <wpfui:Button Grid.Column="2" Icon="Delete20" Content="Delete" Margin="0,15,15,0" Appearance="Danger" Visibility="Hidden"/>
-                <wpfui:Button Grid.Column="3" Icon="Eraser24" Content="Format" Margin="0,15,15,0" Appearance="Danger" Visibility="Hidden"/>
-
-                <wpfui:Button Grid.Column="1" Icon="Toolbox28" Content="Add driver" IsEnabled="false" Margin="0,15,15,0"/>
-                <ToggleButton Grid.Column="2" x:Name="UseRecoveryBtn" Content="Add Recovery" IsEnabled="true" Margin="0,15,15,0"/>
-                <ToggleButton Grid.Column="3" x:Name="UseNTLDRBtn" Content="Use NTLDR (XP)" Margin="0,15,15,0"/>
-                <RadioButton Grid.Column="4" x:Name="BIOSRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="BIOS" Margin="0,15,0,0" MaxWidth="1" Checked="BIOSRadio_Checked" />
-                <RadioButton Grid.Column="5" x:Name="EFIRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
+                <ToggleButton Grid.Column="1" x:Name="UseRecoveryBtn" Content="Add Recovery" IsEnabled="true" Margin="0,15,15,0"/>
+                <ToggleButton Grid.Column="2" x:Name="UseNTLDRBtn" Content="Use NTLDR (XP)" Margin="0,15,15,0"/>
+                <RadioButton Grid.Column="3" x:Name="BIOSRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="BIOS" Margin="0,15,0,0" MaxWidth="1" Checked="BIOSRadio_Checked" />
+                <RadioButton Grid.Column="4" x:Name="EFIRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
             </Grid>
         </StackPanel>
 

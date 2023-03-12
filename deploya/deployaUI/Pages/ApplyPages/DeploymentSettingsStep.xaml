@@ -184,6 +184,36 @@
                         </StackPanel>
                     </wpfui:CardExpander>
 
+                    <wpfui:CardControl Icon="Settings48" Margin="0,5,0,0">
+                        <wpfui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Inject Drivers" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Load and inject multiple drivers." />
+                                </StackPanel>
+                                <TextBlock
+                                    FontSize="12"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                    x:Name="TbDrvPath"
+                                    Text="No source directory selected." />
+                                <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,16,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                            </Grid>
+                        </wpfui:CardControl.Header>
+                    </wpfui:CardControl>
+
                     <wpfui:CardControl Icon="BoxMultipleArrowRight24" Margin="0,5,0,0">
                         <wpfui:CardControl.Header>
                             <Grid>

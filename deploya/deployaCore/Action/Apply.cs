@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using deployaCore.Common;
+using static System.Collections.Specialized.BitVector32;
 
 namespace deployaCore.Action
 {
@@ -30,23 +32,55 @@ namespace deployaCore.Action
             }
         }
 
-        internal static void AddDriverToDisk(string windowsPath, List<string> driverPath, BackgroundWorker worker = null)
+        internal static void AddDriverToDisk(string windowsDrive, List<string> driverPath, BackgroundWorker worker = null)
         {
             Bw = worker;
-
-            foreach (var driver in driverPath.Where(File.Exists))
+            try
             {
-                using var session = DismApi.OpenOfflineSession(windowsPath);
+                Output.WriteLine("[Driver] Entering Injection process ...");
+                Output.WriteLine("[Driver] Initialize Dism API ...");
+                DismApi.Initialize(DismLogLevel.LogErrors);
+                Output.WriteLine("[Driver] Open offline session ...");
 
+                DismSession session = null;
                 try
                 {
-                    DismApi.AddDriver(session, driver, true);
-                    if (Bw != null) Bw.ReportProgress(202, ""); // Update progress text
+                    if (Bw != null) Bw.ReportProgress(207, "Initialize"); // Update progress text
+                    session = DismApi.OpenOfflineSession(windowsDrive);
+                    Output.WriteLine("[Driver] Session opened. ");
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    Output.WriteLine("[Driver] Failed to open offline session: " + ex.Message);
+                    Output.WriteLine("[Driver] Shutdown Dism API ...");
+                    DismApi.Shutdown();
+                    return;
                 }
+
+                var currentDriverCount = 0;
+                foreach (var driver in driverPath.Where(File.Exists))
+                {
+                    try
+                    {
+                        currentDriverCount++;
+                        Output.WriteLine($"[Driver] Current Driver ({currentDriverCount}): {driver}");
+                        if (Bw != null) Bw.ReportProgress(207, currentDriverCount); // Update progress text
+                        DismApi.AddDriver(session, driver, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Output.WriteLine("[Driver] Failed to inject driver: " + ex.Message);
+                        if (Bw != null) Bw?.ReportProgress(308, "");
+                    }
+                }
+
+                session.Close();
+                DismApi.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                Output.WriteLine("[Driver] Unknown error: " + ex.Message);
+                DismApi.Shutdown();
             }
         }
 
