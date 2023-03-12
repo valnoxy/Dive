@@ -176,9 +176,9 @@ namespace deployaUI
                 Common.UnattendMode? um = Common.UnattendMode.Admin;
                 Common.DeploymentInfo.Username = "Administrator";
                 Common.DeploymentInfo.Password = "Pa$$w0rd";
-                Common.DeploymentOption.UseCopyProfile = true;
-                Common.DeploymentOption.UseSMode = true;
-                Common.OemInfo.UseOemInfo = true;
+                Common.DeploymentOption.UseCopyProfile = false;
+                Common.DeploymentOption.UseSMode = false;
+                Common.OemInfo.UseOemInfo = false;
                 Common.OemInfo.Model = "Toaster";
                 Common.OemInfo.Manufacturer = "Fabrikam";
                 Common.OemInfo.SupportHours = "24/7";

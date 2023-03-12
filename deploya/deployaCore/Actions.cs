@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using deployaCore.Assets;
+using Microsoft.Dism;
 
 namespace deployaCore
 {
@@ -280,8 +282,9 @@ namespace deployaCore
         /// <param name="ui">User Interface type</param>
         /// <param name="windowsPath">Path to the Windows directory</param>
         /// <param name="recoveryLetter">Drive letter of the recovery partition</param>
+        /// <param name="implementDive">Implement Dive as a custom recovery tool into Windows RE</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallRecovery(Entities.UI ui, string windowsPath, string recoveryLetter, BackgroundWorker worker = null)
+        public static void InstallRecovery(Entities.UI ui, string windowsPath, string recoveryLetter, bool implementDive = false, BackgroundWorker worker = null)
         {
             Output.Write("Installing Recovery ...       ");
             ConsoleUtility.WriteProgressBar(0);
@@ -363,6 +366,61 @@ namespace deployaCore
                 }
             }
 
+            // Implement Dive
+            if (implementDive)
+            {
+                try
+                {
+                    // Initialize Dism API
+                    DismApi.Initialize(DismLogLevel.LogErrors);
+
+                    // Prepare session
+                    var imageFile = System.IO.Path.Combine(recoveryLetter, "Recovery", "WindowsRE", "Winre.wim");
+                    var mountPath = System.IO.Path.Combine(windowsPath, "..", "dive-tmp", "mount");
+                    var targetPath = System.IO.Path.Combine(mountPath, "sources", "recovery", "tools");
+                    const int imageIndex = 1;
+                    Directory.CreateDirectory(mountPath);
+
+                    // Mount image
+                    DismApi.MountImage(imageFile, mountPath, imageIndex);
+
+                    // Copy Dive
+                    var strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    var strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
+                    Common.FileIO.CopyFilesRecursively(new DirectoryInfo(strWorkPath), new DirectoryInfo(Path.Combine(targetPath, "Dive")));
+
+                    // Create WinREConfig.xml
+                    File.WriteAllText(Path.Combine(targetPath, "WinREConfig.xml"), WinRE.WinREConfig);
+
+                    // Unmount image
+                    DismApi.UnmountImage(mountPath, true);
+                }
+                catch
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("");
+                    Console.WriteLine("   An Error has occurred.");
+                    Console.WriteLine("   Error: Cannot modify WinRE");
+                    if (ui == Entities.UI.Command)
+                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
+                    Console.ResetColor();
+                    switch (ui)
+                    {
+                        case Entities.UI.Graphical:
+                            worker.ReportProgress(304, "");
+                            break;
+                        case Entities.UI.Command:
+                            Environment.Exit(1);
+                            break;
+                    }
+                }
+                finally
+                {
+                    // Close Dism API
+                    DismApi.Shutdown();
+                }
+            }
+
             // Register recovery partition
             try
             {
@@ -373,6 +431,17 @@ namespace deployaCore
                 p.StartInfo.CreateNoWindow = true;
                 p.Start();
                 p.WaitForExit();
+
+                if (implementDive)
+                {
+                    var recoveryBootMenuPath = System.IO.Path.Combine(recoveryLetter, "Recovery", "BootMenu");
+                    Directory.CreateDirectory(recoveryBootMenuPath);
+
+                    File.WriteAllText(Path.Combine(recoveryBootMenuPath, "AddDiagnosticsToolToBootMenu.xml"), WinRE.AddDiagnosticsToolToBootMenu);
+                    p.StartInfo.Arguments = $"/setbootshelllink /configfile {Path.Combine(recoveryBootMenuPath, "AddDiagnosticsToolToBootMenu.xml")}";
+                    p.Start();
+                    p.WaitForExit();
+                }
             }
             catch
             {

@@ -715,9 +715,11 @@ namespace deployaUI.Common
                 if (mode != Common.UnattendMode.AdminWithoutPassword ||
                     mode != Common.UnattendMode.AdminWithoutPasswordAndOem)
                 {
-                    uc.settings[0].component.AutoLogon.Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword();
-                    uc.settings[0].component.AutoLogon.Password.Value = Common.DeploymentInfo.Password;
-                    uc.settings[0].component.AutoLogon.Password.PlainText = true;
+                    uc.settings[0].component.AutoLogon.Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
+                        {
+                            Value = Common.DeploymentInfo.Password,
+                            PlainText = true
+                        };
                 }
 
             }
@@ -726,50 +728,57 @@ namespace deployaUI.Common
             if (mode != Common.UnattendMode.OnlyOem)
             {
                 uc.settings[0].component.UserAccounts = new UnattendXmlClass.unattendSettingsComponentUserAccounts();
-                
-                // Administrator Password
-                if (mode == Common.UnattendMode.Admin ||
-                    mode == Common.UnattendMode.AdminWithoutOem)
-                {
-                    uc.settings[0].component.UserAccounts.AdministratorPassword =
-                        new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
-                        {
-                            Value = Common.DeploymentInfo.Password,
-                            PlainText = true
-                        };
-                }
 
-                // Local account
-                if (mode == Common.UnattendMode.User ||
-                    mode == Common.UnattendMode.UserWithoutOem ||
-                    mode == Common.UnattendMode.UserWithoutPassword ||
-                    mode == Common.UnattendMode.UserWithoutPasswordAndOem)
+                switch (mode)
                 {
-                    uc.settings[0].component.UserAccounts.LocalAccounts =
-                        new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
-                        {
-                            LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
+                    // Administrator Password
+                    case Common.UnattendMode.Admin:
+                    case Common.UnattendMode.AdminWithoutOem:
+                        uc.settings[0].component.UserAccounts.AdministratorPassword =
+                            new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
+                            {
+                                Value = Common.DeploymentInfo.Password,
+                                PlainText = true
+                            };
+                        break;
+
+                    // Local account
+                    case Common.UnattendMode.User:
+                    case Common.UnattendMode.UserWithoutOem:
+                    case Common.UnattendMode.UserWithoutPassword:
+                    case Common.UnattendMode.UserWithoutPasswordAndOem:
+                    {
+                        uc.settings[0].component.UserAccounts.LocalAccounts =
+                            new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
+                            {
+                                LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
                                 {
                                     action = "add"
                                 }
-                        };
+                            };
 
-                    // Password
-                    if (mode != Common.UnattendMode.UserWithoutPassword ||
-                        mode != Common.UnattendMode.UserWithoutPasswordAndOem)
-                    {
-                        uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Password =
-                            new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
+                        // Password
+                        if (mode != Common.UnattendMode.UserWithoutPassword ||
+                            mode != Common.UnattendMode.UserWithoutPasswordAndOem)
+                        {
+                            uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Password =
+                                new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
                                 {
                                     Value = Common.DeploymentInfo.Password,
                                     PlainText = true
                                 };
-                    }
+                        }
 
-                    uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Name = Common.DeploymentInfo.Username;
-                    uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Group = "Administrators";
+                        uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Name = Common.DeploymentInfo.Username;
+                        uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Group = "Administrators";
+                        break;
+                    }
                 }
             }
+
+            var oemLogo = "";
+            if (!string.IsNullOrEmpty(Common.OemInfo.LogoPath))
+                oemLogo = "%WINDIR%\\System32\\logo.bmp";
 
             // OEM Information
             if (mode != Common.UnattendMode.AdminWithoutOem ||
@@ -779,7 +788,7 @@ namespace deployaUI.Common
             {
                 uc.settings[0].component.OEMInformation = new UnattendXmlClass.unattendSettingsComponentOEMInformation
                     {
-                        Logo = "%WINDIR%\\System32\\logo.bmp",
+                        Logo = oemLogo,
                         Manufacturer = Common.OemInfo.Manufacturer,
                         Model = Common.OemInfo.Model,
                         SupportHours = Common.OemInfo.SupportHours,
@@ -791,49 +800,51 @@ namespace deployaUI.Common
             // S-Mode (Windows 10 1709 and up)
             if (Common.DeploymentOption.UseSMode)
             {
-                uc.settings[1] = new UnattendXmlClass.unattendSettings();
-                uc.settings[1].pass = "offlineServicing";
-                uc.settings[1].component = new UnattendXmlClass.unattendSettingsComponent
+                uc.settings[1] = new UnattendXmlClass.unattendSettings
                 {
-                    name = "Microsoft-Windows-CodeIntegrity",
-                    processorArchitecture = "amd64",
-                    publicKeyToken = "31bf3856ad364e35",
-                    language = "neutral",
-                    versionScope = "nonSxS"
+                    pass = "offlineServicing",
+                    component = new UnattendXmlClass.unattendSettingsComponent
+                    {
+                        name = "Microsoft-Windows-CodeIntegrity",
+                        processorArchitecture = "amd64",
+                        publicKeyToken = "31bf3856ad364e35",
+                        language = "neutral",
+                        versionScope = "nonSxS",
+                        SkuPolicyRequired = 1,
+                        SkuPolicyRequiredSpecified = true
+                    }
                 };
-                uc.settings[1].component.SkuPolicyRequired = 1;
-                uc.settings[1].component.SkuPolicyRequiredSpecified = true;
             }
 
             // Copy Profile (only for syspreped user profiles)
             if (Common.DeploymentOption.UseCopyProfile)
             {
-                int nextIndex = Common.DeploymentOption.UseSMode ? 2 : 1;
-                uc.settings[nextIndex] = new UnattendXmlClass.unattendSettings();
-                uc.settings[nextIndex].pass = "specialize";
-                uc.settings[nextIndex].component = new UnattendXmlClass.unattendSettingsComponent
+                var nextIndex = Common.DeploymentOption.UseSMode ? 2 : 1;
+                uc.settings[nextIndex] = new UnattendXmlClass.unattendSettings
                 {
-                    name = "Microsoft-Windows-Shell-Setup",
-                    processorArchitecture = "amd64",
-                    publicKeyToken = "31bf3856ad364e35",
-                    language = "neutral",
-                    versionScope = "nonSxS"
+                    pass = "specialize",
+                    component = new UnattendXmlClass.unattendSettingsComponent
+                    {
+                        name = "Microsoft-Windows-Shell-Setup",
+                        processorArchitecture = "amd64",
+                        publicKeyToken = "31bf3856ad364e35",
+                        language = "neutral",
+                        versionScope = "nonSxS",
+                        CopyProfile = true,
+                        CopyProfileSpecified = true
+                    }
                 };
-                uc.settings[nextIndex].component.CopyProfile = true;
-                uc.settings[nextIndex].component.CopyProfileSpecified = true;
             }
 
-            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            var ns = new XmlSerializerNamespaces();
             ns.Add("", "");
 
             // Create the serializer
-            XmlSerializer slz = new XmlSerializer(typeof(UnattendXmlClass.unattend), "urn:schemas-microsoft-com:unattend");
+            var slz = new XmlSerializer(typeof(UnattendXmlClass.unattend), "urn:schemas-microsoft-com:unattend");
 
-            using (StringWriter textWriter = new Utf8StringWriter())
-            {
-                slz.Serialize(textWriter, uc, ns);
-                return textWriter.ToString();
-            }
+            using StringWriter textWriter = new Utf8StringWriter();
+            slz.Serialize(textWriter, uc, ns);
+            return textWriter.ToString();
         }
         
         public class Utf8StringWriter : StringWriter

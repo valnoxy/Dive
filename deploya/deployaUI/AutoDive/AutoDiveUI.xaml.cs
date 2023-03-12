@@ -517,7 +517,7 @@ namespace deployaUI.AutoDive
             if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
                 worker.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, worker);
+                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, false, worker);
 
                 if (IsCanceled)
                 {

@@ -416,7 +416,7 @@ namespace deployaUI.Pages.ApplyPages
             if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
                 worker.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, worker);
+                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
             
                 if (IsCanceled)
                 {

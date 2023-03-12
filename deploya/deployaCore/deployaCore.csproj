@@ -29,6 +29,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\WinREConfig.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="deploya.ico" />
 	</ItemGroup>
 
@@ -38,10 +42,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Resource Include="Resources\WinREConfig.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Assets\UefiSevenResources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>UefiSevenResources.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Assets\WinRE.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>WinRE.resx</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
@@ -49,6 +62,10 @@
 	  <EmbeddedResource Update="Assets\UefiSevenResources.resx">
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>UefiSevenResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Assets\WinRE.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>WinRE.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
 

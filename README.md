@@ -15,6 +15,8 @@
     <a href="https://github.com/valnoxy/dive/issues">Report Bug</a>
     ·
     <a href="https://github.com/valnoxy/dive/discussions/">Discussions</a>
+    ·
+    <a href="https://www.youtube.com/watch?v=DkE-EamEDdc">Demo Video</a>
   </p>
 </p>
 

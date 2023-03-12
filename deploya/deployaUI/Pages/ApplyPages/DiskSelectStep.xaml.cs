@@ -70,11 +70,18 @@ namespace deployaUI.Pages.ApplyPages
                 UseNTLDRBtn.IsChecked = true;
                 BIOSRadio.IsChecked = true;
                 UseRecoveryBtn.IsChecked = false;
+                DiveToRecovery.IsChecked = false;
             }
             else if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
             {
                 UseRecoveryBtn.IsChecked = false;
                 UseNTLDRBtn.IsChecked = false;
+                DiveToRecovery.IsChecked = false;
+            }
+            else if (Common.ApplyDetails.Name.ToLower().Contains("windows 7"))
+            {
+                UseRecoveryBtn.IsChecked = true;
+                DiveToRecovery.IsChecked = false;
             }
             else if (Common.ApplyDetails.Name.Contains("(") || Common.ApplyDetails.Name.Contains(")"))
             {
@@ -85,6 +92,7 @@ namespace deployaUI.Pages.ApplyPages
             {
                 UseNTLDRBtn.IsChecked = false;
                 UseRecoveryBtn.IsChecked = true;
+                DiveToRecovery.IsChecked = true;
             }
         }
 
@@ -289,6 +297,20 @@ namespace deployaUI.Pages.ApplyPages
             {
                 Common.DeploymentOption.UseCopyProfile = false;
                 Common.Debug.WriteLine("Disabled 'CopyProfile'");
+            }
+        }
+
+        private void DiveToRecovery_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (DiveToRecovery.IsChecked == true)
+            {
+                Common.DeploymentOption.AddDiveToWinRE = true;
+                Common.Debug.WriteLine("Enabled 'AddDiveToWinRE'");
+            }
+            else
+            {
+                Common.DeploymentOption.AddDiveToWinRE = false;
+                Common.Debug.WriteLine("Disabled 'AddDiveToWinRE'");
             }
         }
     }

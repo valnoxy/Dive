@@ -48,6 +48,7 @@ namespace deployaUI.Common
     {
         public static bool UseSMode { get; set; }
         public static bool UseCopyProfile { get; set; }
+        public static bool AddDiveToWinRE { get; set;}
     }
 
     public static class Tweaks

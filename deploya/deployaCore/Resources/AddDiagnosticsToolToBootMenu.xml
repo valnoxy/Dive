@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- AddDiagnosticsToolToBootMenu.xml -->
+<BootShell>
+	<WinRETool locale="en-us">
+		<Name>Dive</Name>
+		<Description>Install, capture and tweak Windows on this device.</Description>
+	</WinRETool>
+	<WinRETool locale="de-de">
+		<Name>Dive</Name>
+		<Description>Installiere, erfasse und optimiere Windows auf diesem Gerät.</Description>
+	</WinRETool>
+</BootShell>
