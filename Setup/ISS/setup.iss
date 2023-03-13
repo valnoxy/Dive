@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Dive"
-#define MyAppVersion "1.0.0.289 b4"
+#define MyAppVersion "1.0.0.362 b5"
 #define MyAppPublisher "Exploitox"
 #define MyAppURL "https://exploitox.de/dive"
 #define MyAppExeName "Dive.exe"
