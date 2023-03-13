@@ -37,7 +37,8 @@ namespace deployaCore.Action
             Bw = worker;
             try
             {
-                Output.WriteLine("[Driver] Entering Injection process ...");
+                var driverCount = driverPath.Count;
+                Output.WriteLine($"[Driver] Entering Injection process with {driverCount} drivers ...");
                 Output.WriteLine("[Driver] Initialize Dism API ...");
                 DismApi.Initialize(DismLogLevel.LogErrors);
                 Output.WriteLine("[Driver] Open offline session ...");
@@ -52,14 +53,15 @@ namespace deployaCore.Action
                 catch (Exception ex)
                 {
                     Output.WriteLine("[Driver] Failed to open offline session: " + ex.Message);
-                    Output.WriteLine("[Driver] Shutdown Dism API ...");
+                    Output.WriteLine("[Driver] Shutting down API ...");
                     DismApi.Shutdown();
                     return;
                 }
 
                 var currentDriverCount = 0;
-                foreach (var driver in driverPath.Where(File.Exists))
+                foreach (var driver in driverPath)
                 {
+                    Output.WriteLine("[Driver] Begin driver installation ...");
                     try
                     {
                         currentDriverCount++;
@@ -74,8 +76,12 @@ namespace deployaCore.Action
                     }
                 }
 
+                Output.WriteLine("[Driver] Closing session ...");
                 session.Close();
+                Output.WriteLine("[Driver] Shutting down API ...");
                 DismApi.Shutdown();
+                Output.WriteLine("[Driver] Job completed. Returning now ...");
+                return;
             }
             catch (Exception ex)
             {

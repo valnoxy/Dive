@@ -200,7 +200,7 @@
                                     <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Load and inject multiple drivers." />
+                                        Text="Load and inject multiple drivers. (Vista and up)" />
                                 </StackPanel>
                                 <TextBlock
                                     FontSize="12"

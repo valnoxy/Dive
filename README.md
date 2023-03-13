@@ -4,9 +4,9 @@
 <p align="center">
     Easy Deployment for Windows
     <br />
-    <strong>Version: </strong>1.0.0.289 (Beta 4)
+    <strong>Version: </strong>1.0.0.362 (Beta 5)
     <br/>
-    <strong>Core: </strong>12.0.0.426
+    <strong>Core: </strong>12.0.0.452
     <br />
     <br />
     <a href="https://github.com/valnoxy/dive/releases"><strong>Download now »</strong></a>
@@ -20,7 +20,7 @@
   </p>
 </p>
 
-![-----------------------------------------------------](https://dl.exploitox.de/t440p-oc/rainbow.png)
+![-----------------------------------------------------](https://raw.githubusercontent.com/valnoxy/valnoxy/main/assets/bar.gif)
 
 ## 🔔 Information
 Dive (formally deploya) is a little application for deploying Windows on a machine. 
@@ -28,6 +28,8 @@ Dive (formally deploya) is a little application for deploying Windows on a machi
 - Deploy WIM-Files on any drive
 - Mass deploy Windows with AutoDive (W.I.P)
 - Bypass Windows 11 Microsoft-Account compulsion
+- Configure Windows with OEM & Local Accound settings 
+- Inject multiple drivers
 - Capture Windows installation
 - Install Windows from the Cloud
 

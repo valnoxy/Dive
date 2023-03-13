@@ -255,15 +255,19 @@ namespace deployaUI.Pages.ApplyPages
             {
                 TbDrvPath.Text = dialog.SelectedPath;
 
-                List<string> infFiles = Directory.GetFiles(dialog.SelectedPath, "*.inf")
-                    .Select(Path.GetFileName)
+                var infFiles = Directory.GetFiles(dialog.SelectedPath, "*.inf", SearchOption.AllDirectories)
+                    .Select(Path.GetFullPath)
                     .ToList();
 
                 switch (infFiles.Count)
                 {
                     case > 0:
-                        var driverWindow = new LoadDriversLiveSystem(infFiles);
-                        driverWindow.ShowDialog();
+                        if (File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
+                        {
+                            var driverWindow = new LoadDriversLiveSystem(infFiles);
+                            driverWindow.ShowDialog();
+                        }
+                        Common.Debug.WriteLine($"Found {infFiles.Count} drivers.");
                         Common.ApplyDetails.DriverList = infFiles;
                         break;
                     case 0:

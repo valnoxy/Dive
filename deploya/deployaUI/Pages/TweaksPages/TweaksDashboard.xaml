@@ -12,6 +12,7 @@
         <wpfui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToMigratePage"
+            IsEnabled="false"
             Icon="ArrowCircleRight28">
             <StackPanel>
                 <TextBlock
@@ -27,6 +28,7 @@
         <wpfui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToRepairPage"
+            IsEnabled="false"
             Icon="WrenchScrewdriver20">
             <StackPanel>
                 <TextBlock
