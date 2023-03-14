@@ -176,16 +176,16 @@ namespace deployaUI
                 Common.UnattendMode? um = Common.UnattendMode.Admin;
                 Common.DeploymentInfo.Username = "Administrator";
                 Common.DeploymentInfo.Password = "Pa$$w0rd";
-                Common.DeploymentOption.UseCopyProfile = false;
-                Common.DeploymentOption.UseSMode = false;
-                Common.OemInfo.UseOemInfo = false;
+                Common.DeploymentOption.UseCopyProfile = true;
+                Common.DeploymentOption.UseSMode = true;
+                Common.OemInfo.UseOemInfo = true;
                 Common.OemInfo.Model = "Toaster";
                 Common.OemInfo.Manufacturer = "Fabrikam";
                 Common.OemInfo.SupportHours = "24/7";
                 Common.OemInfo.SupportURL = "https://fabrikam.com";
                 Common.OemInfo.SupportPhone = "+1 111 11111111";
 
-                Common.Debug.WriteLine("Unattend Mode: Admin");
+                Common.Debug.WriteLine("Unattend Mode: " + um.Value);
                 Common.Debug.WriteLine("Username: " + Common.DeploymentInfo.Username);
                 Common.Debug.WriteLine("Password: " + Common.DeploymentInfo.Password);
                 Common.Debug.WriteLine("Use S Mode: " + Common.DeploymentOption.UseSMode);

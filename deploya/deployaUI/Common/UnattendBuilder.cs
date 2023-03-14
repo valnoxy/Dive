@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
-using static deployaUI.Common.XMLSetting;
 
 namespace deployaUI.Common
 {
     public class UnattendXmlClass
     {
-        /// <remarks/>
         [System.SerializableAttribute()]
         [System.ComponentModel.DesignerCategoryAttribute("code")]
         [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
@@ -95,6 +90,8 @@ namespace deployaUI.Common
             private unattendSettingsComponentAutoLogon autoLogonField;
 
             private unattendSettingsComponentUserAccounts userAccountsField;
+
+            private unattendSettingsComponentSynchronousCommand[] firstLogonCommandsField;
 
             private string nameField;
 
@@ -196,6 +193,20 @@ namespace deployaUI.Common
                 set
                 {
                     this.userAccountsField = value;
+                }
+            }
+
+            /// <remarks/>
+            [System.Xml.Serialization.XmlArrayItemAttribute("SynchronousCommand", IsNullable = false)]
+            public unattendSettingsComponentSynchronousCommand[] FirstLogonCommands
+            {
+                get
+                {
+                    return this.firstLogonCommandsField;
+                }
+                set
+                {
+                    this.firstLogonCommandsField = value;
                 }
             }
 
@@ -679,6 +690,92 @@ namespace deployaUI.Common
                 }
             }
         }
+
+        /// <remarks/>
+        [System.SerializableAttribute()]
+        [System.ComponentModel.DesignerCategoryAttribute("code")]
+        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
+        public partial class unattendSettingsComponentSynchronousCommand
+        {
+
+            private int orderField;
+
+            private bool requiresUserInputField;
+
+            private string commandLineField;
+
+            private string descriptionField;
+
+            private string actionField;
+
+            /// <remarks/>
+            public int Order
+            {
+                get
+                {
+                    return this.orderField;
+                }
+                set
+                {
+                    this.orderField = value;
+                }
+            }
+
+            /// <remarks/>
+            public bool RequiresUserInput
+            {
+                get
+                {
+                    return this.requiresUserInputField;
+                }
+                set
+                {
+                    this.requiresUserInputField = value;
+                }
+            }
+
+            /// <remarks/>
+            public string CommandLine
+            {
+                get
+                {
+                    return this.commandLineField;
+                }
+                set
+                {
+                    this.commandLineField = value;
+                }
+            }
+
+            /// <remarks/>
+            public string Description
+            {
+                get
+                {
+                    return this.descriptionField;
+                }
+                set
+                {
+                    this.descriptionField = value;
+                }
+            }
+
+            /// <remarks/>
+            [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State")]
+            public string action
+            {
+                get
+                {
+                    return this.actionField;
+                }
+                set
+                {
+                    this.actionField = value;
+                }
+            }
+        }
+
+
     }
 
     public class UnattendBuilder
@@ -686,6 +783,10 @@ namespace deployaUI.Common
         public static string Build(Common.UnattendMode? mode)
         {
             Common.Debug.WriteLine($"[UnattendBuilder] Entering Build process with mode {mode.Value} ...");
+
+            var synchronousCommands = new List<UnattendXmlClass.unattendSettingsComponentSynchronousCommand>();
+            var synchronousCommandCount = 0;
+
             var uc = new UnattendXmlClass.unattend
             {
                 settings = new UnattendXmlClass.unattendSettings[3]
@@ -721,10 +822,10 @@ namespace deployaUI.Common
                 {
                     Common.Debug.WriteLine("[UnattendBuilder] Define Admin password");
                     uc.settings[0].component.AutoLogon.Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
-                        {
-                            Value = Common.DeploymentInfo.Password,
-                            PlainText = true
-                        };
+                    {
+                        Value = Common.DeploymentInfo.Password,
+                        PlainText = true
+                    };
                 }
 
             }
@@ -779,6 +880,17 @@ namespace deployaUI.Common
 
                         uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Name = Common.DeploymentInfo.Username;
                         uc.settings[0].component.UserAccounts.LocalAccounts.LocalAccount.Group = "Administrators";
+
+                        // Add FirstLogonCommand for PasswordExpires=false
+                        synchronousCommandCount++;
+                        synchronousCommands.Add(new UnattendXmlClass.unattendSettingsComponentSynchronousCommand
+                        {
+                            action = "add",
+                            Order = synchronousCommandCount,
+                            RequiresUserInput = false,
+                            CommandLine = $"cmd /C wmic useraccount where name=\"{Common.DeploymentInfo.Username}\" set PasswordExpires=false",
+                            Description = "Password never expires"
+                        });
                         break;
                     }
                 }
@@ -818,6 +930,12 @@ namespace deployaUI.Common
                         SupportURL = Common.OemInfo.SupportURL
                     };
                 }
+            }
+
+            // Add FirstLogonCommands list if synchronousCommands is not empty
+            if (synchronousCommands.Count > 0)
+            {
+                uc.settings[0].component.FirstLogonCommands = synchronousCommands.ToArray();
             }
 
             // S-Mode (Windows 10 1709 and up)
