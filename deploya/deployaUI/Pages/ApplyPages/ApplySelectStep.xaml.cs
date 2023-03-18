@@ -146,10 +146,9 @@ namespace deployaUI.Pages.ApplyPages
                     ProgrText.Text = $"Installing UefiSeven ...";
                     break;
                 case 207:                           // 207: ProgText -> Injecting drivers
-                    if (e.UserState == "Initialize")
-                        ProgrText.Text = $"Opening Dism Session for Driver injection ...";
-                    else
-                        ProgrText.Text = $"Injecting drivers ({e.UserState} of {_driverCount}) ...";
+                    ProgrText.Text = e.UserState == "Initialize" 
+                        ? "Opening Dism Session for Driver injection ..." 
+                        : $"Injecting drivers ({e.UserState} of {_driverCount}) ...";
                     break;
                 case 250:                           // 250: Installation complete
                     ProgrText.Text = "Installation completed. Press 'Next' to restart your computer.";
@@ -395,10 +394,17 @@ namespace deployaUI.Pages.ApplyPages
                     throw new ArgumentOutOfRangeException();
             }
 
-            Output.WriteLine($"Windows drive: {windowsDrive}");
-            Output.WriteLine($"Boot drive: {bootDrive}");
-            Output.WriteLine($"Recovery drive: {recoveryDrive}");
-            Output.WriteLine($"Partition style: {partStyle}");
+            Common.Debug.Write("New Windows drive: ");
+            Common.Debug.Write($"{windowsDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Common.Debug.Write("New Boot drive: ");
+            Common.Debug.Write($"{bootDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Common.Debug.Write("New Recovery drive: ");
+            Common.Debug.Write($"{recoveryDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Common.Debug.Write("Using partition style: ");
+            Common.Debug.Write($"{partStyle}\n", true, ConsoleColor.DarkYellow);
 
             #endregion
 
@@ -472,16 +478,16 @@ namespace deployaUI.Pages.ApplyPages
                 else
                 {
                     // Administrator / User with OEM infos
-                    if (!String.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && !String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
+                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
                     }
 
                     // Administrator / User with OEM infos, but without password
-                    if (!String.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
+                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
@@ -489,7 +495,7 @@ namespace deployaUI.Pages.ApplyPages
 
                     // Administrator / User without OEM infos
                     if (Common.DeploymentInfo.Username == "Administrator"
-                        && !String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo == false)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
@@ -497,7 +503,7 @@ namespace deployaUI.Pages.ApplyPages
 
                     // Administrator without OEM infos and password
                     if (Common.DeploymentInfo.Username == "Administrator"
-                        && String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo == false)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;

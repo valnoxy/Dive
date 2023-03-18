@@ -86,21 +86,4 @@ namespace deployaUI.Common
         Migrate,
         RepairBootloader
     }
-
-    public static class Debug
-    {
-        public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("[");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("*");
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("] ");
-
-            Console.ForegroundColor = color;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-    }
 }

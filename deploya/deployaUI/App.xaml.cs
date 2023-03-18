@@ -97,18 +97,20 @@ namespace deployaUI
 
         static void ShowGUI()
         {
-            MainWindow wnd = new MainWindow();
+            var wnd = new MainWindow();
             wnd.ShowDialog();
             Environment.Exit(0);
         }
 
         static void ShowAutoDive()
         {
-            AutoDiveUi wnd = new AutoDiveUi();
+            var wnd = new AutoDiveUi();
             wnd.ShowDialog();
             Environment.Exit(0);
         }
         #endregion
+
+        #region Console Window State
 
         [DllImport("kernel32.dll")]
         public static extern IntPtr GetConsoleWindow();
@@ -116,29 +118,29 @@ namespace deployaUI
         [DllImport("user32.dll")]
         public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        public const int SW_HIDE = 0;
-        public const int SW_SHOW = 5;
+        public const int SwHide = 0;
+        public const int SwShow = 5;
+
+        #endregion
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            string[] args = Environment.GetCommandLineArgs();
+            var args = Environment.GetCommandLineArgs();
             var handle = GetConsoleWindow();
 
             if (args.Length == 1)
             {
 #if DEBUG
-                ShowWindow(handle, SW_SHOW);
+                ShowWindow(handle, SwShow);
 #else
-                ShowWindow(handle, SW_HIDE);
+                ShowWindow(handle, SwHide);
 #endif
+                // Initialize Console
+                Common.Debug.InitializeConsole();                
+                //Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
 
-                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
-                Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-                Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
-                Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
-
-                DriveInfo[] allDrives = DriveInfo.GetDrives();
-                foreach (DriveInfo d in allDrives)
+                var allDrives = DriveInfo.GetDrives();
+                foreach (var d in allDrives)
                 {
                     if (File.Exists(Path.Combine(d.Name, ".diveconfig")))
                     {
@@ -161,9 +163,9 @@ namespace deployaUI
                 }
 
                 ShowGUI();
-                //ShowAutoDive();
             }
 
+#if DEBUG
             if (args.Contains("--unattend-test"))
             {
                 Console.Title = $"{VersionInfo.ProductName} - Debug Console";
@@ -203,6 +205,7 @@ namespace deployaUI
 
                 Environment.Exit(0);
             }
+#endif
 
             var parser = new CommandLine.Parser(with => with.HelpWriter = null);
             var parserResult = parser.ParseArguments<ApplyOptions, CaptureOptions>(args);

@@ -7,9 +7,9 @@ namespace deployaUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Wpf.Ui.Controls.UiWindow
+    public partial class MainWindow
     {
-        private bool _displayDebugConsole = false;
+        private bool _displayDebugConsole;
 
         public MainWindow()
         {
@@ -30,7 +30,7 @@ namespace deployaUI
 #endif
             // Get version
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             var version = fvi.FileVersion;
             VersionString.Text = $"[{version}]";
         }
@@ -42,23 +42,16 @@ namespace deployaUI
 
         private void CommandLine_Click(object sender, RoutedEventArgs e)
         {
-            /*
-            var p = new Process();
-            p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.CreateNoWindow = false;
-            p.StartInfo.UseShellExecute = true;
-            p.Start();
-            */
             var handle = App.GetConsoleWindow();
 
-            if (_displayDebugConsole == true)
+            if (_displayDebugConsole)
             {
-                App.ShowWindow(handle, App.SW_HIDE);
+                App.ShowWindow(handle, App.SwHide);
                 _displayDebugConsole = false;
             }
             else
             {
-                App.ShowWindow(handle, App.SW_SHOW);
+                App.ShowWindow(handle, App.SwShow);
                 _displayDebugConsole = true;
             }
         }        

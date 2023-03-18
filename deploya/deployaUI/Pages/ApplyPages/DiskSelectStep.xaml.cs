@@ -15,7 +15,7 @@ namespace deployaUI.Pages.ApplyPages
     /// </summary>
     public partial class DiskSelectStep : UserControl
     {
-        public const int ERROR_INVALID_FUNCTION = 1;
+        public const int ErrorInvalidFunction = 1;
         public static DiskSelectStep? ContentWindow;
 
         [DllImport("kernel32.dll",
@@ -26,23 +26,16 @@ namespace deployaUI.Pages.ApplyPages
             CallingConvention = CallingConvention.StdCall)]
         public static extern int GetFirmwareType(string lpName, string lpGUID, IntPtr pBuffer, uint size);
 
-        public static bool IsWindowsUEFI()
+        public static bool IsWindowsUefi()
         {
             // Call the function with a dummy variable name and a dummy variable namespace (function will fail because these don't exist.)
             GetFirmwareType("", "{00000000-0000-0000-0000-000000000000}", IntPtr.Zero, 0);
 
-            if (Marshal.GetLastWin32Error() == ERROR_INVALID_FUNCTION)
-            {
-                // Calling the function threw an ERROR_INVALID_FUNCTION win32 error, which gets thrown if either
-                // - The mainboard doesn't support UEFI and/or
-                // - Windows is installed in legacy BIOS mode
-                return false;
-            }
-            else
-            {
-                // If the system supports UEFI and Windows is installed in UEFI mode it doesn't throw the above error, but a more specific UEFI error
-                return true;
-            }
+            return Marshal.GetLastWin32Error() != ErrorInvalidFunction;
+            // Calling the function threw an ERROR_INVALID_FUNCTION win32 error, which gets thrown if either
+            // - The mainboard doesn't support UEFI and/or
+            // - Windows is installed in legacy BIOS mode
+            // If the system supports UEFI and Windows is installed in UEFI mode it doesn't throw the above error, but a more specific UEFI error
         }
 
         public DiskSelectStep()
@@ -98,15 +91,18 @@ namespace deployaUI.Pages.ApplyPages
 
         private void CheckFirmware()
         {
-            if (IsWindowsUEFI())
+            if (IsWindowsUefi())
             {
                 EFIRadio.IsChecked = true;
-                Common.Debug.WriteLine("Firmware detected: EFI", ConsoleColor.White);
+
+                Common.Debug.Write("Firmware detected: ");
+                Common.Debug.Write("EFI / CSM\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
                 BIOSRadio.IsChecked = true;
-                Common.Debug.WriteLine("Firmware detected: BIOS / CSM", ConsoleColor.White);
+                Common.Debug.Write("Firmware detected: ");
+                Common.Debug.Write("BIOS (Legacy)\n", true, ConsoleColor.DarkYellow);
             }
         }
 
@@ -115,65 +111,52 @@ namespace deployaUI.Pages.ApplyPages
             DiskListView.Items.Clear();
             try
             {
-                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
-                foreach (ManagementObject info in searcher.Get())
+                var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
+                foreach (var info in searcher.Get())
                 {
-                    string DeviceID = "";
-                    string Model = "";
-                    string Interface = "";
-                    string Serial = "";
-                    string Size = "";
-                    string SizeInGB = "";
-
-                    if (info["DeviceID"] != null) DeviceID = info["DeviceID"].ToString();
-                    if (info["Model"] != null) Model = info["Model"].ToString();
-                    if (info["InterfaceType"] != null) Interface = info["InterfaceType"].ToString();
-                    if (info["SerialNumber"] != null) Serial = info["SerialNumber"].ToString();
-                    if (info["Size"] != null) Size = info["Size"].ToString();
-                    if (info["Size"] != null) SizeInGB = ByteToGB(Convert.ToDouble(info["Size"])).ToString();
-
-                    Common.Debug.WriteLine($"DeviceID: {DeviceID}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Model: {Model}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Interface: {Interface}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Serial: {Serial}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Size: {Size}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Size in GB: {SizeInGB}", ConsoleColor.White);
-
-                    var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 1));
+                    var deviceId = info["DeviceID"].ToString();
+                    var model = info["Model"].ToString();
+                    var sizeInGb = ByteToGB(Convert.ToDouble(info["Size"])).ToString();
+                    var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System)[..1]);
 
                     // Check for Dive Medium
                     var allDrives = DriveInfo.GetDrives();
-                    var blackListedDisks = new List<string>();
-                    foreach (var d in allDrives)
-                    {
-                        if (File.Exists(Path.Combine(d.Name, ".diveusb")))
-                        {
-                            blackListedDisks.Add(GetDiskNumber(d.Name.Substring(0, 1)));
-                        }
-                    }
+                    var blackListedDisks = 
+                        (from d in allDrives where File.Exists(Path.Combine(d.Name, ".diveusb")) 
+                            select GetDiskNumber(d.Name[..1])).ToList();
 
-                    if (DeviceID != $"\\\\.\\PHYSICALDRIVE{ret}")
+                    Common.Debug.Write("Disk ");
+                    Common.Debug.Write(model!, true, ConsoleColor.DarkYellow);
+                    Common.Debug.Write(" with ID ", true);
+                    Common.Debug.Write(deviceId!, true, ConsoleColor.DarkYellow);
+                    Common.Debug.Write(" and a size of ", true);
+                    Common.Debug.Write(sizeInGb + "GB", true, ConsoleColor.DarkYellow);
+
+                    if (deviceId != $"\\\\.\\PHYSICALDRIVE{ret}")
                     {
                         // Add to list
-                        var driveId = DeviceID;
-                        driveId = Regex.Match(driveId, @"\d+").Value;
-                        var drive = $"{Model} | {SizeInGB} GB | Disk {driveId}";
+                        var driveId = deviceId;
+                        driveId = Regex.Match(driveId!, @"\d+").Value;
+                        var drive = $"{model} | {sizeInGb} GB | Disk {driveId}";
                         if (blackListedDisks.Contains(driveId))
                         {
-                            Common.Debug.WriteLine("Skipping as this contains the Dive medium ...", ConsoleColor.Yellow);
-                            Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
+                            Common.Debug.Write(" will be skipped (", true);
+                            Common.Debug.Write("Dive Medium", true, ConsoleColor.DarkYellow);
+                            Common.Debug.Write(").\n", true);
                             continue;
                         }
                         DiskListView.Items.Add(drive);
+                        Common.Debug.Write(" is available.\n", true);
                     }
                     else
                     {
-                        Common.Debug.WriteLine("Skipping as this is the main disk ...", ConsoleColor.Yellow);
+                        Common.Debug.Write(" will be skipped (", true);
+                        Common.Debug.Write("Current Windows Disk", true, ConsoleColor.DarkYellow);
+                        Common.Debug.Write(").\n", true);
                     }
-                    Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }
-            catch (Exception)
+            catch
             {
                 // throw;
             }
@@ -181,8 +164,8 @@ namespace deployaUI.Pages.ApplyPages
 
         private int ByteToGB(double bytes) // Convert Bytes to GB
         {
-            double gb = bytes / Math.Pow(10, 9);
-            int i = (int)Math.Round(gb);
+            var gb = bytes / Math.Pow(10, 9);
+            var i = (int)Math.Round(gb);
             return i;
         }
 
@@ -193,11 +176,11 @@ namespace deployaUI.Pages.ApplyPages
             var query = new ObjectQuery("Associators of {Win32_LogicalDisk.DeviceID='" + letter + ":'} WHERE ResultRole=Antecedent");
             var searcher = new ManagementObjectSearcher(scope, query);
             var queryCollection = searcher.Get();
-            foreach (ManagementObject m in queryCollection)
+            foreach (var m in queryCollection)
             {
-                string input = m["Name"].ToString().Replace("Disk #", "");
+                var input = m["Name"].ToString()!.Replace("Disk #", "");
                 ret = new string(input.SkipWhile(c => !char.IsDigit(c))
-                    .TakeWhile(c => char.IsDigit(c))
+                    .TakeWhile(char.IsDigit)
                     .ToArray());
             }
             return ret;
@@ -205,27 +188,26 @@ namespace deployaUI.Pages.ApplyPages
 
         private void DiskListView_Selected(object sender, RoutedEventArgs e)
         {
-            if (DiskListView.SelectedItem != null)
+            if (DiskListView.SelectedItem == null) return;
+            var itemData = DiskListView.SelectedItem.ToString();
+            const string toBeSearched = "| Disk ";
+            var ix = itemData!.IndexOf(toBeSearched, StringComparison.Ordinal);
+
+            if (ix == -1) return;
+            var diskIndex = itemData[(ix + toBeSearched.Length)..];
+            Common.ApplyDetails.DiskIndex = Convert.ToInt32(diskIndex);
+            
+            Common.Debug.Write("The disk with ID ");
+            Common.Debug.Write(Common.ApplyDetails.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(" will be used for deployment.\n", true);
+            
+            if (ApplyContent.ContentWindow != null)
             {
-                string itemData = DiskListView.SelectedItem.ToString();
-                string toBeSearched = "| Disk ";
-                int ix = itemData.IndexOf(toBeSearched);
-
-                if (ix != -1)
-                {
-                    string diskindex = itemData.Substring(ix + toBeSearched.Length);
-                    Common.ApplyDetails.DiskIndex = Convert.ToInt32(diskindex);
-                    Common.Debug.WriteLine($"Using disk {Common.ApplyDetails.DiskIndex} for deployment", ConsoleColor.White);
-
-                    if (ApplyContent.ContentWindow != null)
-                    {
-                        ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
-                    }
-                    if (CloudContent.ContentWindow != null)
-                    {
-                        CloudContent.ContentWindow.NextBtn.IsEnabled = true;
-                    }
-                }
+                ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+            }
+            if (CloudContent.ContentWindow != null)
+            {
+                CloudContent.ContentWindow.NextBtn.IsEnabled = true;
             }
         }
 
@@ -237,23 +219,29 @@ namespace deployaUI.Pages.ApplyPages
         private void EFIRadio_Checked(object sender, RoutedEventArgs e)
         {
             Common.ApplyDetails.UseEFI = true;
+            Common.Debug.Write("Firmware has been changed to: ");
+            Common.Debug.Write("EFI\n", true, ConsoleColor.DarkYellow);
         }
 
         private void BIOSRadio_Checked(object sender, RoutedEventArgs e)
         {
             Common.ApplyDetails.UseEFI = false;
+            Common.Debug.Write("Firmware has been changed to: ");
+            Common.Debug.Write("BIOS\n", true, ConsoleColor.DarkYellow);
         }
 
         public bool IsNTLDRChecked()
         {
             if ((bool)UseNTLDRBtn.IsChecked)
             {
-                Common.Debug.WriteLine("Using NTLDR", ConsoleColor.White);
+                Common.Debug.Write("Bootloader has been changed to: ");
+                Common.Debug.Write("NTLDR\n", true, ConsoleColor.DarkYellow);
                 return true;
             }
             else
             {
-                Common.Debug.WriteLine("Using BOOTMGR", ConsoleColor.White);
+                Common.Debug.Write("Bootloader has been changed to: ");
+                Common.Debug.Write("BOOTMGR\n", true, ConsoleColor.DarkYellow);
                 return false;
             }
         }
@@ -262,12 +250,14 @@ namespace deployaUI.Pages.ApplyPages
         {
             if ((bool)UseRecoveryBtn.IsChecked)
             {
-                Common.Debug.WriteLine("Using Recovery partition", ConsoleColor.White);
+                Common.Debug.Write("Create separate recovery partition: ");
+                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
                 return true;
             }
             else
             {
-                Common.Debug.WriteLine("Using no Recovery partition", ConsoleColor.White);
+                Common.Debug.Write("Create separate recovery partition: ");
+                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
                 return false;
             }
         }
@@ -277,12 +267,14 @@ namespace deployaUI.Pages.ApplyPages
             if (SModeToggle.IsChecked == true)
             {
                 Common.DeploymentOption.UseSMode = true;
-                Common.Debug.WriteLine("Using S Mode");
+                Common.Debug.Write("Using S Mode in Unattend: ");
+                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
                 Common.DeploymentOption.UseSMode = false;
-                Common.Debug.WriteLine("Not using S Mode");
+                Common.Debug.Write("Using S Mode in Unattend: ");
+                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
         }
 
@@ -291,12 +283,14 @@ namespace deployaUI.Pages.ApplyPages
             if (CopyProfileToggle.IsChecked == true)
             {
                 Common.DeploymentOption.UseCopyProfile = true;
-                Common.Debug.WriteLine("Enabled 'CopyProfile'");
+                Common.Debug.Write("Using CopyProfile in Unattend: ");
+                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
                 Common.DeploymentOption.UseCopyProfile = false;
-                Common.Debug.WriteLine("Disabled 'CopyProfile'");
+                Common.Debug.Write("Using CopyProfile in Unattend: ");
+                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
         }
 
@@ -305,12 +299,14 @@ namespace deployaUI.Pages.ApplyPages
             if (DiveToRecovery.IsChecked == true)
             {
                 Common.DeploymentOption.AddDiveToWinRE = true;
-                Common.Debug.WriteLine("Enabled 'AddDiveToWinRE'");
+                Common.Debug.Write("Implement Dive into Windows RE image: ");
+                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
                 Common.DeploymentOption.AddDiveToWinRE = false;
-                Common.Debug.WriteLine("Disabled 'AddDiveToWinRE'");
+                Common.Debug.Write("Implement Dive into Windows RE image: ");
+                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
         }
     }
