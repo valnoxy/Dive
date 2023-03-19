@@ -20,6 +20,7 @@ namespace deployaUI.Common
         private static ProgressBar? _installUnattendProgressBar;
         private static ProgressBar? _installDriversProgressBar;
         private static ProgressBar? _installUefiSevenProgressBar;
+        private static ProgressBar? _captureDiskProgressBar;
 
         public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
         {
@@ -116,6 +117,10 @@ namespace deployaUI.Common
                     _installUefiSevenProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
                     progressBar = _installUefiSevenProgressBar;
                     break;
+                case Progress.CaptureDisk:
+                    _captureDiskProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _captureDiskProgressBar;
+                    break;
                 default:
                     return;
             }
@@ -139,6 +144,10 @@ namespace deployaUI.Common
 
             _logConsole.WriteLine($"{_versionInfo.ProductName} [Version: {_versionInfo.ProductVersion}]"); // Header
             _logConsole.WriteLine(_versionInfo.LegalCopyright + "\n"); // Copyright text
+#if DEBUG
+            Debug.Write("Warning! ", false, ConsoleColor.Red);
+            Debug.Write("This is a Debug build. This is not a production ready version.\n", true);
+#endif
         }
     }
 }

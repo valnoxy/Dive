@@ -155,12 +155,17 @@ namespace deployaCore.Action
             {
                 case WimMessageType.Progress:
                     var wimMessageProgress = (WimMessageProgress)message;
+                    var estimatedTime = new TimeSpan(
+                        wimMessageProgress.EstimatedTimeRemaining.Days, 
+                        wimMessageProgress.EstimatedTimeRemaining.Hours,
+                        wimMessageProgress.EstimatedTimeRemaining.Minutes,
+                        wimMessageProgress.EstimatedTimeRemaining.Seconds);
                     Bw?.ReportProgress(wimMessageProgress.PercentComplete, JsonConvert.SerializeObject(new ActionWorker
                     {
                         Action = Progress.ApplyImage,
                         IsError = false,
                         IsIndeterminate = false,
-                        Message = $"Applying image ({wimMessageProgress.PercentComplete}% - {wimMessageProgress.EstimatedTimeRemaining})..."
+                        Message = $"Applying image ({wimMessageProgress.PercentComplete}% - {estimatedTime})..."
                     }));
                     break;
 

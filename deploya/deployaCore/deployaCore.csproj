@@ -18,7 +18,7 @@
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PackageId>deploya</PackageId>
-		<Version>12.0.0.452</Version>
+		<Version>12.0.0.461</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>
 		<Product>deploya</Product>

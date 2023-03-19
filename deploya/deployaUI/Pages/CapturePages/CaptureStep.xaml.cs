@@ -3,7 +3,9 @@ using deployaCore.Common;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
-using System.Text.RegularExpressions;
+using deployaUI.Common;
+using Newtonsoft.Json;
+using System;
 
 namespace deployaUI.Pages.CapturePages
 {
@@ -51,88 +53,72 @@ namespace deployaUI.Pages.CapturePages
 
         private void captureBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
-            //
-            // Value list
-            // --------------------------
-            // Progressbar handling
-            //   101: Progressbar is not Indeterminate
-            //   102: Progressbar is Indeterminate
-            //
-            // Standard Message handling
-            //   201: ProgText -> Capture Disk
-            //   250: Capturing complete
-            //
-            // Error message handling
-            //   301: Failed at capturing disk
-            //
-            // Range 0-100 -> Progressbar percentage
-            //
+            var responseJson = e.UserState as string;
+            if (string.IsNullOrEmpty(responseJson)) return;
 
-            // Progress bar handling
-            switch (e.ProgressPercentage)
+            var response = JsonConvert.DeserializeObject<ActionWorker>(responseJson);
+            if (response.IsError)
             {
-                #region Progress bar settings
-                case 101:                           // 101: Progressbar is not Indeterminate
-                    ProgrBar.IsIndeterminate = false;
-                    break;
-                case 102:                           // 102: Progressbar is Indeterminate
-                    ProgrBar.IsIndeterminate = true;
-                    break;
-                #endregion
+                ProgrText.Text = response.Message;
+                ProgrBar.Value = e.ProgressPercentage;
 
-                #region Standard message handling
-                case 201:                           // 201: ProgText -> Capturing disk (Generic; Disabled by default)
-                    ProgrText.Text = $"Capturing disk ({ProgrBar.Value}%) ...";
-                    break;
-                case 202:                           // 202: ProgText -> Capturing disk
-                    ProgrText.Text = $"Copying files to image ({ProgrBar.Value}%) ...";
-                    break;
-                case 203:                           // 203: ProgText -> Capturing disk
-                    ProgrText.Text = $"Scanning disk ({ProgrBar.Value}%) ...";
-                    break;
-                case 204:                           // 204: ProgText -> Capturing disk
-                    ProgrText.Text = $"Compressing image ({ProgrBar.Value}%) ...";
-                    break;
-                case 250:                           // 250: Installation complete
-                    ProgrText.Text = "Capturing completed. Press 'Next' to exit Dive.";
-                    ProgrBar.Value = 100;
-                    if (CaptureContent.ContentWindow != null)
-                        CaptureContent.ContentWindow.NextBtn.IsEnabled = true;
-                    break;
-                #endregion
+                Debug.WriteLine(response.Message, ConsoleColor.Red);
 
-                #region Error message handling
-                case 301:                           // 301: Failed at capturing disk
-                    ProgrText.Text = "Failed at capturing disk. Please check your disk and try again.";
-                    ProgrBar.Value = 0;
-                    if (CaptureContent.ContentWindow != null)
-                    {
-                        CaptureContent.ContentWindow.NextBtn.IsEnabled = false;
-                        CaptureContent.ContentWindow.BackBtn.IsEnabled = false;
-                        CaptureContent.ContentWindow.CancelBtn.IsEnabled = true;
-                    }
-                    IsCanceled = true;
-                    break;
-                #endregion
-            }
-
-            // Progressbar percentage
-            if (e.ProgressPercentage <= 100)
-            {
-                this.ProgrBar.Value = e.ProgressPercentage;
-
-                string currentAction = ProgrText.Text;
-                Match match = Regex.Match(currentAction, @"\((\d+)%\)");
-
-                if (match.Success)
+                if (ApplyContent.ContentWindow != null)
                 {
-                    int value = int.Parse(match.Groups[1].Value);
-
-                    value = e.ProgressPercentage;
-                    ProgrText.Text = currentAction.Replace(match.Value, "(" + value + "%)");
+                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
                 }
+                if (CloudContent.ContentWindow != null)
+                {
+                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+
+                IsCanceled = true;
+                return;
             }
-                
+
+            if (response.IsWarning)
+            {
+                Debug.WriteLine(response.Message, ConsoleColor.Yellow);
+                return;
+            }
+
+            if (response.IsDebug)
+            {
+                if (response.Message == "Job Done.")
+                {
+                    ProgrText.Text = "Capturing completed. Press 'Next' to close Dive.";
+                    ProgrBar.Value = 100;
+                    if (ApplyContent.ContentWindow != null)
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                    if (CloudContent.ContentWindow != null)
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = true;
+                    return;
+                }
+                Debug.WriteLine(response.Message);
+                return;
+            }
+
+            switch (response.Action)
+            {
+                case Progress.CaptureDisk:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+                        Debug.RefreshProgressBar(Progress.CaptureDisk, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+            }
         }
 
         private void CaptureWim(object? sender, DoWorkEventArgs e)
@@ -143,12 +129,7 @@ namespace deployaUI.Pages.CapturePages
 
             #endregion
 
-            // Initialize worker progress
-            worker.ReportProgress(0, "");       // Value 0
-
             // Capture disk
-            worker.ReportProgress(101, "");     // not Indeterminate
-            worker.ReportProgress(201, "");     // Capture Disk Text
             Actions.CaptureToWim(Common.CaptureInfo.Name, Common.CaptureInfo.Description, Common.CaptureInfo.PathToCapture, FullFilePath, worker);
             if (IsCanceled)
             {
@@ -157,7 +138,11 @@ namespace deployaUI.Pages.CapturePages
             }
 
             // Installation complete
-            worker.ReportProgress(250, "");     // Capturing complete Text
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                IsDebug = true,
+                Message = "Job Done."
+            }));
         }
     }
 }
