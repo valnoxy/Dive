@@ -139,8 +139,7 @@ namespace deployaUI.Pages.CapturePages
         {
             #region Environment definition
 
-            BackgroundWorker worker = sender as BackgroundWorker;
-            Entities.UI ui = Entities.UI.Graphical;
+            var worker = sender as BackgroundWorker;
 
             #endregion
 
@@ -150,7 +149,7 @@ namespace deployaUI.Pages.CapturePages
             // Capture disk
             worker.ReportProgress(101, "");     // not Indeterminate
             worker.ReportProgress(201, "");     // Capture Disk Text
-            Actions.CaptureToWim(ui, Common.CaptureInfo.Name, Common.CaptureInfo.Description, Common.CaptureInfo.PathToCapture, FullFilePath, worker);
+            Actions.CaptureToWim(Common.CaptureInfo.Name, Common.CaptureInfo.Description, Common.CaptureInfo.PathToCapture, FullFilePath, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;

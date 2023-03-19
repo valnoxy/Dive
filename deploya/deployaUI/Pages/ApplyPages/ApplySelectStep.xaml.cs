@@ -1,6 +1,7 @@
 ﻿using deployaCore;
 using deployaCore.Common;
 using deployaUI.Common;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -83,6 +84,157 @@ namespace deployaUI.Pages.ApplyPages
         }
 
         private void applyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
+        {
+            var responseJson = e.UserState as string;
+            if (string.IsNullOrEmpty(responseJson)) return;
+            
+            var response = JsonConvert.DeserializeObject<ActionWorker>(responseJson);
+            if (response.IsError)
+            {
+                ProgrText.Text = response.Message;
+                ProgrBar.Value = e.ProgressPercentage;
+
+                Debug.WriteLine(response.Message, ConsoleColor.Red);
+
+                if (ApplyContent.ContentWindow != null)
+                {
+                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+                if (CloudContent.ContentWindow != null)
+                {
+                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+
+                IsCanceled = true;
+                return;
+            }
+
+            if (response.IsWarning)
+            {
+                Debug.WriteLine(response.Message, ConsoleColor.Yellow);
+                return;
+            }
+
+            if (response.IsDebug)
+            {
+                if (response.Message == "Job Done.")
+                {
+                    ProgrText.Text = 
+                        !File.Exists("X:\\Windows\\System32\\wpeutil.exe") 
+                            ? "Installation completed. Press 'Next' to restart your computer." 
+                            : "Installation completed. Press 'Next' to close Dive.";
+                    ProgrBar.Value = 100;
+                    if (ApplyContent.ContentWindow != null)
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                    if (CloudContent.ContentWindow != null)
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = true;
+                    return;
+                }
+                Debug.WriteLine(response.Message);
+                return;
+            }
+
+            switch (response.Action)
+            {
+                case Progress.PrepareDisk:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
+                    break;
+                }
+                case Progress.ApplyImage:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
+                    break;
+                }
+                case Progress.InstallBootloader:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
+                    break;
+                }
+                case Progress.InstallRecovery:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.InstallRecovery, e.ProgressPercentage, response.Message);
+                    break;
+                }
+                case Progress.InstallUnattend:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.InstallUnattend, e.ProgressPercentage, response.Message);
+                    break;
+                }
+                case Progress.InstallDrivers:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.InstallDrivers, e.ProgressPercentage, response.Message);
+                    break;
+                }
+                case Progress.InstallUefiSeven:
+                {
+                    ProgrText.Text = response.Message;
+                    if (response.IsIndeterminate)
+                        ProgrBar.IsIndeterminate = true;
+                    else
+                    {
+                        ProgrBar.IsIndeterminate = false;
+                        ProgrBar.Value = e.ProgressPercentage;
+                    }
+                    Debug.RefreshProgressBar(Progress.InstallUefiSeven, e.ProgressPercentage, response.Message);
+                    break;
+                }
+            }
+        }
+
+        private void applyBackgroundWorker_ProgressChanged_ (object? sender, ProgressChangedEventArgs e)
         {
             //
             // Value list
@@ -310,7 +462,6 @@ namespace deployaUI.Pages.ApplyPages
             #region Environment definition
 
             var worker = sender as BackgroundWorker;
-            var ui = Entities.UI.Graphical; // UI definition
             var firmware = Common.ApplyDetails.UseEFI switch // Firmware definition
             {
                 true => Entities.Firmware.EFI,
@@ -408,38 +559,41 @@ namespace deployaUI.Pages.ApplyPages
 
             #endregion
 
-            // Initialize worker progress
-            worker?.ReportProgress(0, "");       // Value 0
+            #region Prepare Disk
 
             // Prepare disk
-            worker?.ReportProgress(201, "");     // Prepare Disk Text
-            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
+            Actions.PrepareDisk(firmware, bootloader, Common.ApplyDetails.DiskIndex, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
                 return;
             }
 
+            #endregion
+
+            #region Apply Image
+
             // Apply image
-            worker?.ReportProgress(202, "");     // Applying Image Text
-            worker?.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWim(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            Actions.ApplyWim(windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
                 return;
             }
-            
+
+            #endregion
+
+            #region Install Bootloader
+
             // Install Bootloader
-            worker?.ReportProgress(203, "");     // Installing Bootloader Text
             switch (partStyle)
             {
                 case Entities.PartitionStyle.SeparateBoot:
                 case Entities.PartitionStyle.Full:
-                    Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, bootDrive, worker);
+                    Actions.InstallBootloader(firmware, bootloader, windowsDrive, bootDrive, worker);
                     break;
                 case Entities.PartitionStyle.Single:
-                    Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, windowsDrive, worker);
+                    Actions.InstallBootloader(firmware, bootloader, windowsDrive, windowsDrive, worker);
                     break;
             }
 
@@ -449,11 +603,14 @@ namespace deployaUI.Pages.ApplyPages
                 return;
             }
 
+            #endregion
+
+            #region Install Recovery (only for Vista and higher)
+
             // Install Recovery (only for Vista and higher)
             if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
-                worker?.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
+                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
             
                 if (IsCanceled)
                 {
@@ -462,11 +619,13 @@ namespace deployaUI.Pages.ApplyPages
                 }
             }
 
+            #endregion
+
+            #region Install unattend file (only for Vista and higher)
+
             // Install unattend file (only for Vista and higher)
             if (Common.DeploymentInfo.UseUserInfo || Common.OemInfo.UseOemInfo)
             {
-                worker?.ReportProgress(205, "");     // Installing unattend file
-
                 // Building config
                 var config = "";
                 Common.UnattendMode? um = null;
@@ -521,7 +680,7 @@ namespace deployaUI.Pages.ApplyPages
 
                 Debug.WriteLine(config);
                  
-                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
+                Actions.InstallUnattend($"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
 
                 if (IsCanceled)
                 {
@@ -530,13 +689,16 @@ namespace deployaUI.Pages.ApplyPages
                 }
             }
 
+
+            #endregion
+
+            #region Install Drivers (only for Vista and higher)
+            
             // Install Drivers (only for Vista and higher)
             if (Common.ApplyDetails.DriverList != null)
             {
-                worker?.ReportProgress(207, "");     // Installing Drivers Text
-
                 _driverCount = Common.ApplyDetails.DriverList.Count;
-                Actions.InstallDriver(ui, windowsDrive, Common.ApplyDetails.DriverList, worker);
+                Actions.InstallDriver(windowsDrive, Common.ApplyDetails.DriverList, worker);
 
                 if (IsCanceled)
                 {
@@ -544,12 +706,15 @@ namespace deployaUI.Pages.ApplyPages
                     return;
                 }
             }
+
+            #endregion
+
+            #region Install UefiSeven (only for Vista and 7 with EFI)
 
             // Install UefiSeven (only for Vista and 7 with EFI)
             if (Common.WindowsModification.InstallUefiSeven)
             {
-                worker?.ReportProgress(206, "");     // Installing UefiSeven
-                deployaCore.Action.UefiSeven.InstallUefiSeven(ui, bootDrive, 
+                deployaCore.Action.UefiSeven.InstallUefiSeven(bootDrive, 
                     Common.WindowsModification.UsToggleSkipErros, 
                     Common.WindowsModification.UsToggleFakeVesa,
                     Common.WindowsModification.UsToggleVerbose,
@@ -563,8 +728,14 @@ namespace deployaUI.Pages.ApplyPages
                 }
             }
 
+            #endregion
+
             // Installation complete
-            worker?.ReportProgress(250, "");     // Installation complete Text
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                IsDebug = true,
+                Message = "Job Done."
+            }));
         }
     }
 }

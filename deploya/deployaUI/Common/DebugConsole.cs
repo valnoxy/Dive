@@ -3,89 +3,79 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using deployaCore.Common;
 
 namespace deployaUI.Common
 {
     public static class Debug
     {
-        public static FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
-        public static IConsole? LogConsole;
-        public static IConsole? ActionConsole;
+        private static readonly FileVersionInfo _versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
+        private static IConsole? _logConsole;
+        private static IConsole? _actionConsole;
 
-        public static ProgressBar? PrepareDiskProgressBar;
-        public static ProgressBar? ApplyImageProgressBar;
-        public static ProgressBar? InstallBootloaderProgressBar;
-        public static ProgressBar? InstallRecoveryProgressBar;
-        public static ProgressBar? InstallUnattendProgressBar;
-        public static ProgressBar? InstallDriversProgressBar;
-        public static ProgressBar? InstallUefiSevenProgressBar;
-
-        public enum Progress
-        {
-            PrepareDisk,
-            ApplyImage,
-            InstallBootloader,
-            InstallRecovery,
-            InstallUnattend,
-            InstallDrivers,
-            InstallUefiSeven
-        }
+        private static ProgressBar? _prepareDiskProgressBar;
+        private static ProgressBar? _applyImageProgressBar;
+        private static ProgressBar? _installBootloaderProgressBar;
+        private static ProgressBar? _installRecoveryProgressBar;
+        private static ProgressBar? _installUnattendProgressBar;
+        private static ProgressBar? _installDriversProgressBar;
+        private static ProgressBar? _installUefiSevenProgressBar;
 
         public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
         {
-            if (LogConsole == null) return;
-            LogConsole.ForegroundColor = ConsoleColor.DarkGray;
-            LogConsole.Write("[");
-            LogConsole.ForegroundColor = ConsoleColor.White;
-            LogConsole.Write("*");
-            LogConsole.ForegroundColor = ConsoleColor.DarkGray;
-            LogConsole.Write("] ");
+            if (_logConsole == null) return;
+            _logConsole.ForegroundColor = ConsoleColor.DarkGray;
+            _logConsole.Write("[");
+            _logConsole.ForegroundColor = ConsoleColor.White;
+            _logConsole.Write("*");
+            _logConsole.ForegroundColor = ConsoleColor.DarkGray;
+            _logConsole.Write("] ");
 
-            LogConsole.ForegroundColor = color;
-            LogConsole.WriteLine(message);
+            _logConsole.ForegroundColor = color;
+            _logConsole.WriteLine(message);
         }
 
         public static void Write(string message, bool continueLine = false, ConsoleColor color = ConsoleColor.White)
         {
-            if (LogConsole == null) return;
+            if (_logConsole == null) return;
 
             if (!continueLine)
             {
-                LogConsole.ForegroundColor = ConsoleColor.DarkGray;
-                LogConsole.Write("[");
-                LogConsole.ForegroundColor = ConsoleColor.White;
-                LogConsole.Write("*");
-                LogConsole.ForegroundColor = ConsoleColor.DarkGray;
-                LogConsole.Write("] ");
+                _logConsole.ForegroundColor = ConsoleColor.DarkGray;
+                _logConsole.Write("[");
+                _logConsole.ForegroundColor = ConsoleColor.White;
+                _logConsole.Write("*");
+                _logConsole.ForegroundColor = ConsoleColor.DarkGray;
+                _logConsole.Write("] ");
             }
 
-            LogConsole.ForegroundColor = color;
-            LogConsole.Write(message);
+            _logConsole.ForegroundColor = color;
+            _logConsole.Write(message);
         }
 
         public static void TestWriteAction()
         {
-            if (ActionConsole == null) return;
+            if (_actionConsole == null) return;
 
-            var pb = new ProgressBar(ActionConsole, PbStyle.SingleLine, 50);
+            var pb = new ProgressBar(_actionConsole, PbStyle.SingleLine, 50);
             pb.Refresh(0, "connecting to server to download 5 files asychronously.");
             Thread.Sleep(1000);
             pb.Refresh(25, "downloading file number 25");
             Thread.Sleep(1000);
             pb.Refresh(50, "finished.");
-            var pb1 = new ProgressBar(ActionConsole, PbStyle.SingleLine, 50);
+            var pb1 = new ProgressBar(_actionConsole, PbStyle.SingleLine, 50);
             pb1.Refresh(0, "connecting to server to download 5 files asychronously.");
             Thread.Sleep(1000);
             pb1.Refresh(25, "downloading file number 25");
             Thread.Sleep(1000);
             pb1.Refresh(50, "finished.");
-            var pb2 = new ProgressBar(ActionConsole, PbStyle.SingleLine, 50);
+            var pb2 = new ProgressBar(_actionConsole, PbStyle.SingleLine, 50);
             pb2.Refresh(0, "connecting to server to download 5 files asychronously.");
             Thread.Sleep(1000);
             pb2.Refresh(25, "downloading file number 25");
             Thread.Sleep(1000);
             pb2.Refresh(50, "finished.");
-            var pb3 = new ProgressBar(ActionConsole, PbStyle.SingleLine, 50);
+            var pb3 = new ProgressBar(_actionConsole, PbStyle.SingleLine, 50);
             pb3.Refresh(0, "connecting to server to download 5 files asychronously.");
             Thread.Sleep(1000);
             pb3.Refresh(25, "downloading file number 25");
@@ -99,32 +89,32 @@ namespace deployaUI.Common
             switch (progress)
             {
                 case Progress.PrepareDisk:
-                    PrepareDiskProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = PrepareDiskProgressBar;
+                    _prepareDiskProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _prepareDiskProgressBar;
                     break;
                 case Progress.ApplyImage:
-                    ApplyImageProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = ApplyImageProgressBar;
+                    _applyImageProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _applyImageProgressBar;
                     break;
                 case Progress.InstallBootloader:
-                    InstallBootloaderProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = InstallBootloaderProgressBar;
+                    _installBootloaderProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _installBootloaderProgressBar;
                     break;
                 case Progress.InstallRecovery:
-                    InstallRecoveryProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = InstallRecoveryProgressBar;
+                    _installRecoveryProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _installRecoveryProgressBar;
                     break;
                 case Progress.InstallUnattend:
-                    InstallUnattendProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = InstallUnattendProgressBar;
+                    _installUnattendProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _installUnattendProgressBar;
                     break;
                 case Progress.InstallDrivers:
-                    InstallDriversProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = InstallDriversProgressBar;
+                    _installDriversProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _installDriversProgressBar;
                     break;
                 case Progress.InstallUefiSeven:
-                    InstallUefiSevenProgressBar ??= new ProgressBar(ActionConsole, PbStyle.SingleLine, 100);
-                    progressBar = InstallUefiSevenProgressBar;
+                    _installUefiSevenProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
+                    progressBar = _installUefiSevenProgressBar;
                     break;
                 default:
                     return;
@@ -135,7 +125,7 @@ namespace deployaUI.Common
 
         public static void InitializeConsole()
         {
-            Console.Title = $@"{VersionInfo.ProductName} - Debug Console";
+            Console.Title = $@"{_versionInfo.ProductName} - Debug Console";
 
             // create an 80 by 20 inline window
             var window = new Window(Console.WindowWidth, Console.WindowHeight -1);
@@ -144,11 +134,11 @@ namespace deployaUI.Common
                 new Split(8, "Action", LineThickNess.Single)
             );
 
-            LogConsole = consoles[0];
-            ActionConsole = consoles[1];
+            _logConsole = consoles[0];
+            _actionConsole = consoles[1];
 
-            LogConsole.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-            LogConsole.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+            _logConsole.WriteLine($"{_versionInfo.ProductName} [Version: {_versionInfo.ProductVersion}]"); // Header
+            _logConsole.WriteLine(_versionInfo.LegalCopyright + "\n"); // Copyright text
         }
     }
 }

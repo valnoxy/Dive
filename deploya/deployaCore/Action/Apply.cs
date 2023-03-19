@@ -3,10 +3,8 @@ using Microsoft.Wim;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using deployaCore.Common;
-using static System.Collections.Specialized.BitVector32;
+using Newtonsoft.Json;
 
 namespace deployaCore.Action
 {
@@ -38,22 +36,53 @@ namespace deployaCore.Action
             try
             {
                 var driverCount = driverPath.Count;
-                Output.WriteLine($"[Driver] Entering Injection process with {driverCount} drivers ...");
-                Output.WriteLine("[Driver] Initialize Dism API ...");
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    IsDebug = true,
+                    Message = $"[Driver] Entering Injection process with {driverCount} drivers ..."
+                }));
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    IsDebug = true,
+                    Message = $"[Driver] Initialize DISM API"
+                }));
                 DismApi.Initialize(DismLogLevel.LogErrors);
-                Output.WriteLine("[Driver] Open offline session ...");
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    IsDebug = true,
+                    Message = $"[Driver] Open offline session ..."
+                }));
 
                 DismSession session = null;
                 try
                 {
-                    if (Bw != null) Bw.ReportProgress(207, "Initialize"); // Update progress text
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.InstallDrivers,
+                        IsError = false,
+                        IsIndeterminate = true,
+                        Message = "Opening Dism Session for Driver injection ..."
+                    }));
                     session = DismApi.OpenOfflineSession(windowsDrive);
-                    Output.WriteLine("[Driver] Session opened. ");
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = $"[Driver] Session opened."
+                    }));
                 }
                 catch (Exception ex)
                 {
-                    Output.WriteLine("[Driver] Failed to open offline session: " + ex.Message);
-                    Output.WriteLine("[Driver] Shutting down API ...");
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.InstallDrivers,
+                        IsError = true,
+                        Message = $"[Driver] Failed to open offline session: " + ex.Message
+                    }));
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = $"[Driver] Shutting down API ..."
+                    }));
                     DismApi.Shutdown();
                     return;
                 }
@@ -61,32 +90,62 @@ namespace deployaCore.Action
                 var currentDriverCount = 0;
                 foreach (var driver in driverPath)
                 {
-                    Output.WriteLine("[Driver] Begin driver installation ...");
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = $"[Driver] Begin driver installation ..."
+                    }));
                     try
                     {
                         currentDriverCount++;
-                        Output.WriteLine($"[Driver] Current Driver ({currentDriverCount}): {driver}");
-                        if (Bw != null) Bw.ReportProgress(207, currentDriverCount); // Update progress text
+                        worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                        {
+                            IsDebug = true,
+                            Message = $"[Driver] Current Driver ({currentDriverCount}): {driver}"
+                        }));
+                        worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                        {
+                            Action = Progress.InstallDrivers,
+                            IsError = false,
+                            IsIndeterminate = true,
+                            Message = $"Injecting driver {currentDriverCount} of {driverCount} ..."
+                        }));
                         DismApi.AddDriver(session, driver, true);
                     }
                     catch (Exception ex)
                     {
-                        Output.WriteLine("[Driver] Failed to inject driver: " + ex.Message);
-                        if (Bw != null) Bw?.ReportProgress(308, "");
+                        worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                        {
+                            Action = Progress.InstallDrivers,
+                            IsWarning = true,
+                            IsIndeterminate = false,
+                            Message = $"Failed to inject driver {driver}."
+                        }));
                     }
                 }
 
-                Output.WriteLine("[Driver] Closing session ...");
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    IsDebug = true,
+                    Message = $"[Driver] Closing session ..."
+                }));
                 session.Close();
-                Output.WriteLine("[Driver] Shutting down API ...");
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    IsDebug = true,
+                    Message = $"[Driver] Shutting down DISM API ..."
+                }));
                 DismApi.Shutdown();
-                Output.WriteLine("[Driver] Job completed. Returning now ...");
-                return;
             }
             catch (Exception ex)
             {
-                Output.WriteLine("[Driver] Unknown error: " + ex.Message);
-                DismApi.Shutdown();
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    Action = Progress.InstallDrivers,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Unknown error at installing drivers."
+                }));
             }
         }
 
@@ -96,24 +155,35 @@ namespace deployaCore.Action
             {
                 case WimMessageType.Progress:
                     var wimMessageProgress = (WimMessageProgress)message;
-                    if (Bw != null)
+                    Bw?.ReportProgress(wimMessageProgress.PercentComplete, JsonConvert.SerializeObject(new ActionWorker
                     {
-                        Bw.ReportProgress(wimMessageProgress.PercentComplete, ""); // Update progress bar
-                        Bw.ReportProgress(202, ""); // Update progress text
-                    }
-                    ConsoleUtility.WriteProgressBar(wimMessageProgress.PercentComplete, true);
+                        Action = Progress.ApplyImage,
+                        IsError = false,
+                        IsIndeterminate = false,
+                        Message = $"Applying image ({wimMessageProgress.PercentComplete}% - {wimMessageProgress.EstimatedTimeRemaining})..."
+                    }));
                     break;
 
                 case WimMessageType.Error:
                     var wimMessageError = (WimMessageError)message;
-                    Console.WriteLine($"Error: {0} ({1})", (object)wimMessageError.Path, (object)wimMessageError.Win32ErrorCode);
-                    Bw?.ReportProgress(302, "");
-
+                    Bw?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.ApplyImage,
+                        IsError = true,
+                        IsIndeterminate = false,
+                        Message = $"Error: {(object)wimMessageError.Path} {(object)wimMessageError.Win32ErrorCode}"
+                    }));
                     break;
 
                 case WimMessageType.Warning:
                     var wimMessageWarning = (WimMessageWarning)message;
-                    Console.WriteLine($"Warning: {0} ({1})", (object)wimMessageWarning.Path, (object)wimMessageWarning.Win32ErrorCode);
+                    Bw?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.PrepareDisk,
+                        IsWarning = true,
+                        IsIndeterminate = false,
+                        Message = $"Error: {(object)wimMessageWarning.Path} {(object)wimMessageWarning.Win32ErrorCode}"
+                    })); 
                     break;
             }
             return WimMessageResult.Success;

@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using deployaCore.Assets;
 using Microsoft.Dism;
+using Newtonsoft.Json;
 
 namespace deployaCore
 {
@@ -30,19 +31,22 @@ namespace deployaCore
         /// </summary>
         /// <param name="firmware">Firmware type of the device</param>
         /// <param name="bootloader">Windows Bootloader</param>
-        /// <param name="ui">User Interface type</param>
         /// <param name="disk">Disk Identifier</param>
         /// <param name="useRecovery">Install native recovery partition</param>
         /// <param name="windowsDrive">Drive letter of the Windows partition</param>
         /// <param name="bootDrive">Drive letter of the Boot partition</param>
         /// <param name="recoveryDrive">Drive letter of the Recovery partition</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, int disk, Entities.PartitionStyle partitionStyle, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, int disk, Entities.PartitionStyle partitionStyle, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
         {
             // General message
-            Output.Write("Partitioning disk ...         ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); }
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.PrepareDisk,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Partitioning disk ..."
+            }));
 
             // Validate parsed arguments
             if (useRecovery && (windowsDrive == "\0" || bootDrive == "\0" || recoveryDrive == "\0"))
@@ -149,14 +153,13 @@ namespace deployaCore
                             partDest.StandardInput.WriteLine("exit");
                             break;
                         case Entities.Firmware.EFI: // Windows on EFI
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("");
-                            Console.WriteLine("   An Error has occurred.");
-                            Console.WriteLine("   Error: You cannot use Single Partition layout on a System with EFI Firmware.");
-                            if (ui == Entities.UI.Command)
-                                Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                            Console.ResetColor();
-                            if (ui == Entities.UI.Graphical) { worker.ReportProgress(301, ""); }
+                            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                            {
+                                Action = Progress.PrepareDisk,
+                                IsError = true,
+                                IsIndeterminate = false,
+                                Message = "You cannot use Single Partition layout on a system with EFI Firmware."
+                            }));
                             return;
                     }
                     break;
@@ -165,39 +168,49 @@ namespace deployaCore
 
             if (partDest.ExitCode != 0)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: " + partDest.ExitCode.ToString());
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                if (ui == Entities.UI.Graphical) { worker.ReportProgress(301, ""); }
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    Action = Progress.PrepareDisk,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Diskpart terminated with exit code " + partDest.ExitCode + "."
+                }));
                 return;
             }
-            
-            ConsoleUtility.WriteProgressBar(100, true);
-            Console.WriteLine();
-            if (ui != Entities.UI.Graphical) return;
-            worker.ReportProgress(101, ""); worker.ReportProgress(100, "");
+
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.PrepareDisk,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
 
         /// <summary>
         /// Installs the specified Windows image.
         /// </summary>
-        /// <param name="ui">User Interface type</param>
         /// <param name="path">Target path</param>
         /// <param name="wimFile">Path to image file</param>
         /// <param name="index">Index identifier of the SKU</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void ApplyWim(Entities.UI ui, string path, string wimFile, int index, BackgroundWorker worker = null)
+        public static void ApplyWim(string path, string wimFile, int index, BackgroundWorker worker = null)
         {
-            Output.Write("Applying Image ...            ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
-            
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.ApplyImage,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Applying image ..."
+            }));
             Apply.WriteToDisk(wimFile, index, path, worker);
-            Console.WriteLine();
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.ApplyImage,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
 
         /// <summary>
@@ -205,90 +218,91 @@ namespace deployaCore
         /// </summary>
         /// <param name="firmware">Firmware type of the device</param>
         /// <param name="bootloader">Windows Bootloader</param>
-        /// <param name="ui">User Interface type</param>
         /// <param name="windowsPath">Path to the Windows directory</param>
         /// <param name="bootloaderLetter">Drive letter of the boot partition</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, Entities.UI ui, string windowsPath, string bootloaderLetter, BackgroundWorker worker = null)
+        public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, string windowsPath, string bootloaderLetter, BackgroundWorker worker = null)
         {
-            Output.Write("Installing Bootloader ...     ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
-
-            var bootld = new Process();
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallBootloader,
+                IsError = false,
+                IsIndeterminate = true,
+                Message = "Installing bootloader ..."
+            }));
+            var bootLd = new Process();
 
             #region Bootloader check
             switch (bootloader)
             {
                 case Entities.Bootloader.NTLDR:
                 {
-                    var strBl = bootloaderLetter.Substring(0, 2);
-                    bootld.StartInfo.FileName = "bootsect.exe";
-                    bootld.StartInfo.Arguments = $"/nt52 {strBl} /force /mbr";
+                    var strBl = bootloaderLetter[..2];
+                    bootLd.StartInfo.FileName = "bootsect.exe";
+                    bootLd.StartInfo.Arguments = $"/nt52 {strBl} /force /mbr";
                     break;
                 }
                 case Entities.Bootloader.BOOTMGR:
                 {
                     windowsPath = $"{windowsPath}Windows";
-                    bootld.StartInfo.FileName = "bcdboot.exe";
+                    bootLd.StartInfo.FileName = "bcdboot.exe";
 
-                    bootld.StartInfo.Arguments = firmware switch
+                    bootLd.StartInfo.Arguments = firmware switch
                     {
                         // BIOS
                         Entities.Firmware.BIOS => $"{windowsPath} /s {bootloaderLetter} /f BIOS",
                         // EFI
                         Entities.Firmware.EFI => $"{windowsPath} /s {bootloaderLetter} /f UEFI",
-                        _ => bootld.StartInfo.Arguments
+                        _ => bootLd.StartInfo.Arguments
                     };
                     break;
                 }
             }
             #endregion
 
-            bootld.StartInfo.UseShellExecute = false;
-            bootld.StartInfo.RedirectStandardOutput = true;
-            bootld.StartInfo.CreateNoWindow = true;
-            bootld.Start();
-            bootld.WaitForExit();
+            bootLd.StartInfo.UseShellExecute = false;
+            bootLd.StartInfo.RedirectStandardOutput = true;
+            bootLd.StartInfo.CreateNoWindow = true;
+            bootLd.Start();
+            bootLd.WaitForExit();
 
-            if (bootld.ExitCode != 0)
+            if (bootLd.ExitCode != 0)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: " + bootld.ExitCode.ToString());
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(303, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(bootld.ExitCode);
-                        break;
-                }
+                    Action = Progress.InstallBootloader,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Bootsect / bcdboot terminated with exit code " + bootLd.ExitCode + "."
+                }));
+                return;
             }
 
-            ConsoleUtility.WriteProgressBar(100, true);
-            Console.WriteLine();
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallBootloader,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
 
         /// <summary>
         /// Install and register the recovery partition.
         /// </summary>
-        /// <param name="ui">User Interface type</param>
         /// <param name="windowsPath">Path to the Windows directory</param>
         /// <param name="recoveryLetter">Drive letter of the recovery partition</param>
         /// <param name="implementDive">Implement Dive as a custom recovery tool into Windows RE</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallRecovery(Entities.UI ui, string windowsPath, string recoveryLetter, bool implementDive = false, BackgroundWorker worker = null)
+        public static void InstallRecovery(string windowsPath, string recoveryLetter, bool implementDive = false, BackgroundWorker worker = null)
         {
-            Output.Write("Installing Recovery ...       ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallRecovery,
+                IsError = false,
+                IsIndeterminate = true,
+                Message = "Copying recovery image to partition ..."
+            }));
 
             // Create Recovery directory
             try
@@ -297,22 +311,14 @@ namespace deployaCore
             }
             catch 
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot create recovery directory.");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(304, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(1);
-                        break;
-                }
+                    Action = Progress.InstallRecovery,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Failed to create recovery directory."
+                }));
+                return;
             }
 
             // Copy WinRE image to Recovery partition
@@ -328,42 +334,26 @@ namespace deployaCore
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: Cannot find WindowsRE.wim.");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    switch (ui)
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                     {
-                        case Entities.UI.Graphical:
-                            worker.ReportProgress(304, "");
-                            break;
-                        case Entities.UI.Command:
-                            Environment.Exit(1);
-                            break;
-                    }
+                        Action = Progress.InstallRecovery,
+                        IsError = true,
+                        IsIndeterminate = false,
+                        Message = "Recovery image does not exist in this image."
+                    }));
+                    return;
                 }
             }
             catch
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot copy recovery image.");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(304, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(1);
-                        break;
-                }
+                    Action = Progress.InstallRecovery,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Failed to copy recovery image."
+                }));
             }
 
             // Implement Dive
@@ -371,7 +361,20 @@ namespace deployaCore
             {
                 try
                 {
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.InstallRecovery,
+                        IsError = false,
+                        IsIndeterminate = true,
+                        Message = "Implementing Dive into Windows Recovery image ..."
+                    }));
+
                     // Initialize Dism API
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Initializing DISM API ..."
+                    }));
                     DismApi.Initialize(DismLogLevel.LogErrors);
 
                     // Prepare session
@@ -382,41 +385,58 @@ namespace deployaCore
                     Directory.CreateDirectory(mountPath);
 
                     // Mount image
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Mounting Recovery Image ..."
+                    }));
                     DismApi.MountImage(imageFile, mountPath, imageIndex);
 
                     // Copy Dive
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Copying Dive into Recovery Image ..."
+                    }));
                     var strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
                     Common.FileIO.CopyFilesRecursively(new DirectoryInfo(strWorkPath), new DirectoryInfo(Path.Combine(targetPath, "Dive")));
 
                     // Create WinREConfig.xml
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Creating and injecting WinREConfig.xml ..."
+                    }));
                     File.WriteAllText(Path.Combine(targetPath, "WinREConfig.xml"), WinRE.WinREConfig);
 
                     // Unmount image
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Commiting changes to recovery image ..."
+                    }));
                     DismApi.UnmountImage(mountPath, true);
                 }
                 catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: Cannot modify WinRE");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    switch (ui)
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                     {
-                        case Entities.UI.Graphical:
-                            worker.ReportProgress(304, "");
-                            break;
-                        case Entities.UI.Command:
-                            Environment.Exit(1);
-                            break;
-                    }
+                        Action = Progress.InstallRecovery,
+                        IsError = true,
+                        IsIndeterminate = true,
+                        Message = "Failed to inject Dive into Recovery image."
+                    }));
+                    return;
                 }
                 finally
                 {
-                    // Close Dism API
+                    // Shutdown Dism API
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Shutting down DISM API ..."
+                    })); 
                     DismApi.Shutdown();
                 }
             }
@@ -424,6 +444,13 @@ namespace deployaCore
             // Register recovery partition
             try
             {
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    Action = Progress.InstallRecovery,
+                    IsError = false,
+                    IsIndeterminate = true,
+                    Message = "Registering Recovery image to Windows ..."
+                }));
                 var p = new Process();
                 p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Reagentc.exe");
                 p.StartInfo.Arguments = $"/Setreimage /Path {recoveryLetter}\\Recovery\\WindowsRE /Target {windowsPath}";
@@ -434,6 +461,11 @@ namespace deployaCore
 
                 if (implementDive)
                 {
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        IsDebug = true,
+                        Message = "Apply Diagnostics Tool configuration to recovery image ..."
+                    }));
                     var recoveryBootMenuPath = System.IO.Path.Combine(recoveryLetter, "Recovery", "BootMenu");
                     Directory.CreateDirectory(recoveryBootMenuPath);
 
@@ -445,43 +477,42 @@ namespace deployaCore
             }
             catch
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot register recovery partition.");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(304, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(1);
-                        break;
-                }
+                    Action = Progress.InstallRecovery,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Failed to register recovery image."
+                }));
+                return;
             }
 
-            ConsoleUtility.WriteProgressBar(100, true);
-            Console.WriteLine();
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallRecovery,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
 
         /// <summary>
         /// Installs the unattended configuration file to the Windows Installation (only Vista and higher).
         /// </summary>
-        /// <param name="ui">User Interface type</param>
         /// <param name="windowsPath">Path to the Windows directory</param>
         /// <param name="configuration">Content of the configuration file</param>
         /// <param name="oemLogoPath">Path to the OEM logo</param>
         /// <param name="performDismApply">Whether to perform a DISM Apply-Unattend</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallUnattend(Entities.UI ui, string windowsPath, string configuration, string oemLogoPath = null, bool performDismApply = false, BackgroundWorker worker = null)
+        public static void InstallUnattend(string windowsPath, string configuration, string oemLogoPath = null, bool performDismApply = false, BackgroundWorker worker = null)
         {
-            Output.Write("Installing unattend file ...  ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallUnattend,
+                IsError = false,
+                IsIndeterminate = true,
+                Message = "Installing Unattend configuration ..."
+            }));
 
             // Create Recovery directory
             try
@@ -490,22 +521,14 @@ namespace deployaCore
             }
             catch
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot create Panther directory.");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(305, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(1);
-                        break;
-                }
+                    Action = Progress.InstallUnattend,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Failed to create Panther directory."
+                }));
+                return;
             }
 
             // Write config to disk as unattend.xml
@@ -515,22 +538,14 @@ namespace deployaCore
             }
             catch
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot write content of unattend.xml!");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(305, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(1);
-                        break;
-                }
+                    Action = Progress.InstallUnattend,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Failed to write Unattend configuration to disk."
+                }));
+                return;
             }
 
             // Copy OEM logo to Windows\System32 directory
@@ -542,15 +557,14 @@ namespace deployaCore
                 }
                 catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: Cannot copy OEM logo to the disk!");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    if (ui == Entities.UI.Graphical) { worker.ReportProgress(306, ""); }
-                    if (ui == Entities.UI.Command) { Environment.Exit(1); }
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.InstallUnattend,
+                        IsError = true,
+                        IsIndeterminate = false,
+                        Message = "Failed to copy OEM logo to disk."
+                    }));
+                    return;
                 }
             }
 
@@ -559,7 +573,13 @@ namespace deployaCore
             {
                 try
                 {
-                    Output.Write("Registering unattend file with DISM ...");
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.InstallUnattend,
+                        IsError = false,
+                        IsIndeterminate = true,
+                        Message = "Registering Unattend configuration with DISM ..."
+                    }));
                     var f = new FileInfo(windowsPath);
                     var drive = Path.GetPathRoot(f.FullName);
                     
@@ -573,48 +593,51 @@ namespace deployaCore
                 }
                 catch
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: Cannot apply unattend.xml!");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    switch (ui)
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                     {
-                        case Entities.UI.Graphical:
-                            worker.ReportProgress(306, "");
-                            break;
-                        case Entities.UI.Command:
-                            Environment.Exit(1);
-                            break;
-                    }
+                        Action = Progress.InstallUnattend,
+                        IsError = true,
+                        IsIndeterminate = false,
+                        Message = "Failed to apply Unattend configuration with DISM."
+                    }));
+                    return;
                 }
             }
 
-            ConsoleUtility.WriteProgressBar(100, true);
-            Console.WriteLine();
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallUnattend,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
 
         /// <summary>
         /// Installs the specific driver to the Windows Installation (only Vista and higher).
         /// </summary>
-        /// <param name="ui">User Interface type</param>
         /// <param name="windowsDrive">Drive letter to the Windows disk</param>
         /// <param name="driverPath">List of driver paths</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void InstallDriver(Entities.UI ui, string windowsDrive, List<string> driverPath, BackgroundWorker worker = null)
+        public static void InstallDriver(string windowsDrive, List<string> driverPath, BackgroundWorker worker = null)
         {
-            Output.Write("Installing drivers ...  ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallDrivers,
+                IsError = false,
+                IsIndeterminate = true,
+                Message = "Installing drivers ..."
+            }));
 
             Apply.AddDriverToDisk(windowsDrive, driverPath, worker);
 
-            ConsoleUtility.WriteProgressBar(100, true);
-            Console.WriteLine();
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallDrivers,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
 
         /// <summary>
@@ -666,20 +689,29 @@ namespace deployaCore
         /// <summary>
         /// Installs the specified Windows image.
         /// </summary>
-        /// <param name="ui">User Interface type</param>
         /// <param name="name">Image Name</param>
         /// <param name="description">Description of the image</param>
         /// <param name="pathToCapture">Path of the captured dir</param>
         /// <param name="pathToImage">Path of the output file</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void CaptureToWim(Entities.UI ui, string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
+        public static void CaptureToWim(string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
         {
-            Output.Write("Capture Image ...            ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(0, ""); }
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.CaptureDisk,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Capturing disk ..."
+            }));
 
             Capture.CreateWim(name, description, pathToCapture, pathToImage, worker);
-            Console.WriteLine();
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.CaptureDisk,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
     }
 }

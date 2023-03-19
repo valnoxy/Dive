@@ -223,7 +223,6 @@ namespace deployaUI
 
             Entities.Firmware firmware = new Entities.Firmware();
             Entities.Bootloader bootloader = new Entities.Bootloader();
-            Entities.UI ui = new Entities.UI();
 
             // Firmware definition
             if (options.efi) { firmware = Entities.Firmware.EFI; }
@@ -232,10 +231,7 @@ namespace deployaUI
             // Bootloader definition
             if (options.ntldr) { bootloader = Entities.Bootloader.NTLDR; }
             if (!options.ntldr) { bootloader = Entities.Bootloader.BOOTMGR; }
-
-            // UI definition
-            ui = Entities.UI.Command;
-
+            
             // CLI verify
             string image = options.wimfile.ToString();
             string Index = options.index.ToString();
@@ -299,13 +295,13 @@ namespace deployaUI
 #endregion
 
             //Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
-            Actions.ApplyWim(ui, "W:\\", options.wimfile, options.index);
+            Actions.ApplyWim("W:\\", options.wimfile, options.index);
 
             if (bootloader == Entities.Bootloader.BOOTMGR)
-                Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "S:\\");
+                Actions.InstallBootloader(firmware, bootloader, "W:\\", "S:\\");
 
             if (bootloader == Entities.Bootloader.NTLDR)
-                Actions.InstallBootloader(firmware, bootloader, ui, "W:\\", "W:\\");
+                Actions.InstallBootloader(firmware, bootloader, "W:\\", "W:\\");
         }
 
         private static void RunA(CaptureOptions options)

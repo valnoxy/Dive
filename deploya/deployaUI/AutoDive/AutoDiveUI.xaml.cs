@@ -279,101 +279,79 @@ namespace deployaUI.AutoDive
         bool IsCanceled = false;
         private void applyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
-            //
-            // Value list
-            // --------------------------
-            // Progressbar handling
-            //   101: Progressbar is not Indeterminate
-            //   102: Progressbar is Indeterminate
-            //
-            // Standard Message handling
-            //   201: ProgText -> Prepare Disk
-            //   202: ProgText -> Apply WIM
-            //   203: ProgText -> Install Bootloader
-            //   204: ProgText -> Install recovery
-            //   205: ProgText -> Install unattend.xml
-            //   250: Installation complete
-            //
-            // Error message handling
-            //   301: Failed at preparing disk
-            //   302: Failed at applying WIM
-            //   303: Failed at installing bootloader
-            //   304: Failed at installing recovery
-            //   305: Failed at installing unattend.xml
-            //   306: Failed at copying oem logo
-            //
-            // Range 0-100 -> Progressbar percentage
-            //
+            var response = (ActionWorker)e.UserState!;
 
-            // Progress bar handling
-            switch (e.ProgressPercentage)
+            if (response == null!) return;
+
+            if (response.IsError)
             {
-                #region Progress bar settings
-                case 101:                           // 101: Progressbar is not Indeterminate
-                    ProgrBar.IsIndeterminate = false;
-                    break;
-                case 102:                           // 102: Progressbar is Indeterminate
-                    ProgrBar.IsIndeterminate = true;
-                    break;
-                #endregion
+                ProgrText.Text = response.Message;
+                ProgrBar.Value = e.ProgressPercentage;
 
-                #region Standard message handling
-                case 201:                           // 201: ProgText -> Prepare Disk
-                    ProgrText.Text = "Preparing disk ...";
-                    break;
-                case 202:                           // 202: ProgText -> Applying WIM
-                    ProgrText.Text = $"Applying Image to disk ({ProgrBar.Value}%) ...";
-                    break;
-                case 203:                           // 203: ProgText -> Installing Bootloader
-                    ProgrText.Text = "Installing bootloader to disk ...";
-                    break;
-                case 204:                           // 204: ProgText -> Installing recovery
-                    ProgrText.Text = "Registering recovery partition to Windows ...";
-                    break;
-                case 205:                           // 205: ProgText -> Installing unattend.xml
-                    ProgrText.Text = "Copying unattend.xml to disk ...";
-                    break;
-                case 250:                           // 250: Installation complete
-                    ProgrText.Text = "Installation completed. Restarting now ...";
-                    ProgrBar.Value = 100;
-                    if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
-                        System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
-                    else
-                        System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
-                    break;
-                #endregion
+                Debug.WriteLine(response.Message, ConsoleColor.Red);
 
-                #region Error message handling
-                case 301:                           // 301: Failed at preparing disk
-                    ProgrText.Text = "Failed at preparing disk. Please check your disk and try again.";
-                    IsCanceled = true;
-                    break;
-                case 302:                           // 302: Failed at applying WIM
-                    ProgrText.Text = "Failed at applying WIM. Please check your image and try again.";
-                    IsCanceled = true;
-                    break;
-                case 303:                           // 303: Failed at installing bootloader
-                    ProgrText.Text = "Failed at installing bootloader. Please check your image and try again.";
-                    IsCanceled = true;
-                    break;
-                case 304:                           // 304: Failed at installing recovery
-                    ProgrText.Text = "Failed at installing recovery. Please check your image and try again.";
-                    IsCanceled = true;
-                    break;
-                case 305:                           // 305: Failed at installing unattend.xml
-                    ProgrText.Text = "Failed at copying unattend.xml to disk. Please check your image or config and try again.";
-                    IsCanceled = true;
-                    break;
-                case 306:                           // 306: Failed at copying oem logo
-                    ProgrText.Text = "Failed at copying oem logo to disk. Please check your config and try again.";
-                    IsCanceled = true;
-                    break;
-                    #endregion
+                if (ApplyContent.ContentWindow != null)
+                {
+                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+                if (CloudContent.ContentWindow != null)
+                {
+                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                }
+
+                IsCanceled = true;
+                return;
             }
 
-            // Progressbar percentage
-            if (e.ProgressPercentage <= 100)
-                this.ProgrBar.Value = e.ProgressPercentage;
+            if (response.IsWarning)
+            {
+                Debug.WriteLine(response.Message, ConsoleColor.Yellow);
+                return;
+            }
+
+            if (response.IsDebug)
+            {
+                Debug.WriteLine(response.Message);
+                return;
+            }
+
+            switch (response.Action)
+            {
+                case Progress.PrepareDisk:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                            ProgrBar.Value = e.ProgressPercentage;
+                        Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                case Progress.ApplyImage:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                            ProgrBar.Value = e.ProgressPercentage;
+                        Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                case Progress.InstallBootloader:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                            ProgrBar.Value = e.ProgressPercentage;
+                        Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+            }
         }
 
         private void ApplyWim(object? sender, DoWorkEventArgs e)
@@ -381,7 +359,6 @@ namespace deployaUI.AutoDive
             #region Environment definition
 
             var worker = sender as BackgroundWorker;
-            var ui = Entities.UI.Graphical; // UI definition
             var firmware = Common.ApplyDetails.UseEFI switch // Firmware definition
             {
                 true => Entities.Firmware.EFI,
@@ -465,19 +442,26 @@ namespace deployaUI.AutoDive
                     throw new ArgumentOutOfRangeException();
             }
 
-            Output.WriteLine($"Windows drive: {windowsDrive}");
-            Output.WriteLine($"Boot drive: {bootDrive}");
-            Output.WriteLine($"Recovery drive: {recoveryDrive}");
-            Output.WriteLine($"Partition style: {partStyle}");
+            Common.Debug.Write("New Windows drive: ");
+            Common.Debug.Write($"{windowsDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Common.Debug.Write("New Boot drive: ");
+            Common.Debug.Write($"{bootDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Common.Debug.Write("New Recovery drive: ");
+            Common.Debug.Write($"{recoveryDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Common.Debug.Write("Using partition style: ");
+            Common.Debug.Write($"{partStyle}\n", true, ConsoleColor.DarkYellow);
 
             #endregion
 
             // Initialize worker progress
-            worker.ReportProgress(0, "");       // Value 0
+            worker?.ReportProgress(0, "");       // Value 0
 
             // Prepare disk
-            worker.ReportProgress(201, "");     // Prepare Disk Text
-            Actions.PrepareDisk(firmware, bootloader, ui, Common.ApplyDetails.DiskIndex, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
+            worker?.ReportProgress(201, "");     // Prepare Disk Text
+            Actions.PrepareDisk(firmware, bootloader, Common.ApplyDetails.DiskIndex, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -485,9 +469,9 @@ namespace deployaUI.AutoDive
             }
 
             // Apply image
-            worker.ReportProgress(202, "");     // Applying Image Text
-            worker.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWim(ui, windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            worker?.ReportProgress(202, "");     // Applying Image Text
+            worker?.ReportProgress(0, "");       // Value 0
+            Actions.ApplyWim(windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -495,15 +479,15 @@ namespace deployaUI.AutoDive
             }
 
             // Install Bootloader
-            worker.ReportProgress(203, "");     // Installing Bootloader Text
+            worker?.ReportProgress(203, "");     // Installing Bootloader Text
             switch (partStyle)
             {
                 case Entities.PartitionStyle.SeparateBoot:
                 case Entities.PartitionStyle.Full:
-                    Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, bootDrive, worker);
+                    Actions.InstallBootloader(firmware, bootloader, windowsDrive, bootDrive, worker);
                     break;
                 case Entities.PartitionStyle.Single:
-                    Actions.InstallBootloader(firmware, bootloader, ui, windowsDrive, windowsDrive, worker);
+                    Actions.InstallBootloader(firmware, bootloader, windowsDrive, windowsDrive, worker);
                     break;
             }
 
@@ -516,8 +500,8 @@ namespace deployaUI.AutoDive
             // Install Recovery (only for Vista and higher)
             if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
             {
-                worker.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery(ui, $"{windowsDrive}Windows", recoveryDrive, false, worker);
+                worker?.ReportProgress(204, "");     // Installing Bootloader Text
+                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
 
                 if (IsCanceled)
                 {
@@ -529,10 +513,10 @@ namespace deployaUI.AutoDive
             // Install unattend file (only for Vista and higher)
             if (Common.DeploymentInfo.UseUserInfo || Common.OemInfo.UseOemInfo)
             {
-                worker.ReportProgress(205, "");     // Installing unattend file
+                worker?.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
-                string config = "";
+                var config = "";
                 Common.UnattendMode? um = null;
 
                 if (!Common.DeploymentInfo.UseUserInfo && Common.OemInfo.UseOemInfo)
@@ -542,16 +526,16 @@ namespace deployaUI.AutoDive
                 else
                 {
                     // Administrator / User with OEM infos
-                    if (!String.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && !String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
+                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
                     }
 
                     // Administrator / User with OEM infos, but without password
-                    if (!String.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
+                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
@@ -559,7 +543,7 @@ namespace deployaUI.AutoDive
 
                     // Administrator / User without OEM infos
                     if (Common.DeploymentInfo.Username == "Administrator"
-                        && !String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo == false)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
@@ -567,7 +551,7 @@ namespace deployaUI.AutoDive
 
                     // Administrator without OEM infos and password
                     if (Common.DeploymentInfo.Username == "Administrator"
-                        && String.IsNullOrEmpty(Common.DeploymentInfo.Password)
+                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
                         && Common.OemInfo.UseOemInfo == false)
                     {
                         um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;
@@ -585,7 +569,7 @@ namespace deployaUI.AutoDive
 
                 Debug.WriteLine(config);
 
-                Actions.InstallUnattend(ui, $"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
+                Actions.InstallUnattend($"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
 
                 if (IsCanceled)
                 {
@@ -597,8 +581,28 @@ namespace deployaUI.AutoDive
             // Install Drivers (only for Vista and higher)
             if (Common.ApplyDetails.DriverList != null)
             {
-                worker.ReportProgress(206, "");     // Installing Drivers Text
-                Actions.InstallDriver(ui, $"{windowsDrive}Windows", Common.ApplyDetails.DriverList, worker);
+                worker?.ReportProgress(207, "");     // Installing Drivers Text
+
+                var _driverCount = Common.ApplyDetails.DriverList.Count;
+                Actions.InstallDriver(windowsDrive, Common.ApplyDetails.DriverList, worker);
+
+                if (IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+
+            // Install UefiSeven (only for Vista and 7 with EFI)
+            if (Common.WindowsModification.InstallUefiSeven)
+            {
+                worker?.ReportProgress(206, "");     // Installing UefiSeven
+                deployaCore.Action.UefiSeven.InstallUefiSeven(bootDrive,
+                    Common.WindowsModification.UsToggleSkipErros,
+                    Common.WindowsModification.UsToggleFakeVesa,
+                    Common.WindowsModification.UsToggleVerbose,
+                    Common.WindowsModification.UsToggleLog,
+                    worker);
 
                 if (IsCanceled)
                 {
@@ -608,7 +612,7 @@ namespace deployaUI.AutoDive
             }
 
             // Installation complete
-            worker.ReportProgress(250, "");     // Installation complete Text
+            worker?.ReportProgress(250, "");     // Installation complete Text
         }
 
     }

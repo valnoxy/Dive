@@ -14,12 +14,6 @@
             NTLDR,
         }
 
-        public enum UI
-        {
-            Graphical,
-            Command,
-        }
-
         public enum PartitionStyle
         {
             Single,

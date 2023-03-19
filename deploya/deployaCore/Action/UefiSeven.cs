@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using deployaCore.Assets;
 using deployaCore.Common;
+using Newtonsoft.Json;
 
 namespace deployaCore.Action
 {
@@ -11,18 +12,21 @@ namespace deployaCore.Action
         /// <summary>
         /// Install UefiSeven on the target system
         /// </summary>
-        /// <param name="ui">User Interface type</param>
         /// <param name="bootLetter">Drive letter of the recovery partition</param>
         /// <param name="logToFile">Log to UefiSeven.log file</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
         /// <param name="skipErrors">Skip warnings and prompts</param>
         /// <param name="fakeVesaForce">Overwrite Int10h handler with fakevesa even when the native handler is present</param>
         /// <param name="verboseBoot">Enable verbose mode</param>
-        public static void InstallUefiSeven(Entities.UI ui, string bootLetter, bool skipErrors, bool fakeVesaForce, bool verboseBoot, bool logToFile, BackgroundWorker worker = null)
+        public static void InstallUefiSeven(string bootLetter, bool skipErrors, bool fakeVesaForce, bool verboseBoot, bool logToFile, BackgroundWorker worker = null)
         {
-            Output.Write("Installing UefiSeven ...      ");
-            ConsoleUtility.WriteProgressBar(0);
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(102, ""); worker.ReportProgress(0, ""); }
+            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallUefiSeven,
+                IsError = false,
+                IsIndeterminate = true,
+                Message = "Installing UefiSeven ..."
+            }));
 
             // Find bootmgfw.efi and rename it to bootmgfw.original.efi
             try
@@ -50,67 +54,46 @@ namespace deployaCore.Action
                     }
                     catch
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("");
-                        Console.WriteLine("   An Error has occurred.");
-                        Console.WriteLine("   Error: Cannot extract UefiSeven to disk.");
-                        if (ui == Entities.UI.Command)
-                            Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                        Console.ResetColor();
-                        switch (ui)
+                        worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                         {
-                            case Entities.UI.Graphical:
-                                worker.ReportProgress(307, "");
-                                break;
-                            case Entities.UI.Command:
-                                Environment.Exit(1);
-                                break;
-                        }
+                            Action = Progress.InstallUefiSeven,
+                            IsError = true,
+                            IsIndeterminate = false,
+                            Message = "Failed to install UefiSeven."
+                        }));
+                        return;
                     }
                 }
                 else
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("");
-                    Console.WriteLine("   An Error has occurred.");
-                    Console.WriteLine("   Error: The file 'bootmgfw.efi' is missing.");
-                    if (ui == Entities.UI.Command)
-                        Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                    Console.ResetColor();
-                    switch (ui)
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                     {
-                        case Entities.UI.Graphical:
-                            worker.ReportProgress(307, "");
-                            break;
-                        case Entities.UI.Command:
-                            Environment.Exit(1);
-                            break;
-                    }
+                        Action = Progress.InstallUefiSeven,
+                        IsError = true,
+                        IsIndeterminate = false,
+                        Message = "File 'bootmgfw.efi' is missing."
+                    }));
+                    return;
                 }
             }
             catch
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("");
-                Console.WriteLine("   An Error has occurred.");
-                Console.WriteLine("   Error: Cannot create a copy of the efi bootloader.");
-                if (ui == Entities.UI.Command)
-                    Console.WriteLine(); // Only write new line if ui mode is disabled, so that the ui can read the error code above.
-                Console.ResetColor();
-                switch (ui)
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                 {
-                    case Entities.UI.Graphical:
-                        worker.ReportProgress(307, "");
-                        break;
-                    case Entities.UI.Command:
-                        Environment.Exit(1);
-                        break;
-                }
+                    Action = Progress.InstallUefiSeven,
+                    IsError = true,
+                    IsIndeterminate = false,
+                    Message = "Cannot create a copy of the EFI bootloader."
+                }));
             }
 
-            ConsoleUtility.WriteProgressBar(100, true);
-            Console.WriteLine();
-            if (ui == Entities.UI.Graphical) { worker.ReportProgress(101, ""); worker.ReportProgress(100, ""); }
+            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            {
+                Action = Progress.InstallUefiSeven,
+                IsError = false,
+                IsIndeterminate = false,
+                Message = "Done."
+            }));
         }
     }
 }
