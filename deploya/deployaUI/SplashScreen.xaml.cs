@@ -12,6 +12,9 @@ namespace deployaUI
         public SplashScreen()
         {
             InitializeComponent();
+
+            LanguageDropDown.Items.Add("English");
+            LanguageDropDown.Items.Add("Deutsch");
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

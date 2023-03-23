@@ -26,10 +26,9 @@
             <Grid Grid.Column="0" Margin="15,0,15,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon FontSize="19" Symbol="FastForward24" />
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" />
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -39,8 +38,8 @@
                         FontSize="16"
                         FontWeight="Medium"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="Fast Deployment" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Deploy Windows in minutes" />
+                        Text="{DynamicResource FastDeployment}" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource FastDeploymentDescription}" />
                 </StackPanel>
             </Grid>
             
@@ -49,7 +48,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon FontSize="19" Symbol="DesignIdeas24" />
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" />
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -59,8 +58,8 @@
                         FontSize="16"
                         FontWeight="Medium"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="Compatibility" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Legacy &amp; Modern System" />
+                        Text="{DynamicResource Compatibility}" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource CompatibilityDescription}" />
                 </StackPanel>
             </Grid>
 
@@ -69,7 +68,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon FontSize="19" Symbol="Heart24" />
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24" />
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -79,8 +78,8 @@
                         FontSize="16"
                         FontWeight="Medium"
                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="Open Source" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="Find me on GitHub!" />
+                        Text="{DynamicResource OpenSource}" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource OpenSourceDescription}" />
                 </StackPanel>
             </Grid>
         </Grid>
@@ -95,11 +94,11 @@
                         <TextBlock
                             Margin="0,0,0,4"
                             FontWeight="Medium"
-                            Text="Apply Image" />
+                            Text="{DynamicResource ApplyImage}" />
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                            Text="Install your Windows image on this device." />
+                            Text="{DynamicResource ApplyImageDescription}" />
                     </StackPanel>
                 </wpfui:CardAction>
                 <wpfui:CardAction
@@ -110,11 +109,11 @@
                         <TextBlock
                             Margin="0,0,0,4"
                             FontWeight="Medium"
-                            Text="Capture Windows" />
+                            Text="{DynamicResource CaptureWindows}" />
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                            Text="Create a image of your Windows instance." />
+                            Text="{DynamicResource CaptureWindowsDescription}" />
                     </StackPanel>
                 </wpfui:CardAction>
                 <wpfui:CardAction
@@ -125,11 +124,11 @@
                         <TextBlock
                             Margin="0,0,0,4"
                             FontWeight="Medium"
-                            Text="Cloud Installation" />
+                            Text="{DynamicResource CloudInstallation}" />
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                            Text="Install Windows directly from the Internet." />
+                            Text="{DynamicResource CloudInstallationDescription}" />
                     </StackPanel>
                 </wpfui:CardAction>
                 <wpfui:CardAction
@@ -140,11 +139,11 @@
                         <TextBlock
                             Margin="0,0,0,4"
                             FontWeight="Medium"
-                            Text="Repair &amp; Tweaks"/>
+                            Text="{DynamicResource RepairAndTweaks}"/>
                         <TextBlock
                             FontSize="11"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                            Text="Repair or tweak your existing Windows installation." />
+                            Text="{DynamicResource RepairAndTweaksDescription}" />
                     </StackPanel>
                 </wpfui:CardAction>
 
@@ -156,14 +155,14 @@
                     
                     <Grid Grid.Column="0">
                         <wpfui:Anchor
-                            Content="Source code on GitHub"
+                            Content="{DynamicResource SourceCodeBtn}"
                             Margin="0,0,8,0"
                             Icon="Link48"
                             NavigateUri="https://github.com/valnoxy/dive" />
                     </Grid>
                     <Grid Grid.Column="1">
                         <wpfui:Anchor
-                            Content="Project on Exploitox"
+                            Content="{DynamicResource ProjectBtn}"
                             Icon="Link48"
                             NavigateUri="https://exploitox.de/dive" />
                     </Grid>

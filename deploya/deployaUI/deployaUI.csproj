@@ -39,6 +39,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Page Remove="Localization\ResourceDictionary.de-DE.xaml" />
+	  <Page Remove="Localization\ResourceDictionary.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Resource Include="Assets\icon-hdd-40.png" />
 	</ItemGroup>
 
@@ -55,6 +60,8 @@
 		<Resource Include="Assets\icon-windows-xp-40.png" />
 		<Resource Include="Assets\pexels-johannes-plenio-1103970.jpg" />
 		<Resource Include="dive.ico" />
+		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
+		<Resource Include="Localization\ResourceDictionary.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>

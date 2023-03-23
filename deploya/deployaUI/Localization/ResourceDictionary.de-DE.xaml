@@ -1,0 +1,23 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <!-- Dashboard -->
+    <system:String x:Key="FastDeployment">Schnelle Bereitstellung</system:String>
+    <system:String x:Key="FastDeploymentDescription">Installiere Windows in wenigen Minuten</system:String>
+    <system:String x:Key="Compatibility">Kompatibilität</system:String>
+    <system:String x:Key="CompatibilityDescription">Legacy &amp; Moderne Systeme</system:String>
+    <system:String x:Key="OpenSource">Open Source</system:String>
+    <system:String x:Key="OpenSourceDescription">Finde mich auf GitHub!</system:String>
+
+    <system:String x:Key="ApplyImage">Abbild installieren</system:String>
+    <system:String x:Key="ApplyImageDescription">Installiere Windows auf diesem Gerät.</system:String>
+    <system:String x:Key="CaptureWindows">Abbild erfassen</system:String>
+    <system:String x:Key="CaptureWindowsDescription">Erstelle ein Abbild von deiner aktuellen Windows Instanz.</system:String>
+    <system:String x:Key="CloudInstallation">Cloud Installation</system:String>
+    <system:String x:Key="CloudInstallationDescription">Installiere Windows direkt aus dem Internet.</system:String>
+    <system:String x:Key="RepairAndTweaks">Reparieren &amp; Modifizieren</system:String>
+    <system:String x:Key="RepairAndTweaksDescription">Repariere oder modifiziere deine aktuelle Windows Installation.</system:String>
+
+    <system:String x:Key="SourceCodeBtn">Quellcode auf GitHub</system:String>
+    <system:String x:Key="ProjectBtn">Projekt auf Exploitox</system:String>
+</ResourceDictionary>

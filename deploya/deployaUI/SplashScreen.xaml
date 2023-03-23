@@ -24,7 +24,6 @@
 
             <StackPanel Grid.Row="0">
                 <Border
-                    Grid.Row="0"
                     Height="200"
                     CornerRadius="8">
                     <Border.Background>
@@ -50,11 +49,11 @@
                                     FontSize="18"
                                     Foreground="#B7FFFFFF"
                                     Text="Version 1.0.0.374" />
-                                        <TextBlock
-                                            FontSize="28"
-                                            FontWeight="Bold"
-                                            Foreground="#FFFFFF"
-                                            Text="Dive - Deployment is very easy." />
+                                <TextBlock
+                                    FontSize="28"
+                                    FontWeight="Bold"
+                                    Foreground="#FFFFFF"
+                                    Text="Dive - Deployment is very easy." />
                             </StackPanel>
                             <TextBlock
                                 Margin="12"
@@ -88,7 +87,7 @@
                                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                             Text="Please select your language." />
                                     </StackPanel>
-                                    <ui:DropDownButton Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Content="Test" x:Name="ToggleSkipErrors" />
+                                    <ComboBox Grid.Column="1" Margin="0,0,16,0" Width="200" x:Name="LanguageDropDown" />
                                 </Grid>
                             </ui:CardControl.Header>
                         </ui:CardControl>
