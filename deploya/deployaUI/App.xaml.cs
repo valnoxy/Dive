@@ -23,6 +23,7 @@ using System.IO;
 using deployaCore;
 using deployaCore.Common;
 using deployaUI.AutoDive;
+using System.Windows.Threading;
 
 namespace deployaUI
 {
@@ -98,6 +99,12 @@ namespace deployaUI
         static void ShowGUI()
         {
             var wnd = new MainWindow();
+            var splash = new SplashScreen();
+            splash.Show();
+            while (splash.IsVisible)
+            {
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() => { }));
+            }
             wnd.ShowDialog();
             Environment.Exit(0);
         }

@@ -34,6 +34,7 @@
 		<None Remove="Assets\icon-windows-server-2012-40.png" />
 		<None Remove="Assets\icon-windows-vista-40.png" />
 		<None Remove="Assets\icon-windows-xp-40.png" />
+		<None Remove="Assets\pexels-johannes-plenio-1103970.jpg" />
 		<None Remove="Dive.ico" />
 	</ItemGroup>
 
@@ -52,6 +53,7 @@
 		<Resource Include="Assets\icon-windows-server-2012-40.png" />
 		<Resource Include="Assets\icon-windows-vista-40.png" />
 		<Resource Include="Assets\icon-windows-xp-40.png" />
+		<Resource Include="Assets\pexels-johannes-plenio-1103970.jpg" />
 		<Resource Include="dive.ico" />
 	</ItemGroup>
 
