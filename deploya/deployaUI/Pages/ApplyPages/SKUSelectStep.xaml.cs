@@ -19,6 +19,7 @@ namespace deployaUI.Pages.ApplyPages
             public string Name { get; set; }
             public string ImageFile { get; set; }
             public string Index { get; set;}
+            public string Arch { get; set; }
         }
 
         private List<Image> images;
@@ -57,10 +58,24 @@ namespace deployaUI.Pages.ApplyPages
                         foreach (XmlNode node in imageNames)
                         {
                             var productId = node.Attributes?["INDEX"]?.Value;
-                            var productName = node.SelectSingleNode("NAME").InnerText;
+                            var productName = node.SelectSingleNode("NAME")?.InnerText;
+                            var productArch = node.SelectSingleNode("WINDOWS/ARCH")?.InnerText;
+
+                            switch (productArch)
+                            {
+                                case "0":
+                                    productArch = "x86";
+                                    break;
+                                case "9":
+                                    productArch = "x64";
+                                    break;
+                                default:
+                                    productArch = "none";
+                                    break;
+                            }
 
                             Common.Debug.Write("Found ");
-                            Common.Debug.Write(productName, true, ConsoleColor.DarkYellow);
+                            Common.Debug.Write(productName + " (" + productArch + ") ", true, ConsoleColor.DarkYellow);
                             Common.Debug.Write(" with Index ", true);
                             Common.Debug.Write(productId, true, ConsoleColor.DarkYellow);
                             Common.Debug.Write(" in Image ", true);
@@ -121,7 +136,7 @@ namespace deployaUI.Pages.ApplyPages
                             images.Add(new Image
                             {
                                 Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png",
-                                ImageFile = binary, Name = productName, Index = productId
+                                ImageFile = binary, Name = productName, Index = productId, Arch = productArch
                             });
                             counter++;
                         }
