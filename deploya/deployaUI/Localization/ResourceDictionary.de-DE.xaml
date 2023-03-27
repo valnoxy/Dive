@@ -20,4 +20,23 @@
 
     <system:String x:Key="SourceCodeBtn">Quellcode auf GitHub</system:String>
     <system:String x:Key="ProjectBtn">Projekt auf Exploitox</system:String>
+
+    <!-- Menu -->
+    <system:String x:Key="Home">Start</system:String>
+    <system:String x:Key="Apply">Installieren</system:String>
+    <system:String x:Key="Capture">Erfassen</system:String>
+    <system:String x:Key="Cloud">Cloud</system:String>
+    <system:String x:Key="Tweaks">Tweaks</system:String>
+    <system:String x:Key="Console">Konsole</system:String>
+    <system:String x:Key="About">Über</system:String>
+
+    <system:String x:Key="Cancel">Abbrechen</system:String>
+    <system:String x:Key="Back">Zurück</system:String>
+    <system:String x:Key="Next">Weiter</system:String>
+
+    <!-- Apply Page (SKU) -->
+    <system:String x:Key="ApplySKUTitle">Wählen Sie das zu installierende Betriebssystem</system:String>
+    <system:String x:Key="ApplySKUTitleDescription">Bitte wählen Sie eine der verfügbaren Optionen aus, um fortzufahren.</system:String>
+    <system:String x:Key="ReloadBtn">Neu laden</system:String>
+    <system:String x:Key="ImagesCounter">Abbilder geladen: {0}</system:String>
 </ResourceDictionary>

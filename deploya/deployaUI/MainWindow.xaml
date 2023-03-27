@@ -35,39 +35,39 @@
                 Loaded="RootNavigation_OnLoaded">
                 <ui:NavigationStore.Items>
                     <ui:NavigationItem
-                        Content="Home"
+                        Content="{DynamicResource Home}"
                         Icon="Home24"
                         PageTag="dashboard"
                         PageType="{x:Type pages:Dashboard}"/>
                     <ui:NavigationItem
-                        Content="Apply"
+                        Content="{DynamicResource Apply}"
                         Icon="WindowApps24"
                         PageTag="apply"
                         PageType="{x:Type pages:ApplyContent}"/>
                     <ui:NavigationItem
-                        Content="Capture"
+                        Content="{DynamicResource Capture}"
                         Icon="Copy24"
                         PageTag="capture"
                         PageType="{x:Type pages:CaptureContent}"/>
                     <ui:NavigationItem
-                        Content="Cloud"
+                        Content="{DynamicResource Cloud}"
                         Icon="Cloud24"
                         PageType="{x:Type pages:CloudContent}"
                         PageTag="cloud"/>
                     <ui:NavigationItem
-                        Content="Tweaks"
+                        Content="{DynamicResource Tweaks}"
                         Icon="Toolbox28"
                         PageType="{x:Type pages:TweaksContent}"
                         PageTag="repair"/>
                 </ui:NavigationStore.Items>
                 <ui:NavigationStore.Footer>
                     <ui:NavigationItem
-                        Content="Console"
+                        Content="{DynamicResource Console}"
                         Icon="Window24"
                         PageTag="cmd"
                         Click="CommandLine_Click"/>
                     <ui:NavigationItem
-                        Content="About"
+                        Content="{DynamicResource About}"
                         Icon="QuestionCircle24"
                         PageType="{x:Type pages:AboutPage}"
                         PageTag="help"/>

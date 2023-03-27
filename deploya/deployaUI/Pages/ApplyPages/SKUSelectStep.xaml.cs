@@ -153,8 +153,12 @@ namespace deployaUI.Pages.ApplyPages
                     }
                 }
             }
-            
-            ImageCounter.Text = $"Images loaded: {counter}";
+
+            var localizedImageCounter = (string)Application.Current.MainWindow!.FindResource("ImagesCounter");
+            if (string.IsNullOrEmpty(localizedImageCounter))
+                localizedImageCounter = "Images loaded: {0}";
+
+            ImageCounter.Text = string.Format(localizedImageCounter, counter);
             this.DataContext = this;
             SKUListView.ItemsSource = images;
         }

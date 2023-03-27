@@ -23,15 +23,15 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Select the operating system you want to install
-                </TextBlock>
-
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
-                    Please select from one of the available options to continue.
-                </TextBlock>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource ApplySKUTitle}"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource ApplySKUTitleDescription}"/>
             </StackPanel>
-            <wpfui:Button Grid.Column="1" Click="ReloadBtn_Clicked" HorizontalAlignment="Right" Content="Reload" Icon="ArrowReset24" Margin="0,0,0,0"/>
+            <wpfui:Button Grid.Column="1"
+                          Click="ReloadBtn_Clicked" 
+                          HorizontalAlignment="Right"
+                          Content="{DynamicResource ReloadBtn}"
+                          Icon="ArrowReset24" 
+                          Margin="0,0,0,0"/>
         </Grid>
 
         <ListBox Grid.Row="1" Name="SKUListView" VerticalAlignment="Center" SelectionChanged="SKUListView_Selected" Height="335"
