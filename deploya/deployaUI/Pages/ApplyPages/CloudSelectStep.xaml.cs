@@ -6,6 +6,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
+using System.Xml.Linq;
+using Debug = deployaUI.Common.Debug;
 
 namespace deployaUI.Pages.ApplyPages
 {
@@ -20,6 +22,7 @@ namespace deployaUI.Pages.ApplyPages
             public string Name { get; set; }
             public string ImageFile { get; set; }
             public string Index { get; set;}
+            public string Arch { get; set; }
         }
 
         private List<Image> images;
@@ -28,13 +31,6 @@ namespace deployaUI.Pages.ApplyPages
         public CloudSelectStep()
         {
             InitializeComponent();
-            LoadImages();
-        }
-
-        private void LoadImages()
-        {
-            images = new List<Image>();
-            int counter = 0;
 
             // Initialize network on Windows PE
             if (File.Exists("X:\\Windows\\System32\\wpeinit.exe"))
@@ -42,104 +38,145 @@ namespace deployaUI.Pages.ApplyPages
                 Process.Start("X:\\Windows\\System32\\wpeinit.exe");
             }
 
+            LoadImages();
+        }
+
+        private void LoadImages()
+        {
+            images = new List<Image>();
+            var counter = 0;
+
             // Assign network volume
-            Process nv = new Process();
+            var nv = new Process();
             nv.StartInfo.FileName = "cmd.exe";
-            nv.StartInfo.Arguments = "/c \"net use P: \\\\dive.exploitox.de\\dive /user:a a\"";
+            nv.StartInfo.Arguments = "/c \"net use P: \\\\dive.exploitox.de\\dive /user:diveuser D!veUs3r$\"";
             nv.StartInfo.CreateNoWindow = true;
             nv.StartInfo.UseShellExecute = false;
             nv.Start();
             nv.WaitForExit();
+
+            if (nv.ExitCode != 0)
+            {
+                MessageBox.Show("Could not connect to network drive. Please check your network connection and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
             
             // Find WIM USB device 
-            DriveInfo[] allDrives = DriveInfo.GetDrives();
-            foreach (DriveInfo d in allDrives)
+            var allDrives = DriveInfo.GetDrives();
+            foreach (var d in allDrives)
             {
-                if (File.Exists(Path.Combine(d.Name, ".divecloud")) && Directory.Exists(Path.Combine(d.Name, "WIMs")))
+                if (!File.Exists(Path.Combine(d.Name, ".divecloud")) ||
+                    !Directory.Exists(Path.Combine(d.Name, "WIMs"))) continue;
+                var dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim");
+
+                foreach (var binary in dirs)
                 {
-                    string[] dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim");
-
-                    foreach (string binary in dirs)
+                    try
                     {
-                        try
+                        var action = Actions.GetInfo(binary);
+                        var doc = new XmlDocument();
+                        doc.LoadXml(action);
+
+                        var imageNames = doc.DocumentElement!.SelectNodes("/WIM/IMAGE");
+
+                        if (imageNames == null) continue;
+                        foreach (XmlNode node in imageNames)
                         {
-                            string action = Actions.GetInfo(binary);
+                            var productId = node.Attributes?["INDEX"]?.Value;
+                            var productName = node.SelectSingleNode("NAME")?.InnerText;
+                            var productArch = node.SelectSingleNode("WINDOWS/ARCH")?.InnerText;
+                            var productBuild = node.SelectSingleNode("WINDOWS/VERSION/BUILD")?.InnerText;
+                            var productMajor = node.SelectSingleNode("WINDOWS/VERSION/MAJOR")?.InnerText;
+                            var productMinor = node.SelectSingleNode("WINDOWS/VERSION/MINOR")?.InnerText;
+                            var productType = node.SelectSingleNode("WINDOWS/PRODUCTTYPE")?.InnerText;
 
-                            XmlDocument doc = new XmlDocument();
-                            doc.LoadXml(action);
-
-                            XmlNodeList imageNames = doc.DocumentElement.SelectNodes("/WIM/IMAGE");
-
-                            string product_id = "", product_name = "", product_size = "";
-
-                            foreach (XmlNode node in imageNames)
+                            productArch = productArch switch
                             {
-                                product_id = node.Attributes?["INDEX"]?.Value;
-                                product_name = node.SelectSingleNode("NAME").InnerText;
-                                product_size = node.SelectSingleNode("TOTALBYTES").InnerText;
-                                string sizeInGB = convertSize(Convert.ToDouble(product_size));
+                                "0" => "x86",
+                                "5" => "arm",
+                                "6" => "ia64",
+                                "9" => "x64",
+                                "12" => "arm64",
+                                _ => $"Unknown architecture ({productArch})"
+                            };
 
-                                Common.Debug.WriteLine("--- Image ---", ConsoleColor.White);
-                                Common.Debug.WriteLine($"ID : {product_id}", ConsoleColor.White);
-                                Common.Debug.WriteLine($"Name : {product_name}", ConsoleColor.White);
-                                Common.Debug.WriteLine($"Size : {sizeInGB}", ConsoleColor.White);
-                                Common.Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
+                            if (!string.IsNullOrEmpty(productBuild))
+                                productArch = $"Build {productBuild} - {productArch}";
 
-                                string imageVersion = "";
+                            Common.Debug.Write("Found ");
+                            Common.Debug.Write(productName + " (" + productArch + ")", true, ConsoleColor.DarkYellow);
+                            Common.Debug.Write(" with Index ", true);
+                            Common.Debug.Write(productId, true, ConsoleColor.DarkYellow);
+                            Common.Debug.Write(" in Image ", true);
+                            Common.Debug.Write(binary + "\n", true, ConsoleColor.DarkYellow);
 
-                                // Windows Client
-                                if (product_name.ToLower().Contains("windows 2000"))
-                                    imageVersion = "windows-2000";
-                                if (product_name.ToLower().Contains("windows xp"))
-                                    imageVersion = "windows-xp";
-                                if (product_name.ToLower().Contains("windows vista"))
-                                    imageVersion = "windows-vista";
-                                if (product_name.ToLower().Contains("windows 7"))
-                                    imageVersion = "windows-7";
-                                if (product_name.ToLower().Contains("windows 8") || product_name.ToLower().Contains("windows 8.1"))
-                                    imageVersion = "windows-10";
-                                if (product_name.ToLower().Contains("windows 10"))
-                                    imageVersion = "windows-10";
-                                if (product_name.ToLower().Contains("windows 11"))
-                                    imageVersion = "windows-11";
+                            // Determine Windows Version
+                            var imageVersion = "windows";
+                            var osVersion = $"{productMajor}.{productMinor}";
+                            if (productBuild != null)
+                            {
+                                var osBuild = int.Parse(productBuild);
 
-                                // Windows Server
-                                if (product_name.ToLower().Contains("windows server 2003"))
-                                    imageVersion = "windows-xp";
-                                if (product_name.ToLower().Contains("windows server 2008"))
-                                    imageVersion = "windows-7";
-                                if (product_name.ToLower().Contains("windows server 2012"))
-                                    imageVersion = "windows-server-2012";
-                                if (product_name.ToLower().Contains("windows server 2016"))
-                                    imageVersion = "windows-server-2012";
-                                if (product_name.ToLower().Contains("windows server 2019"))
-                                    imageVersion = "windows-server-2012";
-                                if (product_name.ToLower().Contains("windows server 2022"))
-                                    imageVersion = "windows-server-2012";
+                                imageVersion = osVersion switch
+                                {
+                                    "5.0" => "windows-2000",
+                                    "5.1" => "windows-xp",
+                                    "5.2" => "windows-xp", // Windows Server 2003
+                                    "6.0" => "windows-vista",
+                                    "6.1" => "windows-7",
+                                    "6.2" => "windows-8",
+                                    "6.3" => "windows-8", // Windows 8.1
+                                    _ => "windows"
+                                };
 
-                                // Exploitox Internal
-                                if (product_name.ToLower().Contains("ai operating system") || product_name.ToLower().Contains("aios"))
-                                    imageVersion = "aios";
+                                switch (osVersion)
+                                {
+                                    case "10.0" when productType == "WinNT":
+                                        imageVersion = osBuild >= 22000 ? "windows-11" : "windows-10";
+                                        break;
 
-                                // Microsoft Internal / Other OS
-                                if (product_name.ToLower().Contains("windows core os") || product_name.ToLower().Contains("wcos"))
-                                    imageVersion = "windows-10";
-                                if (product_name.ToLower().Contains("phone"))
-                                    imageVersion = "windows-10";
+                                    // Windows Home Server
+                                    case "5.2" when osBuild == 4500:
+                                        imageVersion = "windows-vista";
+                                        break;
 
-                                // Beta
-                                if (product_name.ToLower().Contains("whistler"))
-                                    imageVersion = "windows-xp";
-                                if (product_name.ToLower().Contains("longhorn"))
-                                    imageVersion = "windows-vista";
-                                if (product_name.ToLower().Contains("blue"))
-                                    imageVersion = "windows-10";
+                                    // Windows Home Server 2011
+                                    case "6.1" when osBuild == 8400:
+                                        imageVersion = "windows-7";
+                                        break;
 
-                                images.Add(new Image { Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png", ImageFile = binary, Name = product_name, Index = product_id });
-                                counter++;
+                                    // Windows Server 2012 (R2)
+                                    case "6.2" when productType == "ServerNT":
+                                    case "6.3" when productType == "ServerNT":
+                                        imageVersion = "windows-server-2012";
+                                        break;
+
+                                    // Windows Server 2016 - 2022
+                                    case "10.0" when productType == "ServerNT":
+                                        imageVersion = "windows-server-2012";
+                                        break;
+                                }
                             }
+
+                            // Exploitox Internal
+                            if (productName.ToLower().Contains("ai operating system") ||
+                                productName.ToLower().Contains("aios"))
+                                imageVersion = "aios";
+
+                            images.Add(new Image
+                            {
+                                Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png",
+                                ImageFile = binary,
+                                Name = productName,
+                                Index = productId,
+                                Arch = productArch
+                            });
+                            counter++;
                         }
-                        catch (Exception ex) { Console.WriteLine(ex.Message); }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message, ConsoleColor.Red);
                     }
                 }
             }
@@ -153,23 +190,10 @@ namespace deployaUI.Pages.ApplyPages
 
             ImageCounter.Text = $"Images loaded: {counter}";
             this.DataContext = this;
+            SKUListView.ItemsSource = images;
         }
 
-        private String convertSize(double size)
-        {
-            String[] units = new String[] { "B", "KB", "MB", "GB", "TB", "PB" };
-
-            double mod = 1024.0;
-
-            int i = 0;
-
-            while (size >= mod)
-            {
-                size /= mod;
-                i++;
-            }
-            return Math.Round(size, 2) + units[i];//with 2 decimals
-        }
+        private void ReloadBtn_Clicked(object sender, RoutedEventArgs e) => LoadImages();
 
         private void SKUListView_Selected(object sender, RoutedEventArgs e)
         {

@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
+using deployaUI.Common;
 
 namespace deployaUI.Pages.ApplyPages
 {
@@ -52,7 +53,7 @@ namespace deployaUI.Pages.ApplyPages
                         var doc = new XmlDocument();
                         doc.LoadXml(action);
 
-                        var imageNames = doc.DocumentElement.SelectNodes("/WIM/IMAGE");
+                        var imageNames = doc.DocumentElement!.SelectNodes("/WIM/IMAGE");
 
                         if (imageNames == null) continue;
                         foreach (XmlNode node in imageNames)
@@ -60,78 +61,83 @@ namespace deployaUI.Pages.ApplyPages
                             var productId = node.Attributes?["INDEX"]?.Value;
                             var productName = node.SelectSingleNode("NAME")?.InnerText;
                             var productArch = node.SelectSingleNode("WINDOWS/ARCH")?.InnerText;
+                            var productBuild = node.SelectSingleNode("WINDOWS/VERSION/BUILD")?.InnerText;
+                            var productMajor = node.SelectSingleNode("WINDOWS/VERSION/MAJOR")?.InnerText;
+                            var productMinor = node.SelectSingleNode("WINDOWS/VERSION/MINOR")?.InnerText;
+                            var productType = node.SelectSingleNode("WINDOWS/PRODUCTTYPE")?.InnerText;
 
-                            switch (productArch)
+                            productArch = productArch switch
                             {
-                                case "0":
-                                    productArch = "x86";
-                                    break;
-                                case "9":
-                                    productArch = "x64";
-                                    break;
-                                default:
-                                    productArch = "none";
-                                    break;
-                            }
+                                "0" => "x86",
+                                "5" => "arm",
+                                "6" => "ia64",
+                                "9" => "x64",
+                                "12" => "arm64",
+                                _ => $"Unknown architecture ({productArch})"
+                            };
+
+                            if (!string.IsNullOrEmpty(productBuild))
+                                productArch = $"Build {productBuild} - {productArch}";
 
                             Common.Debug.Write("Found ");
-                            Common.Debug.Write(productName + " (" + productArch + ") ", true, ConsoleColor.DarkYellow);
+                            Common.Debug.Write(productName + " (" + productArch + ")", true, ConsoleColor.DarkYellow);
                             Common.Debug.Write(" with Index ", true);
                             Common.Debug.Write(productId, true, ConsoleColor.DarkYellow);
                             Common.Debug.Write(" in Image ", true);
                             Common.Debug.Write(binary + "\n", true, ConsoleColor.DarkYellow);
 
-                            // Windows Client
+                            // Determine Windows Version
                             var imageVersion = "windows";
-                            if (productName.ToLower().Contains("windows 2000"))
-                                imageVersion = "windows-2000";
-                            if (productName.ToLower().Contains("windows xp"))
-                                imageVersion = "windows-xp";
-                            if (productName.ToLower().Contains("windows vista"))
-                                imageVersion = "windows-vista";
-                            if (productName.ToLower().Contains("windows 7"))
-                                imageVersion = "windows-7";
-                            if (productName.ToLower().Contains("windows 8") ||
-                                productName.ToLower().Contains("windows 8.1"))
-                                imageVersion = "windows-8";
-                            if (productName.ToLower().Contains("windows 10"))
-                                imageVersion = "windows-10";
-                            if (productName.ToLower().Contains("windows 11"))
-                                imageVersion = "windows-11";
+                            var osVersion = $"{productMajor}.{productMinor}";
+                            if (productBuild != null)
+                            {
+                                var osBuild = int.Parse(productBuild);
 
-                            // Windows Server
-                            if (productName.ToLower().Contains("windows server 2003"))
-                                imageVersion = "windows-xp";
-                            if (productName.ToLower().Contains("windows server 2008"))
-                                imageVersion = "windows-7";
-                            if (productName.ToLower().Contains("windows server 2012"))
-                                imageVersion = "windows-server-2012";
-                            if (productName.ToLower().Contains("windows server 2016"))
-                                imageVersion = "windows-server-2012";
-                            if (productName.ToLower().Contains("windows server 2019"))
-                                imageVersion = "windows-server-2012";
-                            if (productName.ToLower().Contains("windows server 2022"))
-                                imageVersion = "windows-server-2012";
+                                imageVersion = osVersion switch
+                                {
+                                    "5.0" => "windows-2000",
+                                    "5.1" => "windows-xp",
+                                    "5.2" => "windows-xp", // Windows Server 2003
+                                    "6.0" => "windows-vista",
+                                    "6.1" => "windows-7",
+                                    "6.2" => "windows-8",
+                                    "6.3" => "windows-8", // Windows 8.1
+                                    _ => "windows"
+                                };
+
+                                switch (osVersion)
+                                {
+                                    case "10.0" when productType == "WinNT":
+                                        imageVersion = osBuild >= 22000 ? "windows-11" : "windows-10";
+                                        break;
+
+                                    // Windows Home Server
+                                    case "5.2" when osBuild == 4500:
+                                        imageVersion = "windows-vista";
+                                        break;
+
+                                    // Windows Home Server 2011
+                                    case "6.1" when osBuild == 8400:
+                                        imageVersion = "windows-7";
+                                        break;
+
+                                    // Windows Server 2012 (R2)
+                                    case "6.2" when productType == "ServerNT":
+                                    case "6.3" when productType == "ServerNT":
+                                        imageVersion = "windows-server-2012";
+                                        break;
+
+                                    // Windows Server 2016 - 2022
+                                    case "10.0" when productType == "ServerNT":
+                                        imageVersion = "windows-server-2012";
+                                        break;
+                                }
+                            }
 
                             // Exploitox Internal
                             if (productName.ToLower().Contains("ai operating system") ||
                                 productName.ToLower().Contains("aios"))
                                 imageVersion = "aios";
-
-                            // Microsoft Internal / Other OS
-                            if (productName.ToLower().Contains("windows core os") ||
-                                productName.ToLower().Contains("wcos"))
-                                imageVersion = "windows-10";
-                            if (productName.ToLower().Contains("phone"))
-                                imageVersion = "windows-10";
-
-                            // Beta
-                            if (productName.ToLower().Contains("whistler"))
-                                imageVersion = "windows-xp";
-                            if (productName.ToLower().Contains("longhorn"))
-                                imageVersion = "windows-vista";
-                            if (productName.ToLower().Contains("blue"))
-                                imageVersion = "windows-10";
 
                             images.Add(new Image
                             {
@@ -141,12 +147,16 @@ namespace deployaUI.Pages.ApplyPages
                             counter++;
                         }
                     }
-                    catch (Exception ex) { Console.WriteLine(ex.Message); }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message, ConsoleColor.Red);
+                    }
                 }
             }
             
             ImageCounter.Text = $"Images loaded: {counter}";
             this.DataContext = this;
+            SKUListView.ItemsSource = images;
         }
 
         private void SKUListView_Selected(object sender, RoutedEventArgs e)
@@ -167,5 +177,7 @@ namespace deployaUI.Pages.ApplyPages
 
             ApplyContent.ContentWindow!.NextBtn.IsEnabled = true;
         }
+
+        private void ReloadBtn_Clicked(object sender, RoutedEventArgs e) => LoadImages();
     }
 }

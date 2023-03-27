@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -12,6 +13,15 @@ namespace deployaUI
         public SplashScreen()
         {
             InitializeComponent();
+
+            // Get version
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var version = fvi.FileVersion;
+            VersionLabel.Text = $"Version {version}";
+#if DEBUG
+            VersionLabel.Text = $"Version {version} - Debug build";
+#endif
 
             LanguageDropDown.Items.Add("English");
             LanguageDropDown.Items.Add("Deutsch");

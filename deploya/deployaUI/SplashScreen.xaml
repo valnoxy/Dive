@@ -48,7 +48,8 @@
                                 <TextBlock
                                     FontSize="18"
                                     Foreground="#B7FFFFFF"
-                                    Text="Version 1.0.0.374" />
+                                    x:Name="VersionLabel"
+                                    Text="Version" />
                                 <TextBlock
                                     FontSize="28"
                                     FontWeight="Bold"

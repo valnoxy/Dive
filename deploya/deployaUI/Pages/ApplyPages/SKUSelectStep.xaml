@@ -31,7 +31,7 @@
                     Please select from one of the available options to continue.
                 </TextBlock>
             </StackPanel>
-            <wpfui:Button Grid.Column="1" Visibility="Hidden" HorizontalAlignment="Right" Content="Reload" Icon="ArrowReset24" Margin="0,0,0,0"/>
+            <wpfui:Button Grid.Column="1" Click="ReloadBtn_Clicked" HorizontalAlignment="Right" Content="Reload" Icon="ArrowReset24" Margin="0,0,0,0"/>
         </Grid>
 
         <ListBox Grid.Row="1" Name="SKUListView" VerticalAlignment="Center" SelectionChanged="SKUListView_Selected" Height="335"

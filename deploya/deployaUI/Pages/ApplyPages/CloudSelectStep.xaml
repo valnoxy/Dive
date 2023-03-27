@@ -16,19 +16,27 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Select the operating system you want to install
-            </TextBlock>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="450"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
+            <StackPanel Grid.Column="0">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
+                    Select the operating system you want to install
+                </TextBlock>
+
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
                     Please select from one of the available options to continue.
-            </TextBlock>
-        </StackPanel>
+                </TextBlock>
+            </StackPanel>
+            <wpfui:Button Grid.Column="1" Click="ReloadBtn_Clicked" HorizontalAlignment="Right" Content="Reload" Icon="ArrowReset24" Margin="0,0,0,0"/>
+        </Grid>
 
         <ListBox Grid.Row="1" Name="SKUListView" VerticalAlignment="Center" SelectionChanged="SKUListView_Selected" Height="335"
                  ItemsSource="{Binding ImageList}">
-            
+
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -40,7 +48,8 @@
 
                         <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
                         <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
-                        <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                        <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                        <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
