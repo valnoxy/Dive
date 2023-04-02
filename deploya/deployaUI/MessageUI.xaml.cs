@@ -8,7 +8,7 @@ namespace deployaUI
     /// <summary>
     /// Interaktionslogik für MessageUI.xaml
     /// </summary>
-    public partial class MessageUI: Wpf.Ui.Controls.UiWindow
+    public partial class MessageUI
     {
         public virtual string? Summary => _buttonPressed;
 

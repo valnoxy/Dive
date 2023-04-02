@@ -16,7 +16,7 @@
 		<AssemblyName>Dive</AssemblyName>
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
-		<Version>1.0.0.381</Version>
+		<Version>1.0.0.406</Version>
 		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
@@ -69,7 +69,7 @@
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Management" Version="7.0.0" />
-		<PackageReference Include="WPF-UI" Version="2.0.3" />
+		<PackageReference Include="WPF-UI" Version="3.0.0-preview.1" />
 	</ItemGroup>
 
 	<ItemGroup>

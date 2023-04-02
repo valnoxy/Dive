@@ -1,6 +1,13 @@
-﻿using System.Diagnostics;
+﻿using deployaUI.Common;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
+using deployaUI.Pages;
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Common;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Controls.Navigation;
 
 namespace deployaUI
 {
@@ -13,11 +20,6 @@ namespace deployaUI
 
         public MainWindow()
         {
-            Wpf.Ui.Appearance.Background.Apply(
-              this,         // Window class
-              BackgroundType.Mica // Background type
-            );
-
             InitializeComponent();
             
 #if DEBUG
@@ -33,10 +35,99 @@ namespace deployaUI
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             var version = fvi.FileVersion;
             VersionString.Text = $"[{version}]";
+
+            // Build navigation menu
+            var navItems = new List<INavigationViewItem>();
+            var footerNavItems = new List<INavigationViewItem>();
+
+            navItems.Add(new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("Home"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.Home24
+                },
+                TargetPageTag = "dashboard",
+                TargetPageType = new TypeDelegator(typeof(Pages.Dashboard)),
+
+            });
+
+            navItems.Add(new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("Apply"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.WindowApps24
+                },
+                TargetPageTag = "apply",
+                TargetPageType = new TypeDelegator(typeof(Pages.ApplyContent))
+            });
+
+            navItems.Add(new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("Capture"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.Copy24
+                },
+                TargetPageTag = "capture",
+                TargetPageType = new TypeDelegator(typeof(Pages.CaptureContent))
+            });
+
+            navItems.Add(new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("Cloud"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.Cloud24
+                },
+                TargetPageTag = "cloud",
+                TargetPageType = new TypeDelegator(typeof(Pages.CloudContent))
+            });
+
+            navItems.Add(new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("Tweaks"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.Toolbox24
+                },
+                TargetPageTag = "tweaks",
+                TargetPageType = new TypeDelegator(typeof(Pages.TweaksContent))
+            });
+
+            var consoleItem = new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("Console"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.WindowConsole20
+                },
+                TargetPageTag = "console",
+            };
+            footerNavItems.Add(consoleItem);
+            consoleItem.Click += CommandLine_Click;
+
+            footerNavItems.Add(new NavigationViewItem
+            {
+                Content = Common.LocalizationManager.LocalizeValue("About"),
+                Icon = new SymbolIcon
+                {
+                    Symbol = SymbolRegular.QuestionCircle24
+                },
+                TargetPageTag = "about",
+                TargetPageType = new TypeDelegator(typeof(Pages.AboutPage))
+            });
+
+            RootNavigation.MenuItems = navItems;
+            RootNavigation.FooterMenuItems = footerNavItems;
+            RootNavigation.Navigate("dashboard");
         }
 
         private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)
         {
+            RootNavigation.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
+            RootNavigation.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
             RootNavigation.Navigate("dashboard");
         }
 

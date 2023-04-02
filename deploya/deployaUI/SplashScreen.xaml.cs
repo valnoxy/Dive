@@ -8,7 +8,7 @@ namespace deployaUI
     /// <summary>
     /// Interaktionslogik für SplashScreen.xaml
     /// </summary>
-    public partial class SplashScreen : Wpf.Ui.Controls.UiWindow
+    public partial class SplashScreen
     {
         public SplashScreen()
         {

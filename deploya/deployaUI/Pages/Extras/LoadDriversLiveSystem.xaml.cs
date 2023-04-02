@@ -11,7 +11,7 @@ namespace deployaUI.Pages.Extras
     /// <summary>
     /// Interaktionslogik für LoadDriversLiveSystem.xaml
     /// </summary>
-    public partial class LoadDriversLiveSystem: Wpf.Ui.Controls.UiWindow
+    public partial class LoadDriversLiveSystem
     {
         private int _driverCount = 0;
         private List<string> _driverList = null;

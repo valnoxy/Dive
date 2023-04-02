@@ -9,7 +9,7 @@
       d:DesignHeight="450" d:DesignWidth="800">
 
     <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling">
-        <Grid Margin="19,-20,19,0">
+        <Grid Margin="19,20,19,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />

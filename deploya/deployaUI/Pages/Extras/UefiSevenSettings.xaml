@@ -1,4 +1,4 @@
-﻿<ui:UiWindow x:Class="deployaUI.Pages.Extras.UefiSevenSettings"
+﻿<ui:FluentWindow x:Class="deployaUI.Pages.Extras.UefiSevenSettings"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -128,4 +128,4 @@
         <ui:TitleBar ShowMinimize="False" ShowMaximize="False" CanMaximize="False"/>
         <ui:Button Content="Install now" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="20" Click="ExitButton_Click"/>
     </Grid>
-</ui:UiWindow>
+</ui:FluentWindow>

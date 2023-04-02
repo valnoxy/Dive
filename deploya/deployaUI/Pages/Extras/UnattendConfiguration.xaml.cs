@@ -7,7 +7,7 @@ namespace deployaUI.Pages.Extras
     /// <summary>
     /// Interaktionslogik für UnattendConfiguration.xaml
     /// </summary>
-    public partial class UnattendConfiguration : Wpf.Ui.Controls.UiWindow
+    public partial class UnattendConfiguration
     {
         public UnattendConfiguration()
         {

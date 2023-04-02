@@ -9,7 +9,7 @@
       d:DesignHeight="549" d:DesignWidth="728"
       Title="Dashboard">
 
-    <Grid Margin="19,20,19,0">
+    <Grid Margin="19,40,19,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -28,7 +28,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" />
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" 
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -48,7 +49,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" />
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" 
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -68,7 +70,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24" />
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24"
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"

@@ -7,7 +7,7 @@ namespace deployaUI.Pages.Extras
     /// <summary>
     /// Interaktionslogik für UefiSevenSettings.xaml
     /// </summary>
-    public partial class UefiSevenSettings : Wpf.Ui.Controls.UiWindow
+    public partial class UefiSevenSettings
     {
         public UefiSevenSettings()
         {
