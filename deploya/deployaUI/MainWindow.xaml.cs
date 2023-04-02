@@ -35,7 +35,10 @@ namespace deployaUI
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             var version = fvi.FileVersion;
             VersionString.Text = $"[{version}]";
+        }
 
+        private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)
+        {
             // Build navigation menu
             var navItems = new List<INavigationViewItem>();
             var footerNavItems = new List<INavigationViewItem>();
@@ -121,11 +124,7 @@ namespace deployaUI
 
             RootNavigation.MenuItems = navItems;
             RootNavigation.FooterMenuItems = footerNavItems;
-            RootNavigation.Navigate("dashboard");
-        }
 
-        private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)
-        {
             RootNavigation.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             RootNavigation.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
             RootNavigation.Navigate("dashboard");

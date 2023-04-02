@@ -88,7 +88,8 @@
                                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                             Text="Please select your language." />
                                     </StackPanel>
-                                    <ComboBox Grid.Column="1" Margin="0,0,16,0" Width="200" x:Name="LanguageDropDown" />
+                                    <ComboBox Grid.Column="1" Margin="0,0,16,0" Width="200" x:Name="LanguageDropDown" 
+                                              SelectionChanged="LanguageDropDown_OnSelectionChanged"/>
                                 </Grid>
                             </ui:CardControl.Header>
                         </ui:CardControl>

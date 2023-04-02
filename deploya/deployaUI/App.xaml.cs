@@ -105,6 +105,10 @@ namespace deployaUI
             {
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() => { }));
             }
+
+            // Update language
+            Common.LocalizationManager.LoadLanguage(Common.LocalizationManager.CurrentLanguage.Code);
+
             wnd.ShowDialog();
             Environment.Exit(0);
         }

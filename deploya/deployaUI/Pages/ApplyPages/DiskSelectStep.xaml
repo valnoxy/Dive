@@ -46,8 +46,8 @@
                 <wpfui:Button Grid.Column="0" Icon="ArrowReset24" Content="Reload" Margin="0,15,15,0" Click="ReloadBtn_Click"/>
                 <ToggleButton Grid.Column="1" x:Name="UseRecoveryBtn" Content="Add Recovery" IsEnabled="true" Margin="0,15,15,0"/>
                 <ToggleButton Grid.Column="2" x:Name="UseNTLDRBtn" Content="Use NTLDR (XP)" Margin="0,15,15,0"/>
-                <RadioButton Grid.Column="3" x:Name="BIOSRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="BIOS" Margin="0,15,0,0" MaxWidth="1" Checked="BIOSRadio_Checked" />
-                <RadioButton Grid.Column="4" x:Name="EFIRadio" HorizontalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
+                <RadioButton Grid.Column="3" x:Name="BIOSRadio" VerticalAlignment="Center" GroupName="Firmware" Content="BIOS" Margin="0,15,0,0" MaxWidth="1" Checked="BIOSRadio_Checked" />
+                <RadioButton Grid.Column="4" x:Name="EFIRadio" VerticalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
             </Grid>
         </StackPanel>
 

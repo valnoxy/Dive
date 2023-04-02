@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:deployaUI.Pages.ApplyPages"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -23,8 +23,8 @@
         <Grid Grid.Row="1" Height="350">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
                 <StackPanel>
-                    <wpfui:CardExpander Icon="Person24" IsExpanded="False">
-                        <wpfui:CardExpander.Header>
+                    <ui:CardExpander Icon="Person24" IsExpanded="False">
+                        <ui:CardExpander.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -40,9 +40,9 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="{DynamicResource AdminAccountDescription}" />
                                 </StackPanel>
-                                <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_Switch" Unchecked="User_Switch" x:Name="ToggleUser" />
+                                <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_Switch" Unchecked="User_Switch" x:Name="ToggleUser" />
                             </Grid>
-                        </wpfui:CardExpander.Header>
+                        </ui:CardExpander.Header>
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -62,7 +62,7 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,0,5"
                                     Text="{DynamicResource Username}" />
-                                <wpfui:TextBox 
+                                <ui:TextBox 
                                     x:Name="TbUser" 
                                     Grid.Column="1" 
                                     Grid.Row="0"
@@ -78,7 +78,7 @@
                                     FontSize="14"
                                     VerticalAlignment="Center"
                                     Text="{DynamicResource Password}" />
-                                <wpfui:TextBox
+                                <ui:TextBox
                                     x:Name="TbPassword" 
                                     Grid.Column="1" 
                                     Grid.Row="1"
@@ -89,10 +89,10 @@
                             </Grid>
 
                         </StackPanel>
-                    </wpfui:CardExpander>
+                    </ui:CardExpander>
 
-                    <wpfui:CardExpander Icon="BoxEdit24" IsExpanded="False" Margin="0,5,0,0">
-                        <wpfui:CardExpander.Header>
+                    <ui:CardExpander Icon="BoxEdit24" IsExpanded="False" Margin="0,5,0,0">
+                        <ui:CardExpander.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -108,9 +108,9 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="{DynamicResource OEMSupportDescription}" />
                                 </StackPanel>
-                                <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="Oem_Switch" Unchecked="Oem_Switch" x:Name="ToggleOem"/>
+                                <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="Oem_Switch" Unchecked="Oem_Switch" x:Name="ToggleOem"/>
                             </Grid>
-                        </wpfui:CardExpander.Header>
+                        </ui:CardExpander.Header>
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -141,9 +141,9 @@
                                         <ColumnDefinition Width="40"/>
                                         <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
-                                    <wpfui:TextBox x:Name="TbLogo" Grid.Column="0" Icon="Image24" PlaceholderText="{DynamicResource OEMLogoPlaceholder}" IsEnabled="false" TextChanged="TbLogo_OnTextChanged"/>
-                                    <wpfui:Button Grid.Column="1" Width="35" Height="35" Margin="5,0,0,0" Icon="DocumentSearch24" Click="OEMLogo_OpenFileClick"/>
-                                    <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" Icon="Backspace24"/>
+                                    <ui:TextBox x:Name="TbLogo" Grid.Column="0" Icon="Image24" PlaceholderText="{DynamicResource OEMLogoPlaceholder}" IsEnabled="false" TextChanged="TbLogo_OnTextChanged"/>
+                                    <ui:Button Grid.Column="1" Width="35" Height="35" Margin="5,0,0,0" Icon="DocumentSearch24" Click="OEMLogo_OpenFileClick"/>
+                                    <ui:Button Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" Icon="Backspace24"/>
                                 </Grid>
 
                                 <!-- Manufacturer -->
@@ -154,7 +154,7 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,0,5"
                                     Text="{DynamicResource OEMManufacturer}" />
-                                <wpfui:TextBox
+                                <ui:TextBox
                                     x:Name="TbManufacturer" 
                                     Grid.Column="1"
                                     Grid.Row="1"
@@ -171,7 +171,7 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,0,5"
                                     Text="{DynamicResource OEMModel}" />
-                                <wpfui:TextBox
+                                <ui:TextBox
                                     x:Name="TbModel" 
                                     Grid.Column="1"
                                     Grid.Row="2"
@@ -188,7 +188,7 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,0,5"
                                     Text="{DynamicResource OEMSupportHours}" />
-                                <wpfui:TextBox
+                                <ui:TextBox
                                     x:Name="TbSupportHours" 
                                     Grid.Column="1"
                                     Grid.Row="3"
@@ -205,7 +205,7 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,0,5"
                                     Text="{DynamicResource OEMPhoneNo}" />
-                                <wpfui:TextBox
+                                <ui:TextBox
                                     x:Name="TbPhone" 
                                     Grid.Column="1"
                                     Grid.Row="4"
@@ -222,7 +222,7 @@
                                     VerticalAlignment="Center"
                                     Margin="0,0,0,5"
                                     Text="{DynamicResource OEMHomepage}" />
-                                <wpfui:TextBox
+                                <ui:TextBox
                                     x:Name="TbUrl" 
                                     Grid.Column="1"
                                     Grid.Row="5"
@@ -232,10 +232,10 @@
                                     TextChanged="TbUrl_OnTextChanged"/>
                             </Grid>
                         </StackPanel>
-                    </wpfui:CardExpander>
+                    </ui:CardExpander>
 
-                    <wpfui:CardControl Icon="Settings48" Margin="0,5,0,0">
-                        <wpfui:CardControl.Header>
+                    <ui:CardControl Icon="Settings48" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -259,13 +259,13 @@
                                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                     x:Name="TbDrvPath"
                                     Text="{DynamicResource InjectDriversNoSource}" />
-                                <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                                <ui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
                             </Grid>
-                        </wpfui:CardControl.Header>
-                    </wpfui:CardControl>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
 
-                    <wpfui:CardControl Icon="TextBoxSettings24" Margin="0,5,0,0">
-                        <wpfui:CardControl.Header>
+                    <ui:CardControl Icon="TextBoxSettings24" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -281,13 +281,13 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="{DynamicResource MoreSettingsDescription}" />
                                 </StackPanel>
-                                <wpfui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource MoreSettingsBtn}" Click="MoreSettings_OnClicked" />
+                                <ui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource MoreSettingsBtn}" Click="MoreSettings_OnClicked" />
                             </Grid>
-                        </wpfui:CardControl.Header>
-                    </wpfui:CardControl>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
 
-                    <wpfui:CardControl Icon="BoxMultipleArrowRight24" Margin="0,5,0,0">
-                        <wpfui:CardControl.Header>
+                    <ui:CardControl Icon="BoxMultipleArrowRight24" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -304,14 +304,14 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="{DynamicResource SettingsImportExportDescription}" />
                                 </StackPanel>
-                                <wpfui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource ImportBtn}" Click="Import_OnClicked" />
-                                <wpfui:Button Grid.Column="2" Margin="0,0,0,0" Content="{DynamicResource ExportBtn}" Click="Export_OnClicked" />
+                                <ui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource ImportBtn}" Click="Import_OnClicked" />
+                                <ui:Button Grid.Column="2" Margin="0,0,0,0" Content="{DynamicResource ExportBtn}" Click="Export_OnClicked" />
                             </Grid>
-                        </wpfui:CardControl.Header>
-                    </wpfui:CardControl>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
                 </StackPanel>
             </ScrollViewer>
-            <wpfui:Snackbar
+            <ui:Snackbar
                 x:Name="RootSnackbar"
                 Title="Hello World!"
                 MaxWidth="600"
