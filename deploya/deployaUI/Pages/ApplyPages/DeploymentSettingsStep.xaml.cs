@@ -298,5 +298,11 @@ namespace deployaUI.Pages.ApplyPages
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
         }
+
+        private void MoreSettings_OnClicked(object sender, RoutedEventArgs e)
+        {
+            var ucWindow = new UnattendConfiguration();
+            ucWindow.ShowDialog();
+        }
     }
 }

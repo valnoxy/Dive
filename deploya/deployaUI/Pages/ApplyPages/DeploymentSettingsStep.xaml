@@ -16,13 +16,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    How do you want to configure Windows?
-            </TextBlock>
-
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
-                    Please configure Windows to continue.
-            </TextBlock>
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource ConfigureTitle}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource ConfigureTitleDescription}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Height="350">
@@ -39,11 +34,11 @@
                                     <TextBlock
                                         FontSize="13"
                                         FontWeight="Medium"
-                                        Text="Administrator account" />
+                                        Text="{DynamicResource AdminAccountTitle}" />
                                     <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Settings for the Administrator account." />
+                                        Text="{DynamicResource AdminAccountDescription}" />
                                 </StackPanel>
                                 <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_Switch" Unchecked="User_Switch" x:Name="ToggleUser" />
                             </Grid>
@@ -51,28 +46,46 @@
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock
-                                    FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Username" />
-                                <wpfui:TextBox x:Name="TbUser" Grid.Column="1" Icon="Person24" PlaceholderText="Local Username" IsEnabled="true" TextChanged="TbUser_OnTextChanged"/>
-                            </Grid>
-
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
 
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="0"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Password" />
-                                <wpfui:TextBox x:Name="TbPassword" Grid.Column="1" Icon="Key24" PlaceholderText="Password of Local User" IsEnabled="false" TextChanged="TbPassword_OnTextChanged" />
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource Username}" />
+                                <wpfui:TextBox 
+                                    x:Name="TbUser" 
+                                    Grid.Column="1" 
+                                    Grid.Row="0"
+                                    Icon="Person24" 
+                                    PlaceholderText="{DynamicResource UsernamePlaceholder}" 
+                                    IsEnabled="true"
+                                    Margin="0,0,0,5"
+                                    TextChanged="TbUser_OnTextChanged"/>
+
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="1"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Text="{DynamicResource Password}" />
+                                <wpfui:TextBox
+                                    x:Name="TbPassword" 
+                                    Grid.Column="1" 
+                                    Grid.Row="1"
+                                    Icon="Key24"
+                                    PlaceholderText="{DynamicResource PasswordPlaceholder}" 
+                                    IsEnabled="false"
+                                    TextChanged="TbPassword_OnTextChanged" />
                             </Grid>
 
                         </StackPanel>
@@ -89,11 +102,11 @@
                                     <TextBlock
                                         FontSize="13"
                                         FontWeight="Medium"
-                                        Text="OEM Support" />
+                                        Text="{DynamicResource OEMSupportTitle}" />
                                     <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Set OEM Information about this device." />
+                                        Text="{DynamicResource OEMSupportDescription}" />
                                 </StackPanel>
                                 <wpfui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="Oem_Switch" Unchecked="Oem_Switch" x:Name="ToggleOem"/>
                             </Grid>
@@ -101,86 +114,123 @@
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="40"/>
-                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="5*" />
                                 </Grid.ColumnDefinitions>
 
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <!-- OEM Logo -->
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="0"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="OEM Logo" />
-                                <wpfui:TextBox x:Name="TbLogo" Grid.Column="1" Icon="Image24" PlaceholderText="Path to logo" IsEnabled="false" TextChanged="TbLogo_OnTextChanged"/>
-                                <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" Icon="DocumentSearch24" Click="OEMLogo_OpenFileClick"/>
-                                <wpfui:Button Grid.Column="3" Width="35" Height="35" Margin="5,0,0,0" Icon="Backspace24"/>
-                            </Grid>
+                                    Margin="0,0,0,5"
+                                    VerticalAlignment="Center"
+                                    Text="{DynamicResource OEMLogo}" />
+                                <Grid Grid.Column="1" Grid.Row="0" Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <wpfui:TextBox x:Name="TbLogo" Grid.Column="0" Icon="Image24" PlaceholderText="{DynamicResource OEMLogoPlaceholder}" IsEnabled="false" TextChanged="TbLogo_OnTextChanged"/>
+                                    <wpfui:Button Grid.Column="1" Width="35" Height="35" Margin="5,0,0,0" Icon="DocumentSearch24" Click="OEMLogo_OpenFileClick"/>
+                                    <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" Icon="Backspace24"/>
+                                </Grid>
 
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
+                                <!-- Manufacturer -->
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="1"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Manufacturer" />
-                                <wpfui:TextBox x:Name="TbManufacturer" Grid.Column="1" Icon="Building24" PlaceholderText="Name of the Manufacturer" TextChanged="TbManufacturer_OnTextChanged"/>
-                            </Grid>
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMManufacturer}" />
+                                <wpfui:TextBox
+                                    x:Name="TbManufacturer" 
+                                    Grid.Column="1"
+                                    Grid.Row="1"
+                                    Margin="0,0,0,5"
+                                    Icon="Building24"
+                                    PlaceholderText="{DynamicResource OEMManufacturerPlaceholder}" 
+                                    TextChanged="TbManufacturer_OnTextChanged"/>
 
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
+                                <!-- Model -->
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="2"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Model" />
-                                <wpfui:TextBox x:Name="TbModel" Grid.Column="1" Icon="Desktop24" PlaceholderText="Model of this device" TextChanged="TbModel_OnTextChanged"/>
-                            </Grid>
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMModel}" />
+                                <wpfui:TextBox
+                                    x:Name="TbModel" 
+                                    Grid.Column="1"
+                                    Grid.Row="2"
+                                    Margin="0,0,0,5"
+                                    Icon="Desktop24"
+                                    PlaceholderText="{DynamicResource OEMModelPlaceholder}"
+                                    TextChanged="TbModel_OnTextChanged"/>
 
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
+                                <!-- Support Hours -->
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="3"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Support Hours" />
-                                <wpfui:TextBox x:Name="TbSupportHours" Grid.Column="1" Icon="Clock24" PlaceholderText="Support Hours" TextChanged="TbSupportHours_OnTextChanged"/>
-                            </Grid>
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMSupportHours}" />
+                                <wpfui:TextBox
+                                    x:Name="TbSupportHours" 
+                                    Grid.Column="1"
+                                    Grid.Row="3"
+                                    Margin="0,0,0,5"
+                                    Icon="Clock24"
+                                    PlaceholderText="{DynamicResource OEMSupportHoursPlaceholder}"
+                                    TextChanged="TbSupportHours_OnTextChanged"/>
 
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
+                                <!-- Phone Number -->
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="4"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Phone No." />
-                                <wpfui:TextBox x:Name="TbPhone" Grid.Column="1" Icon="Call24" PlaceholderText="Support Phone Number" TextChanged="TbPhone_OnTextChanged"/>
-                            </Grid>
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMPhoneNo}" />
+                                <wpfui:TextBox
+                                    x:Name="TbPhone" 
+                                    Grid.Column="1"
+                                    Grid.Row="4"
+                                    Margin="0,0,0,5"
+                                    Icon="Call24"
+                                    PlaceholderText="{DynamicResource OEMPhoneNoPlaceholder}"
+                                    TextChanged="TbPhone_OnTextChanged"/>
 
-                            <Grid Margin="0,10,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
+                                <!-- Homepage -->
                                 <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="5"
                                     FontSize="14"
-                                    Margin="0,6,0,0"
-                                    Text="Homepage" />
-                                <wpfui:TextBox x:Name="TbUrl" Grid.Column="1" Icon="Earth24" PlaceholderText="Homepage" TextChanged="TbUrl_OnTextChanged"/>
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMHomepage}" />
+                                <wpfui:TextBox
+                                    x:Name="TbUrl" 
+                                    Grid.Column="1"
+                                    Grid.Row="5"
+                                    Margin="0,0,0,5"
+                                    Icon="Earth24"
+                                    PlaceholderText="{DynamicResource OEMHomepagePlaceholder}"
+                                    TextChanged="TbUrl_OnTextChanged"/>
                             </Grid>
-
                         </StackPanel>
                     </wpfui:CardExpander>
 
@@ -196,11 +246,11 @@
                                     <TextBlock
                                         FontSize="13"
                                         FontWeight="Medium"
-                                        Text="Inject Drivers" />
+                                        Text="{DynamicResource InjectDriversTitle}" />
                                     <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Load and inject multiple drivers. (Vista and up)" />
+                                        Text="{DynamicResource InjectDriversDescription}" />
                                 </StackPanel>
                                 <TextBlock
                                     FontSize="12"
@@ -208,8 +258,30 @@
                                     VerticalAlignment="Center"
                                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                     x:Name="TbDrvPath"
-                                    Text="No source directory selected." />
-                                <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,16,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                                    Text="{DynamicResource InjectDriversNoSource}" />
+                                <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                            </Grid>
+                        </wpfui:CardControl.Header>
+                    </wpfui:CardControl>
+
+                    <wpfui:CardControl Icon="TextBoxSettings24" Margin="0,5,0,0">
+                        <wpfui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="{DynamicResource MoreSettingsTitle}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="{DynamicResource MoreSettingsDescription}" />
+                                </StackPanel>
+                                <wpfui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource MoreSettingsBtn}" Click="MoreSettings_OnClicked" />
                             </Grid>
                         </wpfui:CardControl.Header>
                     </wpfui:CardControl>
@@ -226,14 +298,14 @@
                                     <TextBlock
                                         FontSize="13"
                                         FontWeight="Medium"
-                                        Text="Settings Import &amp; Export" />
+                                        Text="{DynamicResource SettingsImportExportTitle}" />
                                     <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Save and load the current settings." />
+                                        Text="{DynamicResource SettingsImportExportDescription}" />
                                 </StackPanel>
-                                <wpfui:Button Grid.Column="1" Margin="0,0,16,0" Content="Import" Click="Import_OnClicked" />
-                                <wpfui:Button Grid.Column="2" Margin="0,0,16,0" Content="Export" Click="Export_OnClicked" />
+                                <wpfui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource ImportBtn}" Click="Import_OnClicked" />
+                                <wpfui:Button Grid.Column="2" Margin="0,0,0,0" Content="{DynamicResource ExportBtn}" Click="Export_OnClicked" />
                             </Grid>
                         </wpfui:CardControl.Header>
                     </wpfui:CardControl>

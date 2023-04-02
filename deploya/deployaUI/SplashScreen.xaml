@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:deployaUI"
         mc:Ignorable="d"
-        Title="Dive" Height="360" Width="650" MaxHeight="360" MaxWidth="650"
+        Title="Dive" MinHeight="360" MinWidth="650" MaxHeight="360" MaxWidth="650"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"
@@ -32,7 +32,7 @@
                             RenderOptions.BitmapScalingMode="HighQuality"
                             Stretch="UniformToFill" />
                     </Border.Background>
-                    <Border CornerRadius="8">
+                    <Border CornerRadius="0">
                         <Border.Background>
                             <RadialGradientBrush>
                                 <GradientStop Offset="0" Color="#1F000000" />

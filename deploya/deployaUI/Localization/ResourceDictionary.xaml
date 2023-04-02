@@ -39,4 +39,43 @@
     <system:String x:Key="ApplySKUTitleDescription">Please select from one of the available options to continue.</system:String>
     <system:String x:Key="ReloadBtn">Reload</system:String>
     <system:String x:Key="ImagesCounter">Images loaded: {0}</system:String>
+
+    <!-- Apply Page (Configure) -->
+    <system:String x:Key="ConfigureTitle">How do you want to configure Windows?</system:String>
+    <system:String x:Key="ConfigureTitleDescription">Please configure Windows to continue.</system:String>
+    
+    <system:String x:Key="AdminAccountTitle">Administrator account</system:String>
+    <system:String x:Key="AdminAccountDescription">Settings for the new Administrator account.</system:String>
+    <system:String x:Key="Username">Username</system:String>
+    <system:String x:Key="Password">Password</system:String>
+    <system:String x:Key="UsernamePlaceholder">Local Username</system:String>
+    <system:String x:Key="PasswordPlaceholder">Password of Local User</system:String>
+
+    <system:String x:Key="OEMSupportTitle">OEM Support</system:String>
+    <system:String x:Key="OEMSupportDescription">Set OEM Information about this device.</system:String>
+    <system:String x:Key="OEMLogo">OEM Logo</system:String>
+    <system:String x:Key="OEMLogoPlaceholder">Path to logo</system:String>
+    <system:String x:Key="OEMManufacturer">Manufacturer</system:String>
+    <system:String x:Key="OEMManufacturerPlaceholder">Manufacturer's name</system:String>
+    <system:String x:Key="OEMModel">Model</system:String>
+    <system:String x:Key="OEMModelPlaceholder">Model of this device</system:String>
+    <system:String x:Key="OEMSupportHours">Support Hours</system:String>
+    <system:String x:Key="OEMSupportHoursPlaceholder">Support Hours</system:String>
+    <system:String x:Key="OEMPhoneNo">Phone No.</system:String>
+    <system:String x:Key="OEMPhoneNoPlaceholder">Support Phone Number</system:String>
+    <system:String x:Key="OEMHomepage">Homepage</system:String>
+    <system:String x:Key="OEMHomepagePlaceholder">Homepage</system:String>
+
+    <system:String x:Key="InjectDriversTitle">Inject Drivers</system:String>
+    <system:String x:Key="InjectDriversDescription">Load and inject multiple drivers (Vista and up).</system:String>
+    <system:String x:Key="InjectDriversNoSource">No source directory selected.</system:String>
+
+    <system:String x:Key="MoreSettingsTitle">More Settings</system:String>
+    <system:String x:Key="MoreSettingsDescription">not implemented yet</system:String>
+    <system:String x:Key="MoreSettingsBtn">Configure</system:String>
+
+    <system:String x:Key="SettingsImportExportTitle">Settings Import &amp; Export</system:String>
+    <system:String x:Key="SettingsImportExportDescription">Save and load the current settings.</system:String>
+    <system:String x:Key="ImportBtn">Import</system:String>
+    <system:String x:Key="ExportBtn">Export</system:String>
 </ResourceDictionary>
