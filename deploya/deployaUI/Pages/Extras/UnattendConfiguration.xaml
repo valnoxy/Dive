@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:deployaUI"
         mc:Ignorable="d"
-        Title="Dive" Height="500" Width="650" MaxHeight="500" MaxWidth="650"
+        Title="Dive - Deployment Settings" MinHeight="600" MinWidth="650" MaxHeight="600" MaxWidth="650"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"
@@ -13,9 +13,18 @@
         WindowCornerPreference="Round"
         WindowStartupLocation="CenterScreen">
 
-    <Grid>
-        <ui:NavigationView >
-
+    <StackPanel>
+        <ui:TitleBar
+            Title="Deployment Settings"
+            ShowMaximize="False"
+            Icon="pack://application:,,,/Dive.ico"
+            ShowMinimize="False"/>
+        <ui:NavigationView PaneDisplayMode="Top">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem Icon="🚧" Content="Deployment"/>
+                <ui:NavigationViewItem Icon="🚧" Content="Out-of-Box-Experience"/>
+                <ui:NavigationViewItem Icon="🚧" Content="Application"/>
+            </ui:NavigationView.MenuItems>
         </ui:NavigationView>
-    </Grid>
+    </StackPanel>
 </ui:FluentWindow>

@@ -1,4 +1,5 @@
-﻿using deployaUI.Common;
+﻿using System;
+using deployaUI.Common;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -28,7 +29,7 @@ namespace deployaUI
             _displayDebugConsole = true;
 #else
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Beta build [B5 Public]";
+            DebugString.Text = "Beta build [B6 Public]";
 #endif
             // Get version
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -127,7 +128,7 @@ namespace deployaUI
 
             RootNavigation.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             RootNavigation.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
-            RootNavigation.Navigate("dashboard");
+            RootNavigation.Navigate("about");
         }
 
         private void CommandLine_Click(object sender, RoutedEventArgs e)
@@ -144,6 +145,11 @@ namespace deployaUI
                 App.ShowWindow(handle, App.SwShow);
                 _displayDebugConsole = true;
             }
-        }        
+        }
+
+        private void MainWindow_OnLoaded(object? sender, EventArgs eventArgs)
+        {
+            RootNavigation.Navigate("dashboard");
+        }
     }
 }

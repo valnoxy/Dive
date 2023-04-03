@@ -13,7 +13,8 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round"
-                 ResizeMode="NoResize">
+                 ResizeMode="NoResize"
+                 ContentRendered="MainWindow_OnLoaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
