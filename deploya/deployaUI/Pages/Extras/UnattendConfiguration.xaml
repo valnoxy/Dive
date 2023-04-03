@@ -19,7 +19,7 @@
             ShowMaximize="False"
             Icon="pack://application:,,,/Dive.ico"
             ShowMinimize="False"/>
-        <ui:NavigationView PaneDisplayMode="Top">
+        <ui:NavigationView PaneDisplayMode="Top" x:Name="NavView">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Icon="🚧" Content="Deployment"/>
                 <ui:NavigationViewItem Icon="🚧" Content="Out-of-Box-Experience"/>

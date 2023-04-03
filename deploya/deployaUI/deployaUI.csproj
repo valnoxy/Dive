@@ -101,10 +101,6 @@
 		</Page>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Pages\Extras\UnattendConfigurationPages\" />
-	</ItemGroup>
-
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64\signtool.exe&quot; sign /sha1 &quot;35f4e53a88751bbe67eaa097513e3db1ad2f49e3&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
 	</Target>

@@ -12,8 +12,16 @@ namespace deployaUI.Common
 
         public static string LocalizeValue(string value)
         {
-            var localizedValue = (string)Application.Current.MainWindow.FindResource(value);
-            return string.IsNullOrEmpty(localizedValue) ? value : localizedValue;
+            try
+            {
+                var localizedValue = (string)Application.Current.MainWindow.FindResource(value);
+                return string.IsNullOrEmpty(localizedValue) ? value : localizedValue;
+            }
+            catch
+            {
+                return value;
+            }
+
         }
 
         public static void LoadLanguage(string languageCode)

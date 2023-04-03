@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
+using Wpf.Ui.Common;
+using Wpf.Ui.Controls.Navigation;
+using Wpf.Ui.Controls;
 
 namespace deployaUI.Pages.Extras
 {
@@ -12,59 +17,44 @@ namespace deployaUI.Pages.Extras
         public UnattendConfiguration()
         {
             InitializeComponent();
-        }
 
-        private void ToggleLog_OnChecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Enabled Boot logging");
-            Common.WindowsModification.UsToggleLog = true;
-        }
+            var navItems = new List<INavigationViewItem>
+            {
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Deployment"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.Home24
+                    },
+                    TargetPageTag = "deployment",
+                    TargetPageType = new TypeDelegator(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage)),
 
-        private void ToggleLog_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Disabled Boot logging");
-            Common.WindowsModification.UsToggleLog = false;
-        }
+                },
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Out-of-Box-Experience"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.WindowApps24
+                    },
+                    TargetPageTag = "oobe"
+                },
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Application"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.AppGeneric32
+                    },
+                    TargetPageTag = "application"
+                }
+            };
 
-        private void ToggleVerbose_OnChecked_OnChecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Enabled Verbose boot");
-            Common.WindowsModification.UsToggleVerbose = true;
-        }
-
-        private void ToggleVerbose_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Disabled Verbose boot");
-            Common.WindowsModification.UsToggleVerbose = false;
-        }
-
-        private void ToggleFakeVesa_OnChecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Enabled Fake Vesa Force");
-            Common.WindowsModification.UsToggleFakeVesa = true;
-        }
-
-        private void ToggleFakeVesa_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Disabled Fake Vesa Force");
-            Common.WindowsModification.UsToggleFakeVesa = false;
-        }
-
-        private void ToggleSkipErrors_OnChecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Enabled Error skip");
-            Common.WindowsModification.UsToggleSkipErros = true;
-        }
-
-        private void ToggleSkipErrors_OnUnchecked(object sender, RoutedEventArgs e)
-        {
-            Common.Debug.WriteLine("[UefiSeven] Disabled Error skip");
-            Common.WindowsModification.UsToggleSkipErros = false;
-        }
-
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
+            NavView.MenuItems = navItems;
+            
+            NavView.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
+            NavView.Navigate("about");
         }
     }
 }

@@ -41,65 +41,61 @@ namespace deployaUI
         private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Build navigation menu
-            var navItems = new List<INavigationViewItem>();
+            var navItems = new List<INavigationViewItem>
+            {
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Home"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.Home24
+                    },
+                    TargetPageTag = "dashboard",
+                    TargetPageType = new TypeDelegator(typeof(Pages.Dashboard)),
+
+                },
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Apply"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.WindowApps24
+                    },
+                    TargetPageTag = "apply",
+                    TargetPageType = new TypeDelegator(typeof(Pages.ApplyContent))
+                },
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Capture"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.Copy24
+                    },
+                    TargetPageTag = "capture",
+                    TargetPageType = new TypeDelegator(typeof(Pages.CaptureContent))
+                },
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Cloud"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.Cloud24
+                    },
+                    TargetPageTag = "cloud",
+                    TargetPageType = new TypeDelegator(typeof(Pages.CloudContent))
+                },
+                new NavigationViewItem
+                {
+                    Content = Common.LocalizationManager.LocalizeValue("Tweaks"),
+                    Icon = new SymbolIcon
+                    {
+                        Symbol = SymbolRegular.Toolbox24
+                    },
+                    TargetPageTag = "tweaks",
+                    TargetPageType = new TypeDelegator(typeof(Pages.TweaksContent))
+                }
+            };
             var footerNavItems = new List<INavigationViewItem>();
-
-            navItems.Add(new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("Home"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.Home24
-                },
-                TargetPageTag = "dashboard",
-                TargetPageType = new TypeDelegator(typeof(Pages.Dashboard)),
-
-            });
-
-            navItems.Add(new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("Apply"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.WindowApps24
-                },
-                TargetPageTag = "apply",
-                TargetPageType = new TypeDelegator(typeof(Pages.ApplyContent))
-            });
-
-            navItems.Add(new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("Capture"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.Copy24
-                },
-                TargetPageTag = "capture",
-                TargetPageType = new TypeDelegator(typeof(Pages.CaptureContent))
-            });
-
-            navItems.Add(new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("Cloud"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.Cloud24
-                },
-                TargetPageTag = "cloud",
-                TargetPageType = new TypeDelegator(typeof(Pages.CloudContent))
-            });
-
-            navItems.Add(new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("Tweaks"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.Toolbox24
-                },
-                TargetPageTag = "tweaks",
-                TargetPageType = new TypeDelegator(typeof(Pages.TweaksContent))
-            });
-
             var consoleItem = new NavigationViewItem
             {
                 Content = Common.LocalizationManager.LocalizeValue("Console"),
