@@ -145,7 +145,7 @@ namespace deployaUI
 
         private void MainWindow_OnLoaded(object? sender, EventArgs eventArgs)
         {
-            RootNavigation.Navigate("dashboard");
+            RootNavigation.Navigate("dashboard"); // Workaround
         }
     }
 }

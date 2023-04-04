@@ -50,24 +50,6 @@
                 <RadioButton Grid.Column="4" x:Name="EFIRadio" VerticalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
             </Grid>
         </StackPanel>
-
-        <StackPanel Grid.Row="3">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                
-                <ToggleButton Grid.Column="2" x:Name="SModeToggle" Content="Windows Code Integrity Mode (S-Mode)" Click="SModeToggle_OnClick" Margin="0,15,15,0"/>
-                <ToggleButton Grid.Column="3" x:Name="CopyProfileToggle" Content="Copy Profile (syspreped Images)" Click="CopyProfileToggle_OnClick" Margin="0,15,15,0"/>
-                <ToggleButton Grid.Column="4" x:Name="DiveToRecovery" Content="Add Dive into WinRE" Click="DiveToRecovery_OnClick" Margin="0,15,15,0"/>
-
-            </Grid>
-        </StackPanel>
-
     </Grid>
 
 </UserControl>

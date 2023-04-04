@@ -77,4 +77,10 @@
     <system:String x:Key="SettingsImportExportDescription">Speichern und laden der aktuellen Einstellungen.</system:String>
     <system:String x:Key="ImportBtn">Importieren</system:String>
     <system:String x:Key="ExportBtn">Exportieren</system:String>
+
+    <!-- Unattend Configuration -->
+    <system:String x:Key="Deployment">Deployment</system:String>
+    <system:String x:Key="OOBE">Out-Of-Box-Experience</system:String>
+    <system:String x:Key="Application">Application</system:String>
+    
 </ResourceDictionary>

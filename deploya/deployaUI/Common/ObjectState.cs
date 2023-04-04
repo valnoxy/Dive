@@ -13,6 +13,8 @@ namespace deployaUI.Common
         public static bool UseEFI { get; set; }
         public static bool UseNTLDR { get; set; }
         public static bool UseRecovery { get; set; }
+        public static string NTVersion { get; set; }
+        public static int Build { get; set; }
         public static List<string> DriverList { get; set; }
     }
 

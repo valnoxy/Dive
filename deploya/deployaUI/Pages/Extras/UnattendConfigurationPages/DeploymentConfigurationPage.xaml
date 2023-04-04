@@ -4,9 +4,74 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:deployaUI.Pages.Extras.UnattendConfigurationPages"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <CheckBox Content="Enable OOBE"/>
+    <StackPanel Margin="10,15,10,15">
+        <ui:CardControl Icon="StoreMicrosoft24" Margin="0,5,0,0">
+            <ui:CardControl.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="Medium"
+                            Text="Windows Code Integrity Mode (S-Mode)" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Allow only running apps from the Microsoft Store." />
+                    </StackPanel>
+                    <ui:ToggleSwitch x:Name="SModeSwitch" Grid.Column="1" Margin="0,0,8,0" Click="CodeIntegrityMode_Click" />
+                </Grid>
+            </ui:CardControl.Header>
+        </ui:CardControl>
+
+        <ui:CardControl Icon="PersonAccounts24" Margin="0,5,0,0">
+            <ui:CardControl.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="Medium"
+                            Text="Copy User Profile" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Copies the user profile that was captured when the instance was created." />
+                    </StackPanel>
+                    <ui:ToggleSwitch x:Name="CopyProfileToggle" Grid.Column="1" Margin="0,0,8,0" Click="CopyProfileToggle_OnClick" />
+                </Grid>
+            </ui:CardControl.Header>
+        </ui:CardControl>
+
+        <ui:CardControl Icon="ArrowReset24" Margin="0,5,0,0">
+            <ui:CardControl.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock
+                            FontSize="13"
+                            FontWeight="Medium"
+                            Text="Inject Dive into WinRE" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="Inject Dive into the Windows recovery environment." />
+                    </StackPanel>
+                    <ui:ToggleSwitch x:Name="DiveToRecovery" Grid.Column="1" Margin="0,0,8,0" Click="DiveToRecovery_OnClick"/>
+                </Grid>
+            </ui:CardControl.Header>
+        </ui:CardControl>
     </StackPanel>
 </UserControl>

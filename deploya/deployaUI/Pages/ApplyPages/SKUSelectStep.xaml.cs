@@ -21,6 +21,8 @@ namespace deployaUI.Pages.ApplyPages
             public string ImageFile { get; set; }
             public string Index { get; set;}
             public string Arch { get; set; }
+            public int Build { get; set; }
+            public string NTVersion { get; set; }
         }
 
         private List<Image> images;
@@ -142,7 +144,12 @@ namespace deployaUI.Pages.ApplyPages
                             images.Add(new Image
                             {
                                 Picture = $"pack://application:,,,/assets/icon-{imageVersion}-40.png",
-                                ImageFile = binary, Name = productName, Index = productId, Arch = productArch
+                                ImageFile = binary, 
+                                Name = productName, 
+                                Index = productId, 
+                                Arch = productArch, 
+                                NTVersion = osVersion, 
+                                Build = int.Parse(productBuild ?? "0")
                             });
                             counter++;
                         }
@@ -170,6 +177,8 @@ namespace deployaUI.Pages.ApplyPages
             Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
             Common.ApplyDetails.FileName = item.ImageFile;
             Common.ApplyDetails.IconPath = item.Picture;
+            Common.ApplyDetails.Build = item.Build;
+            Common.ApplyDetails.NTVersion = item.NTVersion;
 
             Common.Debug.Write("Selected ");
             Common.Debug.Write(Common.ApplyDetails.Name, true, ConsoleColor.DarkYellow);

@@ -78,4 +78,10 @@
     <system:String x:Key="SettingsImportExportDescription">Save and load the current settings.</system:String>
     <system:String x:Key="ImportBtn">Import</system:String>
     <system:String x:Key="ExportBtn">Export</system:String>
+    
+    <!-- Unattend Configuration -->
+    <system:String x:Key="Deployment">Deployment</system:String>
+    <system:String x:Key="OOBE">Out-Of-Box-Experience</system:String>
+    <system:String x:Key="Application">Application</system:String>
+
 </ResourceDictionary>

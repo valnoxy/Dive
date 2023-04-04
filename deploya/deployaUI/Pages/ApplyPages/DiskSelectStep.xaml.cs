@@ -261,53 +261,5 @@ namespace deployaUI.Pages.ApplyPages
                 return false;
             }
         }
-
-        private void SModeToggle_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (SModeToggle.IsChecked == true)
-            {
-                Common.DeploymentOption.UseSMode = true;
-                Common.Debug.Write("Using S Mode in Unattend: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
-            }
-            else
-            {
-                Common.DeploymentOption.UseSMode = false;
-                Common.Debug.Write("Using S Mode in Unattend: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
-            }
-        }
-
-        private void CopyProfileToggle_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (CopyProfileToggle.IsChecked == true)
-            {
-                Common.DeploymentOption.UseCopyProfile = true;
-                Common.Debug.Write("Using CopyProfile in Unattend: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
-            }
-            else
-            {
-                Common.DeploymentOption.UseCopyProfile = false;
-                Common.Debug.Write("Using CopyProfile in Unattend: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
-            }
-        }
-
-        private void DiveToRecovery_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (DiveToRecovery.IsChecked == true)
-            {
-                Common.DeploymentOption.AddDiveToWinRE = true;
-                Common.Debug.Write("Implement Dive into Windows RE image: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
-            }
-            else
-            {
-                Common.DeploymentOption.AddDiveToWinRE = false;
-                Common.Debug.Write("Implement Dive into Windows RE image: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
-            }
-        }
     }
 }

@@ -17,7 +17,10 @@ namespace deployaUI.Pages.Extras
         public UnattendConfiguration()
         {
             InitializeComponent();
+        }
 
+        private void NavView_OnLoaded(object sender, RoutedEventArgs e)
+        {
             var navItems = new List<INavigationViewItem>
             {
                 new NavigationViewItem
@@ -25,36 +28,42 @@ namespace deployaUI.Pages.Extras
                     Content = Common.LocalizationManager.LocalizeValue("Deployment"),
                     Icon = new SymbolIcon
                     {
-                        Symbol = SymbolRegular.Home24
+                        Symbol = SymbolRegular.HardDrive20
                     },
                     TargetPageTag = "deployment",
-                    TargetPageType = new TypeDelegator(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage)),
-
+                    TargetPageType = new TypeDelegator(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage))
                 },
                 new NavigationViewItem
                 {
-                    Content = Common.LocalizationManager.LocalizeValue("Out-of-Box-Experience"),
+                    Content = Common.LocalizationManager.LocalizeValue("OOBE"),
                     Icon = new SymbolIcon
                     {
-                        Symbol = SymbolRegular.WindowApps24
+                        Symbol = SymbolRegular.CheckboxPerson20
                     },
-                    TargetPageTag = "oobe"
+                    TargetPageTag = "oobe",
+                    TargetPageType = new TypeDelegator(typeof(Extras.UnattendConfigurationPages.OOBEConfigurationPage))
                 },
                 new NavigationViewItem
                 {
                     Content = Common.LocalizationManager.LocalizeValue("Application"),
                     Icon = new SymbolIcon
                     {
-                        Symbol = SymbolRegular.AppGeneric32
+                        Symbol = SymbolRegular.AppGeneric20
                     },
-                    TargetPageTag = "application"
+                    TargetPageTag = "application",
+                    TargetPageType = new TypeDelegator(typeof(Extras.UnattendConfigurationPages.ApplicationConfigurationPage))
                 }
             };
 
             NavView.MenuItems = navItems;
-            
+            NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             NavView.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
-            NavView.Navigate("about");
+            NavView.Navigate("application");
+        }
+
+        private void UnattendConfiguration_OnContentRendered(object? sender, EventArgs e)
+        {
+            NavView.Navigate("deployment"); // Workaround
         }
     }
 }
