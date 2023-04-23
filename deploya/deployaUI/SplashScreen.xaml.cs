@@ -22,10 +22,10 @@ namespace deployaUI
 
         private List<Language> languages;
         public SplashScreen()
-        {
+        { 
             InitializeComponent();
 
-            // Get version
+            // Get application version
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             var version = fvi.FileVersion;
@@ -36,14 +36,14 @@ namespace deployaUI
 
             languages = new List<Language>()
             {
-                new Language {Name = "English", Code = "en-US"},
+                new Language {Name = "English", Code = "en-US"}, // Default language
                 new Language {Name = "Deutsch", Code = "de-DE"}
             };
             foreach (var language in languages)
             {
                 LanguageDropDown.Items.Add(language.Name);
             }
-            LanguageDropDown.SelectedIndex = 0; // Default language is English
+            LanguageDropDown.SelectedIndex = 0;
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

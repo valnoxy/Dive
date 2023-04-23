@@ -63,29 +63,24 @@ namespace deployaUI.Pages.ApplyPages
                 UseNTLDRBtn.IsChecked = true;
                 BIOSRadio.IsChecked = true;
                 UseRecoveryBtn.IsChecked = false;
-                DiveToRecovery.IsChecked = false;
             }
             else if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
             {
                 UseRecoveryBtn.IsChecked = false;
                 UseNTLDRBtn.IsChecked = false;
-                DiveToRecovery.IsChecked = false;
             }
             else if (Common.ApplyDetails.Name.ToLower().Contains("windows 7"))
             {
                 UseRecoveryBtn.IsChecked = true;
-                DiveToRecovery.IsChecked = false;
             }
             else if (Common.ApplyDetails.Name.Contains("(") || Common.ApplyDetails.Name.Contains(")"))
             {
-                CopyProfileToggle.IsChecked = true;
                 Common.DeploymentOption.UseCopyProfile = true;
             }
             else
             {
                 UseNTLDRBtn.IsChecked = false;
                 UseRecoveryBtn.IsChecked = true;
-                DiveToRecovery.IsChecked = true;
             }
         }
 

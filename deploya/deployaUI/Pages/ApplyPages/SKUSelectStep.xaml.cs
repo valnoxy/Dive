@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
@@ -39,13 +40,20 @@ namespace deployaUI.Pages.ApplyPages
             images = new List<Image>();
             var counter = 0;
 
-            // Find WIM USB device 
+            // Find WIM USB device
             var allDrives = DriveInfo.GetDrives();
             foreach (var d in allDrives)
             {
-                if (!File.Exists(Path.Combine(d.Name, ".diveusb")) ||
-                    !Directory.Exists(Path.Combine(d.Name, "WIMs"))) continue;
-                var dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim");
+                string[] dirs = { };
+                if (Directory.Exists(Path.Combine(d.Name, "WIMs")))
+                    dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim");
+
+                // Check if Windows Setup Media is presence
+                if (File.Exists(Path.Combine(d.Name, "setup.exe")) && Directory.Exists(Path.Combine(d.Name, "sources")))
+                {
+                    var setupFiles = Directory.GetFiles(Path.Combine(d.Name, "sources"), "*.wim");
+                    dirs = setupFiles.Aggregate(dirs, (current, setupFile) => current.Append(setupFile).ToArray());
+                }
 
                 foreach (var binary in dirs)
                 {
@@ -80,6 +88,17 @@ namespace deployaUI.Pages.ApplyPages
 
                             if (!string.IsNullOrEmpty(productBuild))
                                 productArch = $"Build {productBuild} - {productArch}";
+
+                            // Skip if image is Windows PE
+                            if (productName?.ToLower().Contains("pe") == true)
+                            {
+                                Common.Debug.Write("Image ");
+                                Common.Debug.Write(productName, true, ConsoleColor.DarkYellow);
+                                Common.Debug.Write(" in file ", true);
+                                Common.Debug.Write(binary, true, ConsoleColor.DarkYellow);
+                                Common.Debug.Write(" is a Windows PE image and will be skipped\n", true);
+                                break;
+                            }
 
                             Common.Debug.Write("Found ");
                             Common.Debug.Write(productName + " (" + productArch + ")", true, ConsoleColor.DarkYellow);

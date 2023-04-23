@@ -16,7 +16,7 @@
 		<AssemblyName>Dive</AssemblyName>
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
-		<Version>1.0.0.413</Version>
+		<Version>1.0.0.414</Version>
 		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
@@ -34,7 +34,8 @@
 		<None Remove="Assets\icon-windows-server-2012-40.png" />
 		<None Remove="Assets\icon-windows-vista-40.png" />
 		<None Remove="Assets\icon-windows-xp-40.png" />
-		<None Remove="Assets\pexels-johannes-plenio-1103970.jpg" />
+		<None Remove="Assets\pexels-johannes-plenio-1103970.bmp" />
+		<None Remove="Assets\pexels-johannes-plenio-1103970.png" />
 		<None Remove="Dive.ico" />
 	</ItemGroup>
 
@@ -58,7 +59,7 @@
 		<Resource Include="Assets\icon-windows-server-2012-40.png" />
 		<Resource Include="Assets\icon-windows-vista-40.png" />
 		<Resource Include="Assets\icon-windows-xp-40.png" />
-		<Resource Include="Assets\pexels-johannes-plenio-1103970.jpg" />
+		<Resource Include="Assets\pexels-johannes-plenio-1103970.bmp" />
 		<Resource Include="dive.ico" />
 		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
 		<Resource Include="Localization\ResourceDictionary.xaml" />
