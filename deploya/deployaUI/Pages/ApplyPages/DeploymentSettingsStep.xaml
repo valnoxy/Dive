@@ -281,7 +281,7 @@
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                         Text="{DynamicResource MoreSettingsDescription}" />
                                 </StackPanel>
-                                <ui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource MoreSettingsBtn}" Click="MoreSettings_OnClicked" />
+                                <ui:Button Grid.Column="1" Content="{DynamicResource MoreSettingsBtn}" Click="MoreSettings_OnClicked" />
                             </Grid>
                         </ui:CardControl.Header>
                     </ui:CardControl>
