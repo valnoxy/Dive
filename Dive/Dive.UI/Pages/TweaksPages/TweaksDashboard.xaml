@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Dive.UI.Pages.TweaksDashboard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Dive.UI.Pages"
+    xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+    mc:Ignorable="d"
+    d:DesignHeight="549" d:DesignWidth="728">
+
+    <StackPanel Margin="0,-20,0,0">
+        <wpfui:CardAction
+            Margin="0,0,0,8"
+            Click="SwitchToMigratePage"
+            IsEnabled="false"
+            Icon="ArrowCircleRight28">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="Medium"
+                    Text="Migrate Legacy Windows" />
+                <TextBlock
+                    FontSize="11"
+                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                    Text="Migrate your legacy (CSM) Windows installation to EFI based systems." />
+            </StackPanel>
+        </wpfui:CardAction>
+        <wpfui:CardAction
+            Margin="0,0,0,8"
+            Click="SwitchToRepairPage"
+            IsEnabled="false"
+            Icon="WrenchScrewdriver20">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="Medium"
+                    Text="Repair Bootloader" />
+                <TextBlock
+                    FontSize="11"
+                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                    Text="Repair the Bootloader of your current Windows installation." />
+            </StackPanel>
+        </wpfui:CardAction>
+    </StackPanel>
+</UserControl>

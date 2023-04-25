@@ -1,0 +1,176 @@
+﻿<Page x:Class="Dive.UI.Pages.Dashboard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Dive.UI.Pages"
+      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="549" d:DesignWidth="728"
+      Title="Dashboard">
+
+    <Grid Margin="19,40,19,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Center" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="0" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" 
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="{DynamicResource FastDeployment}" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource FastDeploymentDescription}" />
+                </StackPanel>
+            </Grid>
+            
+            <Grid Grid.Column="1" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" 
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="{DynamicResource Compatibility}" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource CompatibilityDescription}" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="2" Margin="15,0,15,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24"
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="19,0,0,0"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Margin="0,0,0,4"
+                        FontSize="16"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Text="{DynamicResource OpenSource}" />
+                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource OpenSourceDescription}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+        
+        <Grid Grid.Row="2" Margin="0,25,0,0">
+            <StackPanel>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Click="SwitchToApplyPage"
+                    Icon="WindowApps24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="{DynamicResource ApplyImage}" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="{DynamicResource ApplyImageDescription}" />
+                    </StackPanel>
+                </wpfui:CardAction>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Click="SwitchToCapturePage"
+                    Icon="Copy24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="{DynamicResource CaptureWindows}" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="{DynamicResource CaptureWindowsDescription}" />
+                    </StackPanel>
+                </wpfui:CardAction>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Click="SwitchToCloudPage"
+                    Icon="Cloud24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="{DynamicResource CloudInstallation}" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="{DynamicResource CloudInstallationDescription}" />
+                    </StackPanel>
+                </wpfui:CardAction>
+                <wpfui:CardAction
+                    Margin="0,0,0,8"
+                    Click="SwitchToRepairPage"
+                    Icon="Toolbox24">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,4"
+                            FontWeight="Medium"
+                            Text="{DynamicResource RepairAndTweaks}"/>
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                            Text="{DynamicResource RepairAndTweaksDescription}" />
+                    </StackPanel>
+                </wpfui:CardAction>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid Grid.Column="0">
+                        <wpfui:Anchor
+                            Content="{DynamicResource SourceCodeBtn}"
+                            Margin="0,0,8,0"
+                            Icon="Link48"
+                            NavigateUri="https://github.com/valnoxy/dive" />
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <wpfui:Anchor
+                            Content="{DynamicResource ProjectBtn}"
+                            Icon="Link48"
+                            NavigateUri="https://exploitox.de/dive" />
+                    </Grid>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

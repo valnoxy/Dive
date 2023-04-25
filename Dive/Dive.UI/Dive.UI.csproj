@@ -1,0 +1,110 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<SelfContained>true</SelfContained>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<Platforms>x64</Platforms>
+		<Prefer32Bit>false</Prefer32Bit>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<ApplicationIcon>Dive.ico</ApplicationIcon>
+		<AssemblyName>Dive</AssemblyName>
+		<Company>Exploitox</Company>
+		<Authors>valnoxy</Authors>
+		<Version>1.0.0.414</Version>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Assets\icon-aios-40.png" />
+		<None Remove="Assets\icon-hdd-40.png" />
+		<None Remove="Assets\icon-windows-10-40.png" />
+		<None Remove="Assets\icon-windows-11-40.png" />
+		<None Remove="Assets\icon-windows-2000-40.png" />
+		<None Remove="Assets\icon-windows-40.png" />
+		<None Remove="Assets\icon-windows-7-40.png" />
+		<None Remove="Assets\icon-windows-8-40.png" />
+		<None Remove="Assets\icon-windows-server-2012-40.png" />
+		<None Remove="Assets\icon-windows-vista-40.png" />
+		<None Remove="Assets\icon-windows-xp-40.png" />
+		<None Remove="Assets\pexels-johannes-plenio-1103970.bmp" />
+		<None Remove="Assets\pexels-johannes-plenio-1103970.png" />
+		<None Remove="Dive.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Remove="Localization\ResourceDictionary.de-DE.xaml" />
+	  <Page Remove="Localization\ResourceDictionary.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Assets\icon-hdd-40.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Assets\icon-aios-40.png" />
+		<Resource Include="Assets\icon-windows-10-40.png" />
+		<Resource Include="Assets\icon-windows-11-40.png" />
+		<Resource Include="Assets\icon-windows-2000-40.png" />
+		<Resource Include="Assets\icon-windows-40.png" />
+		<Resource Include="Assets\icon-windows-7-40.png" />
+		<Resource Include="Assets\icon-windows-8-40.png" />
+		<Resource Include="Assets\icon-windows-server-2012-40.png" />
+		<Resource Include="Assets\icon-windows-vista-40.png" />
+		<Resource Include="Assets\icon-windows-xp-40.png" />
+		<Resource Include="Assets\pexels-johannes-plenio-1103970.bmp" />
+		<Resource Include="dive.ico" />
+		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
+		<Resource Include="Localization\ResourceDictionary.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.9.1" />
+		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Management" Version="7.0.0" />
+		<PackageReference Include="WPF-UI" Version="3.0.0-preview.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Dive.Core\Dive.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Pages\ApplyPages\CloudSelectStep.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\CapturePages\CaptureStep.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\TweaksContent.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\CloudContent.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\ApplyPages\ApplySelectStep.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\ApplyPages\DiskSelectStep.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\TweaksPages\TweaksActionScreen.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64\signtool.exe&quot; sign /sha1 &quot;35f4e53a88751bbe67eaa097513e3db1ad2f49e3&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
+	</Target>
+
+</Project>

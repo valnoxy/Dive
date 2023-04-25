@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<RootNamespace>Dive.Core</RootNamespace>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>Link</TrimMode>
+		<SelfContained>true</SelfContained>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<AssemblyName>DiveCore</AssemblyName>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x64</Platforms>
+		<Prefer32Bit>false</Prefer32Bit>
+		<DebugType>embedded</DebugType>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<PackageId>Dive</PackageId>
+		<Version>12.0.0.461</Version>
+		<Authors>valnoxy</Authors>
+		<Company>Exploitox</Company>
+		<Product>Dive</Product>
+		<Title>Dive Core</Title>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+		<PackageReleaseNotes>Dive Core</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\WinREConfig.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Dism" Version="2.5.2" />
+		<PackageReference Include="Microsoft.Wim" Version="1.2.11" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\WinREConfig.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Assets\UefiSevenResources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>UefiSevenResources.resx</DependentUpon>
+	  </Compile>
+	  <Compile Update="Assets\WinRE.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>WinRE.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Assets\UefiSevenResources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>UefiSevenResources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	  <EmbeddedResource Update="Assets\WinRE.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>WinRE.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.dll) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22000.0\x64\signtool.exe&quot; sign /sha1 &quot;35f4e53a88751bbe67eaa097513e3db1ad2f49e3&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
+	</Target>
+
+</Project>

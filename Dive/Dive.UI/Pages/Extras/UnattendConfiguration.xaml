@@ -1,0 +1,43 @@
+﻿<ui:FluentWindow x:Class="Dive.UI.Pages.Extras.UnattendConfiguration"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dive.UI"
+        mc:Ignorable="d"
+        Title="Dive - Deployment Settings" MinHeight="600" MinWidth="650" MaxHeight="600" MaxWidth="650"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        WindowStartupLocation="CenterScreen"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        WindowCornerPreference="Round"
+        ResizeMode="NoResize"
+        ContentRendered="UnattendConfiguration_OnContentRendered">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ui:NavigationView
+                x:Name="NavView"
+                Grid.Column="0"
+                Margin="6,0,6,0"
+                Loaded="NavView_OnLoaded"/>
+        </Grid>
+
+        <ui:TitleBar
+            Title="Deployment Settings"
+            ShowMaximize="False"
+            Icon="pack://application:,,,/Dive.ico"
+            ShowMinimize="False"
+            Grid.Row="0"/>
+    </Grid>
+</ui:FluentWindow>

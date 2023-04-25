@@ -1,0 +1,325 @@
+﻿<UserControl x:Class="Dive.UI.Pages.ApplyPages.DeploymentSettingsStep"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:local="clr-namespace:Dive.UI.Pages.ApplyPages"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="0,-20,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <!-- Title with button text -->
+            <RowDefinition Height="*"/>
+            <!-- Content -->
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource ConfigureTitle}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource ConfigureTitleDescription}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Height="350">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
+                <StackPanel>
+                    <ui:CardExpander Icon="Person24" IsExpanded="False">
+                        <ui:CardExpander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="{DynamicResource AdminAccountTitle}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="{DynamicResource AdminAccountDescription}" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_Switch" Unchecked="User_Switch" x:Name="ToggleUser" />
+                            </Grid>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="0"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource Username}" />
+                                <ui:TextBox 
+                                    x:Name="TbUser" 
+                                    Grid.Column="1" 
+                                    Grid.Row="0"
+                                    Icon="Person24" 
+                                    PlaceholderText="{DynamicResource UsernamePlaceholder}" 
+                                    IsEnabled="true"
+                                    Margin="0,0,0,5"
+                                    TextChanged="TbUser_OnTextChanged"/>
+
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="1"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Text="{DynamicResource Password}" />
+                                <ui:TextBox
+                                    x:Name="TbPassword" 
+                                    Grid.Column="1" 
+                                    Grid.Row="1"
+                                    Icon="Key24"
+                                    PlaceholderText="{DynamicResource PasswordPlaceholder}" 
+                                    IsEnabled="false"
+                                    TextChanged="TbPassword_OnTextChanged" />
+                            </Grid>
+
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:CardExpander Icon="BoxEdit24" IsExpanded="False" Margin="0,5,0,0">
+                        <ui:CardExpander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="{DynamicResource OEMSupportTitle}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="{DynamicResource OEMSupportDescription}" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="Oem_Switch" Unchecked="Oem_Switch" x:Name="ToggleOem"/>
+                            </Grid>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="5*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <!-- OEM Logo -->
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="0"
+                                    FontSize="14"
+                                    Margin="0,0,0,5"
+                                    VerticalAlignment="Center"
+                                    Text="{DynamicResource OEMLogo}" />
+                                <Grid Grid.Column="1" Grid.Row="0" Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox x:Name="TbLogo" Grid.Column="0" Icon="Image24" PlaceholderText="{DynamicResource OEMLogoPlaceholder}" IsEnabled="false" TextChanged="TbLogo_OnTextChanged"/>
+                                    <ui:Button Grid.Column="1" Width="35" Height="35" Margin="5,0,0,0" Icon="DocumentSearch24" Click="OEMLogo_OpenFileClick"/>
+                                    <ui:Button Grid.Column="2" Width="35" Height="35" Margin="5,0,0,0" Icon="Backspace24"/>
+                                </Grid>
+
+                                <!-- Manufacturer -->
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="1"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMManufacturer}" />
+                                <ui:TextBox
+                                    x:Name="TbManufacturer" 
+                                    Grid.Column="1"
+                                    Grid.Row="1"
+                                    Margin="0,0,0,5"
+                                    Icon="Building24"
+                                    PlaceholderText="{DynamicResource OEMManufacturerPlaceholder}" 
+                                    TextChanged="TbManufacturer_OnTextChanged"/>
+
+                                <!-- Model -->
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="2"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMModel}" />
+                                <ui:TextBox
+                                    x:Name="TbModel" 
+                                    Grid.Column="1"
+                                    Grid.Row="2"
+                                    Margin="0,0,0,5"
+                                    Icon="Desktop24"
+                                    PlaceholderText="{DynamicResource OEMModelPlaceholder}"
+                                    TextChanged="TbModel_OnTextChanged"/>
+
+                                <!-- Support Hours -->
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="3"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMSupportHours}" />
+                                <ui:TextBox
+                                    x:Name="TbSupportHours" 
+                                    Grid.Column="1"
+                                    Grid.Row="3"
+                                    Margin="0,0,0,5"
+                                    Icon="Clock24"
+                                    PlaceholderText="{DynamicResource OEMSupportHoursPlaceholder}"
+                                    TextChanged="TbSupportHours_OnTextChanged"/>
+
+                                <!-- Phone Number -->
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="4"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMPhoneNo}" />
+                                <ui:TextBox
+                                    x:Name="TbPhone" 
+                                    Grid.Column="1"
+                                    Grid.Row="4"
+                                    Margin="0,0,0,5"
+                                    Icon="Call24"
+                                    PlaceholderText="{DynamicResource OEMPhoneNoPlaceholder}"
+                                    TextChanged="TbPhone_OnTextChanged"/>
+
+                                <!-- Homepage -->
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Grid.Row="5"
+                                    FontSize="14"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,5"
+                                    Text="{DynamicResource OEMHomepage}" />
+                                <ui:TextBox
+                                    x:Name="TbUrl" 
+                                    Grid.Column="1"
+                                    Grid.Row="5"
+                                    Margin="0,0,0,5"
+                                    Icon="Earth24"
+                                    PlaceholderText="{DynamicResource OEMHomepagePlaceholder}"
+                                    TextChanged="TbUrl_OnTextChanged"/>
+                            </Grid>
+                        </StackPanel>
+                    </ui:CardExpander>
+
+                    <ui:CardControl Icon="Settings48" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="{DynamicResource InjectDriversTitle}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="{DynamicResource InjectDriversDescription}" />
+                                </StackPanel>
+                                <TextBlock
+                                    FontSize="12"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                    x:Name="TbDrvPath"
+                                    Text="{DynamicResource InjectDriversNoSource}" />
+                                <ui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+
+                    <ui:CardControl Icon="TextBoxSettings24" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="{DynamicResource MoreSettingsTitle}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="{DynamicResource MoreSettingsDescription}" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Content="{DynamicResource MoreSettingsBtn}" Click="MoreSettings_OnClicked" />
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+
+                    <ui:CardControl Icon="BoxMultipleArrowRight24" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="{DynamicResource SettingsImportExportTitle}" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="{DynamicResource SettingsImportExportDescription}" />
+                                </StackPanel>
+                                <ui:Button Grid.Column="1" Margin="0,0,8,0" Content="{DynamicResource ImportBtn}" Click="Import_OnClicked" />
+                                <ui:Button Grid.Column="2" Margin="0,0,0,0" Content="{DynamicResource ExportBtn}" Click="Export_OnClicked" />
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                </StackPanel>
+            </ScrollViewer>
+            <ui:Snackbar
+                x:Name="RootSnackbar"
+                Title="Hello World!"
+                MaxWidth="600"
+                Appearance="Danger"
+                Icon="Warning24"
+                Message="Remember that the Heat Death of Universe is coming someday, no time to explain - let's go!"
+                Timeout="15000" />
+        </Grid>
+    </Grid>
+
+</UserControl>
