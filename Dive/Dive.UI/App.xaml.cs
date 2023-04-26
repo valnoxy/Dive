@@ -221,123 +221,14 @@ namespace Dive.UI
             var parser = new CommandLine.Parser(with => with.HelpWriter = null);
             var parserResult = parser.ParseArguments<ApplyOptions, CaptureOptions>(args);
             parserResult
-                .WithParsed<ApplyOptions>(options => Run(options))
-                .WithParsed<CaptureOptions>(options => RunA(options))
+                .WithParsed(options => RunA())
                 .WithNotParsed(errs => DisplayHelp(parserResult, errs));
             Environment.Exit(0);
         }
 
-        private static void Run(ApplyOptions options)
+        private static void RunA()
         {
-            throw new NotImplementedException("The CLI is not working in this version.");
-#warning CLI version is not working.
-
-            Entities.Firmware firmware = new Entities.Firmware();
-            Entities.Bootloader bootloader = new Entities.Bootloader();
-
-            // Firmware definition
-            if (options.efi) { firmware = Entities.Firmware.EFI; }
-            if (!options.efi) { firmware = Entities.Firmware.BIOS; }
-
-            // Bootloader definition
-            if (options.ntldr) { bootloader = Entities.Bootloader.NTLDR; }
-            if (!options.ntldr) { bootloader = Entities.Bootloader.BOOTMGR; }
-            
-            // CLI verify
-            string image = options.wimfile.ToString();
-            string Index = options.index.ToString();
-            string diskId = options.driveid.ToString();
-
-            if (diskId.Contains("\\\\.\\PHYSICALDRIVE"))
-                diskId = new string(Enumerable.ToArray<char>(Enumerable.Where<char>((IEnumerable<char>)diskId, new Func<char, bool>(char.IsDigit))));
-
-#region Check options
-
-#region WIM-File
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            if (!File.Exists(image))
-            {
-                Console.WriteLine("[i] Image not exist.");
-                Console.ForegroundColor = (ConsoleColor)15;
-                Environment.Exit(1);
-            }
-            Console.WriteLine("[i] Image     = " + image);
-#endregion
-
-#region Target
-            if (App.GetDiskIndex(diskId) > 0U)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[!] Target not exist. ID: " + App.GetDiskIndex(diskId).ToString());
-                Console.ResetColor();
-                Environment.Exit(1);
-            }
-            Console.WriteLine("[i] Target    = disk" + diskId);
-#endregion
-
-#region BIOS type & Bootloader
-
-            if (options.efi && options.ntldr)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("[!] You cannot use EFI with a legacy bootloader. Aborting ...");
-                Console.ResetColor();
-                Environment.Exit(1);
-            }
-
-            if (options.efi)
-            {
-                Console.WriteLine("[i] Firmware  = EFI");
-                Console.WriteLine("[i] Legacy    = false");
-            }
-            else if (options.ntldr)
-            {
-                Console.WriteLine("[i] Firmware  = BIOS");
-                Console.WriteLine("[i] Legacy    = true");
-            }
-            else
-            {
-                Console.WriteLine("[i] Firmware  = BIOS");
-                Console.WriteLine("[i] Legacy    = false");
-            }
-
-#endregion
-
-#endregion
-
-            //Actions.PrepareDisk(firmware, bootloader, ui, options.driveid, true);
-            Actions.ApplyWim("W:\\", options.wimfile, options.index);
-
-            if (bootloader == Entities.Bootloader.BOOTMGR)
-                Actions.InstallBootloader(firmware, bootloader, "W:\\", "S:\\");
-
-            if (bootloader == Entities.Bootloader.NTLDR)
-                Actions.InstallBootloader(firmware, bootloader, "W:\\", "W:\\");
+            throw new NotImplementedException("The CLI version is obsolete and will be replaced in future versions. Please use the GUI version of Dive for deployment.");
         }
-
-        private static void RunA(CaptureOptions options)
-        {
-            throw new NotImplementedException("The CLI is not working in this version.");
-#warning CLI version is not working.
-        }
-
-        #region Get Disk index
-        public static int GetDiskIndex(string diskId)
-        {
-            // string tempPath = Path.GetTempPath();
-            // File.WriteAllText(tempPath + "getdiskindex.cmd", "@wmic diskdrive get index | more +1");
-            Process process = new Process();
-            process.StartInfo.FileName = "cmd.exe";
-            process.StartInfo.Arguments = "/c \"@wmic diskdrive get index | more +1\"";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.Start();
-            string end = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            // try { File.Delete(Path.Combine(tempPath, "getdiskindex.cmd")); } catch { }
-            return end.Contains(diskId) ? 0 : -1;
-        }
-#endregion
     }
 }

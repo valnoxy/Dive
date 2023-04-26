@@ -75,6 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Dive.AutoInit\Dive.AutoInit.csproj" />
 		<ProjectReference Include="..\Dive.Core\Dive.Core.csproj" />
 	</ItemGroup>
 

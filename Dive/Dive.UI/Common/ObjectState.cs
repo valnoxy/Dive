@@ -85,6 +85,7 @@ namespace Dive.UI.Common
 
     public enum TweakMode
     {
+        AutoInit,
         Migrate,
         RepairBootloader
     }

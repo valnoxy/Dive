@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<RootNamespace>Dive.AutoInit</RootNamespace>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>Link</TrimMode>
+		<SelfContained>true</SelfContained>
+		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<AssemblyName>Dive.AutoInit</AssemblyName>
+		<Platforms>x64</Platforms>
+		<Prefer32Bit>false</Prefer32Bit>
+		<DebugType>embedded</DebugType>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<PackageId>Dive.AutoInit</PackageId>
+		<Version>2.0.0</Version>
+		<Authors>valnoxy</Authors>
+		<Company>Exploitox</Company>
+		<Product>Dive</Product>
+		<Title>Dive AutoInit Module</Title>
+		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+		<PackageReleaseNotes>Dive AutoInit Module</PackageReleaseNotes>
+	</PropertyGroup>
+
+</Project>

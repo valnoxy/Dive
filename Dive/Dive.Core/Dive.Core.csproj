@@ -10,13 +10,13 @@
 		<SelfContained>true</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<AssemblyName>DiveCore</AssemblyName>
+		<AssemblyName>Dive.Core</AssemblyName>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<Platforms>x64</Platforms>
 		<Prefer32Bit>false</Prefer32Bit>
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<PackageId>Dive</PackageId>
+		<PackageId>Dive.Core</PackageId>
 		<Version>12.0.0.461</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>

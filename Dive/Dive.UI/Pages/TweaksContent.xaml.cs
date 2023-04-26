@@ -32,6 +32,18 @@ namespace Dive.UI.Pages
         {
             switch (Common.Tweaks.CurrentMode)
             {
+                case TweakMode.AutoInit:
+                    switch (FrameWindow.Content)
+                    {
+                        case AutoInitSettings:
+                            FrameWindow.Content = TD;
+                            NextBtn.IsEnabled = false;
+                            BackBtn.IsEnabled = false;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 case TweakMode.Migrate:
                     switch (FrameWindow.Content)
                     {
@@ -66,6 +78,18 @@ namespace Dive.UI.Pages
         {
             switch (Common.Tweaks.CurrentMode)
             {
+                case TweakMode.AutoInit:
+                    switch (FrameWindow.Content)
+                    {
+                        case AutoInitSettings:
+                            FrameWindow.Content = TD;
+                            NextBtn.IsEnabled = false;
+                            BackBtn.IsEnabled = false;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 case TweakMode.Migrate:
                     switch (FrameWindow.Content)
                     {

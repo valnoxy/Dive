@@ -27,8 +27,18 @@ namespace Dive.UI.Pages
             InitializeComponent();
 
             var versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
-            valueVersion.Content = $"{versionInfo.ProductName} V. {versionInfo.ProductVersion}";
-            valueCopyright.Content = versionInfo.LegalCopyright;
+            ValueVersion.Content = $"{versionInfo.ProductName} V. {versionInfo.ProductVersion}";
+            ValueCopyright.Content = versionInfo.LegalCopyright;
+
+            // Define Core Version
+            var coreVersion = typeof(Core.Common.Entities).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+            ValueVersionCore.Content = $"{versionInfo.ProductName} Core V. {coreVersion}";
+
+            // Define AutoInit Module Version
+            var autoInitVersion = typeof(AutoInit.AppxManagement).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
+            ValueVersionAutoInit.Content = $"{versionInfo.ProductName} AutoInit Module V. {autoInitVersion}";
         }
     }
 }

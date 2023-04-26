@@ -17,6 +17,12 @@ namespace Dive.UI.Pages
             InitializeComponent();
         }
 
+        private void SwitchToAutoInit(object sender, RoutedEventArgs e)
+        {
+            Common.Tweaks.CurrentMode = TweakMode.AutoInit;
+            TweaksContent.ContentWindow.FrameWindow.Content = new AutoInitSettings();
+        }
+
         private void SwitchToMigratePage(object sender, RoutedEventArgs e)
         {
             Common.Tweaks.CurrentMode = TweakMode.Migrate;

@@ -44,10 +44,12 @@
 
             <Grid Grid.Row="2">
                 <StackPanel>
-                    <Label x:Name="labelTitle" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="About this App" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" FontWeight="Bold" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="valueVersion" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="valueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <TextBlock x:Name="licenseText" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" FontSize="15" TextWrapping="WrapWithOverflow" FontFamily="Segoe UI Variable Display" Height="100">
+                    <Label x:Name="LabelTitle" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="About this App" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" FontWeight="Bold" FontFamily="Segoe UI Variable Display"/>
+                    <Label x:Name="ValueVersion" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive UI V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                    <Label x:Name="ValueVersionCore" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive Core V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                    <Label x:Name="ValueVersionAutoInit" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive AutoInit Module V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                    <Label x:Name="ValueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                    <TextBlock x:Name="LicenseText" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" FontSize="15" TextWrapping="WrapWithOverflow" FontFamily="Segoe UI Variable Display" Height="100">
                         This program is free software: you can redistribute it and/or modify
                         it under the terms of the GNU General Public License as published by
                         the Free Software Foundation, either version 3 of the License, or
