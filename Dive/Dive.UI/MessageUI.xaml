@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dive.UI"
         mc:Ignorable="d"
-        Title="Dive" Height="200" Width="500" MaxHeight="200" MaxWidth="500"
+        Title="Dive" MinHeight="200" MinWidth="500" MaxHeight="200" MaxWidth="500"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"

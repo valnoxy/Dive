@@ -10,20 +10,20 @@
  * Source code: https://github.com/valnoxy/dive
  */
 
+using CommandLine;
+using CommandLine.Text;
+using Dive.UI.AutoDive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using CommandLine;
-using CommandLine.Text;
 using System.Reflection;
 using System.IO;
-using Dive.Core;
-using Dive.Core.Common;
-using Dive.UI.AutoDive;
 using System.Windows.Threading;
+using Dive.UI.Initialization;
+using Application = System.Windows.Application;
 
 namespace Dive.UI
 {
@@ -71,7 +71,7 @@ namespace Dive.UI
         }
 
         [Verb("Capture", HelpText = "Captures a image")]
-        class CaptureOptions
+        private class CaptureOptions
         {
             [Option('c', "cap", Required = true, HelpText = "Input WIM-file to be processed.")]
             public string capturedir { get; set; }
@@ -84,7 +84,7 @@ namespace Dive.UI
 
         }
 
-        static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
+        private static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
         {
             var helpText = HelpText.AutoBuild(result, h =>
             {
@@ -96,7 +96,7 @@ namespace Dive.UI
             Console.WriteLine(helpText);
         }
 
-        static void ShowGUI()
+        private static void ShowGui()
         {
             var wnd = new MainWindow();
             var splash = new SplashScreen();
@@ -113,12 +113,20 @@ namespace Dive.UI
             Environment.Exit(0);
         }
 
-        static void ShowAutoDive()
+        private static void ShowAutoDive()
         {
             var wnd = new AutoDiveUi();
             wnd.ShowDialog();
             Environment.Exit(0);
         }
+
+        private static void ShowAutoInitBoot(Configuration? config)
+        {
+            var wnd = new Initialization.BootWindow(config);
+            wnd.ShowDialog();
+            Environment.Exit(0);
+        }
+
         #endregion
 
         #region Console Window State
@@ -173,7 +181,7 @@ namespace Dive.UI
                     }
                 }
 
-                ShowGUI();
+                ShowGui();
             }
 
 #if DEBUG
@@ -218,7 +226,21 @@ namespace Dive.UI
             }
 #endif
 
-            var parser = new CommandLine.Parser(with => with.HelpWriter = null);
+            if (args.Contains("--autoinit-boot"))
+            {
+                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
+                Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
+                Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+                Console.WriteLine("Please wait ...");
+
+                // Load test config
+                var testConfigJson = Initialization.ConfigurationLoader.CreateConfiguration();
+                var config = Initialization.ConfigurationLoader.LoadConfiguration(testConfigJson);
+
+                ShowAutoInitBoot(config);
+            }
+
+            var parser = new Parser(with => with.HelpWriter = null);
             var parserResult = parser.ParseArguments<ApplyOptions, CaptureOptions>(args);
             parserResult
                 .WithParsed(options => RunA())

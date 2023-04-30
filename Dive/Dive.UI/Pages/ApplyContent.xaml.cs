@@ -66,8 +66,8 @@ namespace Dive.UI.Pages
                 case ApplySelectStep:
                     if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
                         System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
-                    //else
-                    //    System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
+                    else
+                        Environment.Exit(0);
                     break;
             }
         }

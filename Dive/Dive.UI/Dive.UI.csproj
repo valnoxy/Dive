@@ -16,7 +16,7 @@
 		<AssemblyName>Dive</AssemblyName>
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
-		<Version>1.0.0.414</Version>
+		<Version>1.0.0.423</Version>
 		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
@@ -24,6 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Assets\Fadi_Loop_f.gif" />
 		<None Remove="Assets\icon-aios-40.png" />
 		<None Remove="Assets\icon-hdd-40.png" />
 		<None Remove="Assets\icon-windows-10-40.png" />
@@ -46,6 +47,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Assets\Fadi_Loop_f.gif" />
 		<Resource Include="Assets\icon-hdd-40.png" />
 	</ItemGroup>
 
@@ -69,9 +71,11 @@
 	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
+		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="7.0.0" />
+		<PackageReference Include="System.Management" Version="7.0.1" />
 		<PackageReference Include="WPF-UI" Version="3.0.0-preview.1" />
+		<PackageReference Include="XamlAnimatedGif" Version="2.1.1" />
 	</ItemGroup>
 
 	<ItemGroup>

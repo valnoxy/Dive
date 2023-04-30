@@ -81,7 +81,7 @@ namespace Dive.AutoInit
         /// Disable devicecensus.exe
         /// </summary>
         /// <returns>Status of action</returns>
-        public static bool DisableDeviceSensus()
+        public static bool DisableDeviceCensus()
         {
             var status = true;
             var a = System.Processes.RunProcess("schtasks.exe", "/change /TN \"Microsoft\\Windows\\Device Information\\Device\" /disable");
