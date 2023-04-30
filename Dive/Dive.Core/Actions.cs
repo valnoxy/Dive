@@ -647,8 +647,16 @@ namespace Dive.Core
         /// <returns>Information about the image file as XML</returns>
         public static string GetInfo(string imagePath)
         {
+            var imageExtension = Path.GetExtension(imagePath);
+            var option = imageExtension switch
+            {
+                ".wim" => WimCreateFileOptions.None,
+                ".esd" => WimCreateFileOptions.Chunked, // 0x20000000
+                _ => WimCreateFileOptions.None
+            };
+
             using var file = WimgApi.CreateFile(imagePath, 
-                WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None);
+                WimFileAccess.Read, WimCreationDisposition.OpenExisting, option, WimCompressionType.None);
             var a = WimgApi.GetImageInformationAsString(file);
             return a;
         }

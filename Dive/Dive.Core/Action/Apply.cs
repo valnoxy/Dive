@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Dive.Core.Common;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Dive.Core.Action
 {
@@ -16,7 +17,15 @@ namespace Dive.Core.Action
         {
             Bw = worker;
 
-            using var file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, WimCreateFileOptions.None, WimCompressionType.None);
+            var imageExtension = Path.GetExtension(imagePath);
+            var option = imageExtension switch
+            {
+                ".wim" => WimCreateFileOptions.None,
+                ".esd" => WimCreateFileOptions.Chunked, // 0x20000000
+                _ => WimCreateFileOptions.None
+            };
+
+            using var file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, option, WimCompressionType.None);
             WimgApi.SetTemporaryPath(file, Environment.GetEnvironmentVariable("TEMP"));
             WimgApi.RegisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
             try

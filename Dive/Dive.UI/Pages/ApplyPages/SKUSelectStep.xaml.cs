@@ -46,12 +46,16 @@ namespace Dive.UI.Pages.ApplyPages
             {
                 string[] dirs = { };
                 if (Directory.Exists(Path.Combine(d.Name, "WIMs")))
-                    dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim");
+                    dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim")
+                        .Concat(Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.esd"))
+                        .ToArray();
 
                 // Check if Windows Setup Media is presence
                 if (File.Exists(Path.Combine(d.Name, "setup.exe")) && Directory.Exists(Path.Combine(d.Name, "sources")))
                 {
-                    var setupFiles = Directory.GetFiles(Path.Combine(d.Name, "sources"), "*.wim");
+                    var setupFiles = Directory.GetFiles(Path.Combine(d.Name, "sources"), "*.wim")
+                        .Concat(Directory.GetFiles(Path.Combine(d.Name, "sources"), "*.esd"))
+                        .ToArray();
                     dirs = setupFiles.Aggregate(dirs, (current, setupFile) => current.Append(setupFile).ToArray());
                 }
 
