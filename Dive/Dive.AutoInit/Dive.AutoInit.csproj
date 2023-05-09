@@ -28,4 +28,19 @@
 		<PackageReleaseNotes>Dive AutoInit Module</PackageReleaseNotes>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Compile Update="Resources\StartMenu.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>StartMenu.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\StartMenu.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>StartMenu.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
 </Project>

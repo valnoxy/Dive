@@ -23,6 +23,7 @@ using System.Reflection;
 using System.IO;
 using System.Windows.Threading;
 using Dive.UI.Initialization;
+using Action = System.Action;
 using Application = System.Windows.Application;
 
 namespace Dive.UI

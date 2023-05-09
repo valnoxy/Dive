@@ -8,7 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Margin="0,-20,0,0">
-        
         <StackPanel>
             <ui:Card>
                 <Grid>
@@ -28,14 +27,14 @@
                         x:Name="UiFlyout"
                         Grid.Row="0"
                         Padding="-15"
-                        Placement="Bottom">
+                        Placement="Right">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            
+
                             <Label Grid.Row="0"
                                    Content="Verified Playbook"
                                    HorizontalContentAlignment="Center"
@@ -50,8 +49,10 @@
                                 FontSize="12"
                                 Width="215"
                                 TextWrapping="Wrap"/>
-                            <Grid Grid.Row="2" 
-                                  Background="#344a49">
+                            <Border Grid.Row="2"
+                                    Background="#344a49"
+                                    CornerRadius="0,0,5,5"
+                                    BorderThickness="0,0,0,0">
                                 <ui:Button 
                                     Width="225"
                                     Content="Visit website"
@@ -59,14 +60,16 @@
                                     Margin="0,5,0,5"
                                     HorizontalContentAlignment="Center"
                                     HorizontalAlignment="Center"/>
-                            </Grid>
-
+                            </Border>
                         </Grid>
                     </ui:Flyout>
                 </Grid>
             </ui:Card>
+            <ui:Button
+                Click="TestDeploy"
+                Icon="ArrowRight24"
+                Margin="10"
+                Content="Test Boot Deployment (see Console)"/>
         </StackPanel>
-
     </Grid>
-
 </UserControl>

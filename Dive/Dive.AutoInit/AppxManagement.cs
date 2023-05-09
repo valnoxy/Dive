@@ -38,6 +38,30 @@ namespace Dive.AutoInit
         }
 
         /// <summary>
+        /// Removes the App from the system.
+        /// </summary>
+        /// <remarks>
+        /// Return code: 0 = success, 1 = failure
+        /// </remarks>
+        /// <param name="appId">Application ID</param>
+        /// <returns>Status code</returns>
+        public static int RemoveAppXProvisionedPackage(string appId)
+        {
+            var psi = new ProcessStartInfo
+            {
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                Arguments = $"$App = Get-AppXProvisionedPackage -Online | Where {{$_.DisplayName -eq '{appId}' }}; Remove-AppXProvisionedPackage -Online -PackageName $App.PackageName",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                FileName = "powershell.exe"
+            };
+            var proc = Process.Start(psi);
+
+            proc!.WaitForExit();
+            return proc.ExitCode;
+        }
+
+        /// <summary>
         /// Checks if WinGet is installed on the system.
         /// </summary>
         /// <returns>Summary as bool</returns>

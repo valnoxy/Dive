@@ -16,7 +16,7 @@ namespace Dive.AutoInit.System
             };
             var proc = Process.Start(psi);
 
-            proc.WaitForExit();
+            proc!.WaitForExit();
             return proc.ExitCode;
         }
     }

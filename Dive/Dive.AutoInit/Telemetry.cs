@@ -4,7 +4,7 @@
 
 namespace Dive.AutoInit
 {
-    internal class Telemetry
+    public class Telemetry
     {
         /// <summary>
         /// Disable Customer Experience Improvement (CEIP/SQM)
