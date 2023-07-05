@@ -904,7 +904,11 @@ namespace Dive.UI.Common
             }
 
             // OEM Information
-            if (mode is UnattendMode.Admin or UnattendMode.AdminWithoutPassword or UnattendMode.User or UnattendMode.UserWithoutPassword)
+            if (mode is UnattendMode.Admin 
+                or UnattendMode.AdminWithoutPassword 
+                or UnattendMode.User 
+                or UnattendMode.UserWithoutPassword
+                or UnattendMode.OnlyOem)
             {
                 Common.Debug.WriteLine("[UnattendBuilder] OEM Information");
                 if (string.IsNullOrEmpty(Common.OemInfo.LogoPath))

@@ -195,7 +195,7 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
                 var config = "";
-                Common.UnattendMode? um = Common.UnattendMode.Admin;
+                Common.UnattendMode? um = Common.UnattendMode.OnlyOem;
                 Common.DeploymentInfo.Username = "Administrator";
                 Common.DeploymentInfo.Password = "Pa$$w0rd";
                 Common.DeploymentOption.UseCopyProfile = true;
