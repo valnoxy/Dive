@@ -1,11 +1,8 @@
 ﻿using System;
-using Dive.UI.Common;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
-using Dive.UI.Pages;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Navigation;
@@ -41,6 +38,7 @@ namespace Dive.UI
         private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)
         {
             // Build navigation menu
+           
             var navItems = new List<INavigationViewItem>
             {
                 new NavigationViewItem
@@ -107,7 +105,6 @@ namespace Dive.UI
             };
             footerNavItems.Add(consoleItem);
             consoleItem.Click += CommandLine_Click;
-
             footerNavItems.Add(new NavigationViewItem
             {
                 Content = Common.LocalizationManager.LocalizeValue("About"),
@@ -118,13 +115,13 @@ namespace Dive.UI
                 TargetPageTag = "about",
                 TargetPageType = new TypeDelegator(typeof(Pages.AboutPage))
             });
-
+            
             RootNavigation.MenuItems = navItems;
             RootNavigation.FooterMenuItems = footerNavItems;
-
+        
             RootNavigation.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             RootNavigation.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
-            RootNavigation.Navigate("about");
+            RootNavigation.Navigate(new TypeDelegator(typeof(Pages.AboutPage)));
         }
 
         private void CommandLine_Click(object sender, RoutedEventArgs e)

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:Dive.UI.Pages.CapturePages"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -28,8 +28,8 @@
         <Grid Grid.Row="1" Height="350">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
                 <StackPanel>
-                    <wpfui:CardExpander Icon="Database24" IsExpanded="True">
-                        <wpfui:CardExpander.Header>
+                    <ui:CardExpander Icon="Database24" IsExpanded="True">
+                        <ui:CardExpander.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -46,7 +46,7 @@
                                         Text="Details about your Image." />
                                 </StackPanel>
                             </Grid>
-                        </wpfui:CardExpander.Header>
+                        </ui:CardExpander.Header>
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -58,7 +58,7 @@
                                     FontSize="14"
                                     Margin="0,6,0,0"
                                     Text="Name" />
-                                <wpfui:TextBox x:Name="TbName" Grid.Column="1" Icon="TextCaseTitle20" PlaceholderText="My Image" IsEnabled="true" TextChanged="TbName_OnTextChanged"/>
+                                <ui:TextBox x:Name="TbName" Grid.Column="1" Icon="TextCaseTitle20" PlaceholderText="My Image" IsEnabled="true" TextChanged="TbName_OnTextChanged"/>
                             </Grid>
 
                             <Grid Margin="0,10,0,0">
@@ -71,14 +71,14 @@
                                     FontSize="14"
                                     Margin="0,6,0,0"
                                     Text="Description" />
-                                <wpfui:TextBox x:Name="TbDescription" Grid.Column="1" Icon="TextDescription24" PlaceholderText="Captured with Dive" TextChanged="TbDescription_OnTextChanged"/>
+                                <ui:TextBox x:Name="TbDescription" Grid.Column="1" Icon="TextDescription24" PlaceholderText="Captured with Dive" TextChanged="TbDescription_OnTextChanged"/>
                             </Grid>
 
                         </StackPanel>
-                    </wpfui:CardExpander>
+                    </ui:CardExpander>
 
-                    <wpfui:CardControl Icon="HardDrive20" Margin="0,5,0,0">
-                        <wpfui:CardControl.Header>
+                    <ui:CardControl Icon="HardDrive20" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -102,13 +102,13 @@
                                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                     x:Name="TbPath"
                                     Text="No source directory selected." />
-                                <wpfui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                                <ui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
                             </Grid>
-                        </wpfui:CardControl.Header>
-                    </wpfui:CardControl>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
                 </StackPanel>
             </ScrollViewer>
-            <wpfui:Snackbar
+            <ui:Snackbar
                 x:Name="RootSnackbar"
                 Title="Hello World!"
                 MaxWidth="600"

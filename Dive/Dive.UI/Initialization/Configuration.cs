@@ -18,7 +18,9 @@ namespace Dive.UI.Initialization
 
     public class Application
     {
+        public string Name { get; set; }
         public string PackageId { get; set; }
+        public string Scope { get; set; }
         public string PathToExe { get; set; }
     }
 
@@ -98,14 +100,19 @@ namespace Dive.UI.Initialization
                 {
                     new Application
                     {
+                        Name = "Mozilla Firefox",
+                        Scope = "machine",
                         PackageId = "Mozilla.Firefox"
                     },
                     new Application
                     {
+                        Name = "Mozilla Firefox",
+                        Scope = "machine",
                         PackageId = "Adobe.Acrobat.Reader.64-bit"
                     },
                     new Application
                     {
+                        Name = "Fernwartung",
                         PackageId = "https://www.wolkenhof.com/download/Fernwartung_Wolkenhof.exe",
                         PathToExe = "C:\\Users\\Public\\Desktop\\Fernwartung Wolkenhof.exe"
                     }

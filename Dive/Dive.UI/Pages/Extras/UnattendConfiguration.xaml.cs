@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Threading;
 using Wpf.Ui.Common;
-using Wpf.Ui.Controls.Navigation;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Controls.Navigation;
 
 namespace Dive.UI.Pages.Extras
 {

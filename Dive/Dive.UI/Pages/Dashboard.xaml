@@ -99,7 +99,7 @@
                             FontWeight="Medium"
                             Text="{DynamicResource ApplyImage}" />
                         <TextBlock
-                            FontSize="11"
+                            FontSize="12"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource ApplyImageDescription}" />
                     </StackPanel>
@@ -114,7 +114,7 @@
                             FontWeight="Medium"
                             Text="{DynamicResource CaptureWindows}" />
                         <TextBlock
-                            FontSize="11"
+                            FontSize="12"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource CaptureWindowsDescription}" />
                     </StackPanel>
@@ -129,7 +129,7 @@
                             FontWeight="Medium"
                             Text="{DynamicResource CloudInstallation}" />
                         <TextBlock
-                            FontSize="11"
+                            FontSize="12"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource CloudInstallationDescription}" />
                     </StackPanel>
@@ -144,7 +144,7 @@
                             FontWeight="Medium"
                             Text="{DynamicResource RepairAndTweaks}"/>
                         <TextBlock
-                            FontSize="11"
+                            FontSize="12"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource RepairAndTweaksDescription}" />
                     </StackPanel>

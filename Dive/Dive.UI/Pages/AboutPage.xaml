@@ -4,12 +4,12 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Dive.UI.Pages"
-      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800">
 
     <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling">
-        <Grid Margin="19,20,19,0">
+        <Grid Margin="19,0,19,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -19,7 +19,7 @@
 
             <Grid Grid.Row="1">
                 <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Height="97" VerticalAlignment="Top"/>
-                <Viewbox Height="97" VerticalAlignment="Top" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                <Viewbox Height="97" VerticalAlignment="Top">
                     <Canvas Height="1000.000000" Width="2745.000000">
                         <Canvas.RenderTransform>
                             <TransformGroup>
@@ -43,38 +43,79 @@
             </Grid>
 
             <Grid Grid.Row="2">
-                <StackPanel>
-                    <Label x:Name="LabelTitle" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="About this App" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" FontWeight="Bold" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="ValueVersion" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive UI V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="ValueVersionCore" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive Core V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="ValueVersionAutoInit" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive AutoInit Module V." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <Label x:Name="ValueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
-                    <TextBlock x:Name="LicenseText" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" FontSize="15" TextWrapping="WrapWithOverflow" FontFamily="Segoe UI Variable Display" Height="100">
-                        This program is free software: you can redistribute it and/or modify
-                        it under the terms of the GNU General Public License as published by
-                        the Free Software Foundation, either version 3 of the License, or
-                        (at your option) any later version.<LineBreak/><LineBreak/>
-                    </TextBlock>
-                </StackPanel>
+                <ui:Card Height="203">
+                    <StackPanel>
+                        <Label x:Name="LabelTitle"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               Content="About this App"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               FontFamily="Segoe UI Variable Display"/>
+                        <Label x:Name="ValueVersion"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               Content="Dive UI"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="0,-5,0,0"
+                               FontFamily="Segoe UI Variable Display"/>
+                        <Label x:Name="ValueVersionCore"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               Content="Dive Core"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="0,-5,0,0"
+                               FontFamily="Segoe UI Variable Display"/>
+                        <Label x:Name="ValueVersionAutoInit"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               Content="Dive AutoInit Module"
+                               FontSize="15"
+                               VerticalAlignment="Top"
+                               HorizontalAlignment="Left"
+                               Margin="0,-5,0,0"
+                               FontFamily="Segoe UI Variable Display"/>
+                        <Label x:Name="ValueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
+                        <TextBlock x:Name="LicenseText" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" FontSize="15" TextWrapping="WrapWithOverflow" FontFamily="Segoe UI Variable Display" Height="100">
+                            This program is free software: you can redistribute it and/or modify
+                            it under the terms of the GNU General Public License as published by
+                            the Free Software Foundation, either version 3 of the License, or
+                            (at your option) any later version.
+                        </TextBlock>
+                    </StackPanel>
+                </ui:Card>
             </Grid>
 
             <Grid Grid.Row="3" Margin="0,0,0,12">
                 <StackPanel>
-                    <wpfui:Hyperlink
-                        Content="Source Code on GitHub"
-                        Icon="Link48"
-                        NavigateUri="https://github.com/valnoxy/dive" 
-                        FontSize="15" />
-                    <wpfui:Hyperlink
-                        Content="Homepage"
-                        Icon="Link48"
-                        NavigateUri="https://exploitox.de" 
-                        FontSize="15" />
-                    <wpfui:Hyperlink
-                        Content="GNU General Public License"
-                        Icon="Link48"
-                        NavigateUri="https://exploitox.de/license/dive" 
-                        FontSize="15" />
+                    <ui:CardControl Icon="Info24" Margin="0,5,0,5">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Dive is up-to-date!" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                                    <ui:Button Margin="0,0,8,0" 
+                                               Content="Website"
+                                               Click="Homepage_OnClick"/>
+                                    <ui:Button Margin="0,0,8,0" 
+                                               Content="Donate"
+                                               Click="Donate_OnClick"/>
+                                    <ui:Button Content="Source Code"
+                                               Click="SourceCode_OnClick"/>
+                                </StackPanel>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
                 </StackPanel>
             </Grid>
         </Grid>

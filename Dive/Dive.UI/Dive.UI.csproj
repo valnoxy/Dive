@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -17,7 +17,7 @@
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
 		<Version>1.0.0.435</Version>
-		<Copyright>Copyright (c) 2018 - 2023 Exploitox. All rights reserved.</Copyright>
+		<Copyright>Copyright © 2018 - 2023 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -73,9 +73,9 @@
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="7.0.1" />
+		<PackageReference Include="System.Management" Version="7.0.2" />
 		<PackageReference Include="WPF-UI" Version="3.0.0-preview.1" />
-		<PackageReference Include="XamlAnimatedGif" Version="2.1.1" />
+		<PackageReference Include="XamlAnimatedGif" Version="2.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
