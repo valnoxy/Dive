@@ -1,4 +1,6 @@
 ﻿using Dive.Core;
+using Dive.UI.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +8,6 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml;
-using System.Xml.Linq;
 using Debug = Dive.UI.Common.Debug;
 
 namespace Dive.UI.Pages.ApplyPages
@@ -21,8 +22,10 @@ namespace Dive.UI.Pages.ApplyPages
             public string Picture { get; set; }
             public string Name { get; set; }
             public string ImageFile { get; set; }
-            public string Index { get; set;}
+            public string Index { get; set; }
             public string Arch { get; set; }
+            public int Build { get; set; }
+            public string NTVersion { get; set; }
         }
 
         private List<Image> images;
@@ -38,6 +41,52 @@ namespace Dive.UI.Pages.ApplyPages
                 Process.Start("X:\\Windows\\System32\\wpeinit.exe");
             }
 
+            // Assign network volume
+            if (!Directory.Exists("P:\\"))
+            {
+                var allDrives = DriveInfo.GetDrives();
+                foreach (var d in allDrives)
+                {
+                    if (File.Exists(Path.Combine(d.Name, "Dive.conf")))
+                    {
+                        try
+                        {
+                            var cloudConfigFile = File.ReadAllText(Path.Combine(d.Name, "Dive.conf"));
+                            var cloudConfig = JsonConvert.DeserializeObject<Common.CloudConfig>(cloudConfigFile);
+                            if (string.IsNullOrEmpty(cloudConfig!.Username) || string.IsNullOrEmpty(cloudConfig.Password) || string.IsNullOrEmpty(cloudConfig.Hostname))
+                                return; // Empty config
+                            else
+                            {
+                                CloudDetails.Username = cloudConfig.Username;
+                                CloudDetails.Password = cloudConfig.Password;
+                                CloudDetails.Hostname = cloudConfig.Hostname;
+                            }
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                    }
+                }
+
+                var nv = new Process();
+                nv.StartInfo.FileName = "cmd.exe";
+                if (string.IsNullOrEmpty(CloudDetails.Username) || string.IsNullOrEmpty(CloudDetails.Password) || string.IsNullOrEmpty(CloudDetails.Hostname))
+                    nv.StartInfo.Arguments = "/c \"net use P: \\\\dive.exploitox.de\\dive /user:diveuser D!veUs3r$\"";
+                else
+                    nv.StartInfo.Arguments = $"/c \"net use P: \\\\{CloudDetails.Hostname}\\dive /user:{CloudDetails.Username} {CloudDetails.Password}";
+                nv.StartInfo.CreateNoWindow = true;
+                nv.StartInfo.UseShellExecute = false;
+                nv.Start();
+                nv.WaitForExit();
+
+                if (nv.ExitCode != 0)
+                {
+                    MessageBox.Show("Could not connect to network drive. Please check your network connection and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+            }
+
             LoadImages();
         }
 
@@ -46,21 +95,6 @@ namespace Dive.UI.Pages.ApplyPages
             images = new List<Image>();
             var counter = 0;
 
-            // Assign network volume
-            var nv = new Process();
-            nv.StartInfo.FileName = "cmd.exe";
-            nv.StartInfo.Arguments = "/c \"net use P: \\\\dive.exploitox.de\\dive /user:diveuser D!veUs3r$\"";
-            nv.StartInfo.CreateNoWindow = true;
-            nv.StartInfo.UseShellExecute = false;
-            nv.Start();
-            nv.WaitForExit();
-
-            if (nv.ExitCode != 0)
-            {
-                MessageBox.Show("Could not connect to network drive. Please check your network connection and try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-            
             // Find WIM USB device 
             var allDrives = DriveInfo.GetDrives();
             foreach (var d in allDrives)
@@ -102,6 +136,17 @@ namespace Dive.UI.Pages.ApplyPages
 
                             if (!string.IsNullOrEmpty(productBuild))
                                 productArch = $"Build {productBuild} - {productArch}";
+
+                            // Skip if image is Windows PE
+                            if (productName?.ToLower().Contains("pe") == true)
+                            {
+                                Common.Debug.Write("Image ");
+                                Common.Debug.Write(productName, true, ConsoleColor.DarkYellow);
+                                Common.Debug.Write(" in file ", true);
+                                Common.Debug.Write(binary, true, ConsoleColor.DarkYellow);
+                                Common.Debug.Write(" is a Windows PE image and will be skipped\n", true);
+                                break;
+                            }
 
                             Common.Debug.Write("Found ");
                             Common.Debug.Write(productName + " (" + productArch + ")", true, ConsoleColor.DarkYellow);
@@ -169,7 +214,9 @@ namespace Dive.UI.Pages.ApplyPages
                                 ImageFile = binary,
                                 Name = productName,
                                 Index = productId,
-                                Arch = productArch
+                                Arch = productArch,
+                                NTVersion = osVersion,
+                                Build = int.Parse(productBuild ?? "0")
                             });
                             counter++;
                         }
@@ -181,14 +228,11 @@ namespace Dive.UI.Pages.ApplyPages
                 }
             }
 
-            //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-11-40.png", ImageFile = "win11.wim", Name = "Windows 11 Pro (22H2)" });
-            //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-10-40.png", ImageFile = "win10.wim", Name = "Windows 10 Pro (21H2)" });
-            //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-10-40.png", ImageFile = "win8.wim", Name = "Windows 8.1 Pro" });
-            //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-7-40.png", ImageFile = "win7.wim", Name = "Windows 7 Professional" });
-            //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-vista-40.png", ImageFile = "winvista.wim", Name = "Windows Vista" });
-            //images.Add(new Image { Picture = "pack://application:,,,/assets/icon-windows-xp-40.png", ImageFile = "winxp.wim", Name = "Windows XP" });
+            var localizedImageCounter = (string)Application.Current.MainWindow!.FindResource("ImagesCounter");
+            if (string.IsNullOrEmpty(localizedImageCounter))
+                localizedImageCounter = "Images loaded: {0}";
 
-            ImageCounter.Text = $"Images loaded: {counter}";
+            ImageCounter.Text = string.Format(localizedImageCounter, counter);
             this.DataContext = this;
             SKUListView.ItemsSource = images;
         }
@@ -197,19 +241,23 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void SKUListView_Selected(object sender, RoutedEventArgs e)
         {
-            if (SKUListView.SelectedItem is Image item)
-            {
-                Common.ApplyDetails.Name = item.Name;
-                Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
-                Common.ApplyDetails.FileName = item.ImageFile;
-                Common.ApplyDetails.IconPath = item.Picture;
+            if (SKUListView.SelectedItem is not Image item) return;
+            Common.ApplyDetails.Name = item.Name;
+            Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
+            Common.ApplyDetails.FileName = item.ImageFile;
+            Common.ApplyDetails.IconPath = item.Picture;
+            Common.ApplyDetails.Build = item.Build;
+            Common.ApplyDetails.NTVersion = item.NTVersion;
 
-                Common.Debug.WriteLine($"Selected Index: {Common.ApplyDetails.Index}", ConsoleColor.White);
-                Common.Debug.WriteLine($"Selected Name: {Common.ApplyDetails.Name}", ConsoleColor.White);
-                Common.Debug.WriteLine($"Selected Image File Path: {Common.ApplyDetails.FileName}\n", ConsoleColor.White);
+            Common.Debug.Write("Selected ");
+            Common.Debug.Write(Common.ApplyDetails.Name, true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(" with Index ", true);
+            Common.Debug.Write(Common.ApplyDetails.Index.ToString(), true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(" in Image ", true);
+            Common.Debug.Write(Common.ApplyDetails.FileName, true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(" for deployment.\n", true);
 
-                CloudContent.ContentWindow.NextBtn.IsEnabled = true;
-            }
+            CloudContent.ContentWindow!.NextBtn.IsEnabled = true;
         }
     }
 }

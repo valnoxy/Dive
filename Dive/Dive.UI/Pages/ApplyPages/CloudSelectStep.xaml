@@ -23,38 +23,42 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Select the operating system you want to install
-                </TextBlock>
-
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
-                    Please select from one of the available options to continue.
-                </TextBlock>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource ApplySKUTitle}"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource ApplySKUTitleDescription}"/>
             </StackPanel>
-            <ui:Button Grid.Column="1" Click="ReloadBtn_Clicked" HorizontalAlignment="Right" Content="Reload" Icon="ArrowReset24" Margin="0,0,0,0"/>
+            <ui:Button Grid.Column="1"
+                          Click="ReloadBtn_Clicked" 
+                          HorizontalAlignment="Right"
+                          Content="{DynamicResource ReloadBtn}"
+                          Icon="ArrowReset24" 
+                          Margin="0,0,0,0"/>
         </Grid>
 
-        <ListBox Grid.Row="1" Name="SKUListView" VerticalAlignment="Center" SelectionChanged="SKUListView_Selected" Height="335"
-                 ItemsSource="{Binding ImageList}">
+        <ui:Card Grid.Row="1">
+            <ListBox Name="SKUListView" 
+                     Margin="-15"
+                     VerticalAlignment="Center"
+                     SelectionChanged="SKUListView_Selected"
+                     ItemsSource="{Binding ImageList}" 
+                     Height="335">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
-                        <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
-                        <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
-                        <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-
-        </ListBox>
+                            <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
+                            <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
+                            <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                            <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ui:Card>
 
         <TextBlock Grid.Row="2" VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="#FFFFFF"/>
 

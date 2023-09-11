@@ -165,7 +165,7 @@ namespace Dive.UI
                     if (File.Exists(Path.Combine(d.Name, ".diveconfig")))
                     {
 #if RELEASE
-                        if (!File.Exists("X:\\Windows\\System32\\wpeinit.exe")) ShowGUI();
+                        if (!File.Exists("X:\\Windows\\System32\\wpeinit.exe")) ShowGui();
 #endif
                         const string message = "Auto deployment config detected. Do you want to perform the deployment now?";
                         const string title = "AutoDive";

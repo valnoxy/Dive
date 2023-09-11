@@ -26,6 +26,13 @@ namespace Dive.UI.Common
         public static string CustomFilePath { get; set; }
     }
 
+    public static class CloudDetails
+    {
+        public static string Hostname { get; set; }
+        public static string Username { get; set; }
+        public static string Password { get; set; }
+    }
+
     public static class CaptureInfo
     {
         public static string Name { get; set; }
@@ -67,7 +74,6 @@ namespace Dive.UI.Common
         public static bool UsToggleVerbose { get; set; }
         public static bool UsToggleFakeVesa { get; set; }
         public static bool UsToggleSkipErros { get; set; }
-
     }
 
     public enum UnattendMode
