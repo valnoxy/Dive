@@ -15,7 +15,7 @@
                  WindowCornerPreference="Round"
                  ResizeMode="NoResize"
                  ContentRendered="MainWindow_OnLoaded">
-    <Grid>
+    <Grid AllowDrop="True" Drop="UIElement_OnDrop" DragEnter="UIElement_OnDragEnter">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -30,7 +30,8 @@
                 x:Name="RootNavigation"
                 Grid.Column="0"
                 Margin="6,0,6,0"
-                Loaded="RootNavigation_OnLoaded"/>
+                Loaded="RootNavigation_OnLoaded"
+                AllowDrop="True"/>
         </Grid>
 
         <ui:TitleBar

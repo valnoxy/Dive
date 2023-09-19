@@ -1,10 +1,9 @@
 ﻿using System;
-using Dive.UI.Pages.ApplyPages;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using Dive.UI.Common;
 using Dive.UI.Pages.TweaksPages;
+using Dive.UI.Pages.TweaksPages.PlayBook;
 
 namespace Dive.UI.Pages
 {
@@ -15,7 +14,8 @@ namespace Dive.UI.Pages
     {
         public static TweaksContent? ContentWindow;
 
-        TweaksDashboard TD = new TweaksDashboard();
+        readonly TweaksDashboard _td = new();
+        readonly PlayBookLoad _pb = new();
         //DeploymentSettingsStep deploymentSettingsStep = new DeploymentSettingsStep();
 
         public TweaksContent()
@@ -24,7 +24,7 @@ namespace Dive.UI.Pages
 
             NextBtn.IsEnabled = false;
             BackBtn.IsEnabled = false;
-            FrameWindow.Content = TD;
+            FrameWindow.Content = _td;
             ContentWindow = this;
         }
 
@@ -35,8 +35,10 @@ namespace Dive.UI.Pages
                 case TweakMode.AutoInit:
                     switch (FrameWindow.Content)
                     {
-                        case AutoInitSettings:
-                            FrameWindow.Content = TD;
+                        case PlayBookLoad:
+                            //_pb.DragEnter += UserControlDragEnter;
+                            //_pb.Drop += _pb_Drop;
+                            FrameWindow.Content = _pb;
                             NextBtn.IsEnabled = false;
                             BackBtn.IsEnabled = false;
                             break;
@@ -48,7 +50,7 @@ namespace Dive.UI.Pages
                     switch (FrameWindow.Content)
                     {
                         case MigrateSettings:
-                            FrameWindow.Content = TD;
+                            FrameWindow.Content = _td;
                             NextBtn.IsEnabled = false;
                             BackBtn.IsEnabled = false;
                             break;
@@ -61,7 +63,7 @@ namespace Dive.UI.Pages
                     switch (FrameWindow.Content)
                     {
                         case MigrateSettings:
-                            FrameWindow.Content = TD;
+                            FrameWindow.Content = _td;
                             NextBtn.IsEnabled = false;
                             BackBtn.IsEnabled = false;
                             break;
@@ -81,8 +83,8 @@ namespace Dive.UI.Pages
                 case TweakMode.AutoInit:
                     switch (FrameWindow.Content)
                     {
-                        case AutoInitSettings:
-                            FrameWindow.Content = TD;
+                        case PlayBookLoad:
+                            FrameWindow.Content = _td;
                             NextBtn.IsEnabled = false;
                             BackBtn.IsEnabled = false;
                             break;
@@ -94,7 +96,7 @@ namespace Dive.UI.Pages
                     switch (FrameWindow.Content)
                     {
                         case MigrateSettings:
-                            FrameWindow.Content = TD;
+                            FrameWindow.Content = _td;
                             NextBtn.IsEnabled = false;
                             BackBtn.IsEnabled = false;
                             break;
@@ -107,7 +109,7 @@ namespace Dive.UI.Pages
                     switch (FrameWindow.Content)
                     {
                         case MigrateSettings:
-                            FrameWindow.Content = TD;
+                            FrameWindow.Content = _td;
                             NextBtn.IsEnabled = false;
                             BackBtn.IsEnabled = false;
                             break;
@@ -123,7 +125,7 @@ namespace Dive.UI.Pages
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
-            FrameWindow.Content = TD;
+            FrameWindow.Content = _td;
             NextBtn.IsEnabled = false;
             NextBtn.Visibility = Visibility.Visible;
         }

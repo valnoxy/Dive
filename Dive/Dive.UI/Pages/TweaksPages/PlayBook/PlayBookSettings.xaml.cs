@@ -1,24 +1,17 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Management;
-using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Media.Animation;
 using Dive.Core.Common;
-using Konsole;
 using Microsoft.Win32;
-using Windows.Devices.Geolocation;
-using Wpf.Ui.Controls;
 
-namespace Dive.UI.Pages.TweaksPages
+namespace Dive.UI.Pages.TweaksPages.PlayBook
 {
     /// <summary>
-    /// Interaktionslogik für AutoInitSettings.xaml
+    /// Interaktionslogik für PlayBookSettings.xaml
     /// </summary>
-    public partial class AutoInitSettings : System.Windows.Controls.UserControl
+    public partial class PlayBookSettings
     {
-        public AutoInitSettings()
+        public PlayBookSettings()
         {
             InitializeComponent();
 

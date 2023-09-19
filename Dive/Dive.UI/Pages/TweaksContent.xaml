@@ -16,7 +16,7 @@
 
         <!-- step content -->
         <!--<ContentPresenter Grid.Row="1" Content="{Binding StepViewModel}"/>-->
-        <ContentControl x:Name="FrameWindow"/>
+        <ContentControl x:Name="FrameWindow" AllowDrop="True"/>
 
         <!-- buttons -->
         <Grid Grid.Row="2">
@@ -27,7 +27,7 @@
                 <ColumnDefinition Width="80"/>
             </Grid.ColumnDefinitions>
 
-            <Button Content="Cancel"
+            <Button Grid.Column="0" Content="Cancel"
                     x:Name="CancelBtn"
                     IsCancel="True"
                     Width="80"

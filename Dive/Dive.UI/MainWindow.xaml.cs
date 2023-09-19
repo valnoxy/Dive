@@ -26,7 +26,7 @@ namespace Dive.UI
             _displayDebugConsole = true;
 #else
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Beta build [B6 Public]";
+            DebugString.Text = "Public Beta Build 6";
 #endif
             // Get version
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -143,6 +143,16 @@ namespace Dive.UI
         private void MainWindow_OnLoaded(object? sender, EventArgs eventArgs)
         {
             RootNavigation.Navigate("dashboard"); // Workaround
+        }
+
+        private void UIElement_OnDrop(object sender, DragEventArgs e)
+        {
+            Common.Debug.WriteLine("Drop");
+        }
+
+        private void UIElement_OnDragEnter(object sender, DragEventArgs e)
+        {
+            Common.Debug.WriteLine("DragEnter");
         }
     }
 }

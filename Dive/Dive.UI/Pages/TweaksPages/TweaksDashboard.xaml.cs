@@ -1,11 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using Dive.UI.Common;
-using Dive.UI.Pages;
-using Dive.UI.Pages.TweaksPages;
+using Dive.UI.Pages.TweaksPages.PlayBook;
 
-namespace Dive.UI.Pages
+namespace Dive.UI.Pages.TweaksPages
 {
     /// <summary>
     /// Interaktionslogik für TweaksDashboard.xaml
@@ -20,7 +18,7 @@ namespace Dive.UI.Pages
         private void SwitchToAutoInit(object sender, RoutedEventArgs e)
         {
             Common.Tweaks.CurrentMode = TweakMode.AutoInit;
-            TweaksContent.ContentWindow.FrameWindow.Content = new AutoInitSettings();
+            TweaksContent.ContentWindow.FrameWindow.Content = new PlayBookLoad();
         }
 
         private void SwitchToMigratePage(object sender, RoutedEventArgs e)
