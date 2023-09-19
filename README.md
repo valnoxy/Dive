@@ -2,11 +2,11 @@
 
 <h3 align="center">Dive - Deployment is very easy</h3>
 <p align="center">
-    Easy Deployment for Windows
+    Easy OS Deployment for Windows
     <br />
-    <strong>Version: </strong>1.0.0.362 (Beta 5)
+    <strong>Version: </strong>1.0.0.441 (Beta 6)
     <br/>
-    <strong>Core: </strong>12.0.0.452
+    <strong>Core: </strong>12.0.0.461
     <br />
     <br />
     <a href="https://github.com/valnoxy/dive/releases"><strong>Download now »</strong></a>
@@ -42,7 +42,7 @@ Dive (formally deploya) is a little application for deploying Windows on a machi
 > **Note** In some cases, you will only find a ESD file instead. In that case, you'll need to convert the ESD file to a WIM file. You can follow [this guide](https://community.spiceworks.com/how_to/163540-convert-esd-to-wim) to do so.
 
 ## Screenshots
-![Windows PE with Dive](https://dl.exploitox.de/other/dive-screenshot1.png)
+![Windows PE with Dive](https://dl.exploitox.de/other/dive-screenshot2.png)
 
 ## ℹ️ Disclaimer
 > This application will modify the system. I won't be responsible for any damage you've done yourself trying to use this application.
