@@ -451,15 +451,15 @@ namespace Dive.UI.Pages.ApplyPages
                     }
 
                     // Administrator / User without OEM infos
-                    if (DeploymentInfo.Username == "Administrator"
+                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
                         && !string.IsNullOrEmpty(DeploymentInfo.Password)
                         && OemInfo.UseOemInfo == false)
                     {
                         um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
                     }
 
-                    // Administrator without OEM infos and password
-                    if (DeploymentInfo.Username == "Administrator"
+                    // Administrator / User without OEM infos and password
+                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
                         && string.IsNullOrEmpty(DeploymentInfo.Password)
                         && OemInfo.UseOemInfo == false)
                     {
@@ -472,9 +472,11 @@ namespace Dive.UI.Pages.ApplyPages
 
                 if (string.IsNullOrEmpty(config)) 
                     throw new Exception("Could not build or read unattend configuration file.");
-                Debug.WriteLine(config);
+                //Debug.WriteLine(config);
                  
                 Actions.InstallUnattend($"{windowsDrive}Windows", config, OemInfo.LogoPath, DeploymentOption.UseSMode, worker);
+                Debug.Write($"Configuration file written to ");
+                Debug.WriteLine($"{windowsDrive}Windows\\Panther\\unattend.xml", ConsoleColor.DarkYellow);
 
                 if (_isCanceled)
                 {
