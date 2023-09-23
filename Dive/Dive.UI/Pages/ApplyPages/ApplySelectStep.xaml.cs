@@ -12,10 +12,10 @@ namespace Dive.UI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für ApplySelectStep.xaml
     /// </summary>
-    public partial class ApplySelectStep : System.Windows.Controls.UserControl
+    public partial class ApplySelectStep
     {
-        private BackgroundWorker applyBackgroundWorker;
-        bool IsCanceled = false;
+        private readonly BackgroundWorker _applyBackgroundWorker;
+        private bool _isCanceled = false;
         private int _driverCount = 0;
 
         public ApplySelectStep()
@@ -35,39 +35,39 @@ namespace Dive.UI.Pages.ApplyPages
                 CloudContent.ContentWindow.CancelBtn.IsEnabled = false;
             }
 
-            Common.ApplyDetails.UseNTLDR = DiskSelectStep.ContentWindow.IsNTLDRChecked();
-            Common.ApplyDetails.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
+            ApplyDetails.UseNTLDR = DiskSelectStep.ContentWindow!.IsNTLDRChecked();
+            ApplyDetails.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
 
             // Validate deployment settings
-            switch (Common.OemInfo.UseOemInfo)
+            switch (OemInfo.UseOemInfo)
             {
                 case true:
-                    if (Common.OemInfo.SupportPhone == null
-                        && Common.OemInfo.LogoPath == null
-                        && Common.OemInfo.Manufacturer == null
-                        && Common.OemInfo.Model == null
-                        && Common.OemInfo.SupportHours == null
-                        && Common.OemInfo.SupportURL == null)
-                        Common.OemInfo.UseOemInfo = false;
+                    if (OemInfo.SupportPhone == null
+                        && OemInfo.LogoPath == null
+                        && OemInfo.Manufacturer == null
+                        && OemInfo.Model == null
+                        && OemInfo.SupportHours == null
+                        && OemInfo.SupportURL == null)
+                        OemInfo.UseOemInfo = false;
                     break;
             }
 
-            switch (Common.DeploymentInfo.UseUserInfo)
+            switch (DeploymentInfo.UseUserInfo)
             {
                 case true:
-                    if (String.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && String.IsNullOrEmpty(Common.DeploymentInfo.Password) == null)
-                        Common.DeploymentInfo.UseUserInfo = false;
+                    if (String.IsNullOrEmpty(DeploymentInfo.Username)
+                        && String.IsNullOrEmpty(DeploymentInfo.Password) == null)
+                        DeploymentInfo.UseUserInfo = false;
                     break;
             }
 
             // Set active Image to card
-            ImageName.Text = Common.ApplyDetails.Name;
-            ImageFile.Text = Common.ApplyDetails.FileName;
+            ImageName.Text = ApplyDetails.Name;
+            ImageFile.Text = ApplyDetails.FileName;
             var img = new ImageSourceConverter();
             try
             {
-                ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath);
+                ImageIcon.Source = (ImageSource)img.ConvertFromString(ApplyDetails.IconPath);
             }
             catch
             {
@@ -75,162 +75,178 @@ namespace Dive.UI.Pages.ApplyPages
             }
 
             // Background worker for deployment
-            applyBackgroundWorker = new BackgroundWorker();
-            applyBackgroundWorker.WorkerReportsProgress = true;
-            applyBackgroundWorker.WorkerSupportsCancellation = true;
-            applyBackgroundWorker.DoWork += ApplyWim;
-            applyBackgroundWorker.ProgressChanged += applyBackgroundWorker_ProgressChanged;
-            applyBackgroundWorker.RunWorkerAsync();
+            _applyBackgroundWorker = new BackgroundWorker();
+            _applyBackgroundWorker.WorkerReportsProgress = true;
+            _applyBackgroundWorker.WorkerSupportsCancellation = true;
+            _applyBackgroundWorker.DoWork += ApplyWim;
+            _applyBackgroundWorker.ProgressChanged += applyBackgroundWorker_ProgressChanged;
+            _applyBackgroundWorker.RunWorkerAsync();
         }
 
         private void applyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
             var responseJson = e.UserState as string;
             if (string.IsNullOrEmpty(responseJson)) return;
-            
-            var response = JsonConvert.DeserializeObject<ActionWorker>(responseJson);
-            if (response.IsError)
+
+            try
             {
-                ProgrText.Text = response.Message;
-                ProgrBar.Value = e.ProgressPercentage;
-
-                Debug.WriteLine(response.Message, ConsoleColor.Red);
-
-                if (ApplyContent.ContentWindow != null)
+                var response = JsonConvert.DeserializeObject<ActionWorker>(responseJson);
+                if (response!.IsError)
                 {
-                    ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
-                    ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
-                if (CloudContent.ContentWindow != null)
-                {
-                    CloudContent.ContentWindow.NextBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.BackBtn.IsEnabled = false;
-                    CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
-                }
+                    ProgrText.Text = response.Message;
+                    ProgrBar.Value = e.ProgressPercentage;
 
-                IsCanceled = true;
-                return;
-            }
+                    Debug.WriteLine(response.Message, ConsoleColor.Red);
 
-            if (response.IsWarning)
-            {
-                Debug.WriteLine(response.Message, ConsoleColor.Yellow);
-                return;
-            }
-
-            if (response.IsDebug)
-            {
-                if (response.Message == "Job Done.")
-                {
-                    ProgrText.Text = 
-                        File.Exists("X:\\Windows\\System32\\wpeutil.exe") 
-                            ? "Installation completed. Press 'Next' to restart your computer." 
-                            : "Installation completed. Press 'Next' to close Dive.";
-                    ProgrBar.Value = 100;
                     if (ApplyContent.ContentWindow != null)
-                        ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                    {
+                        ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.BackBtn.IsEnabled = false;
+                        ApplyContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+
                     if (CloudContent.ContentWindow != null)
-                        CloudContent.ContentWindow.NextBtn.IsEnabled = true;
+                    {
+                        CloudContent.ContentWindow.NextBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.BackBtn.IsEnabled = false;
+                        CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
+                    }
+
+                    _isCanceled = true;
                     return;
                 }
-                Debug.WriteLine(response.Message);
-                return;
-            }
 
-            switch (response.Action)
+                if (response.IsWarning)
+                {
+                    Debug.WriteLine(response.Message, ConsoleColor.Yellow);
+                    return;
+                }
+
+                if (response.IsDebug)
+                {
+                    if (response.Message == "Job Done.")
+                    {
+                        ProgrText.Text =
+                            File.Exists("X:\\Windows\\System32\\wpeutil.exe")
+                                ? "Installation completed. Press 'Next' to restart your computer."
+                                : "Installation completed. Press 'Next' to close Dive.";
+                        ProgrBar.Value = 100;
+                        if (ApplyContent.ContentWindow != null)
+                            ApplyContent.ContentWindow.NextBtn.IsEnabled = true;
+                        if (CloudContent.ContentWindow != null)
+                            CloudContent.ContentWindow.NextBtn.IsEnabled = true;
+                        return;
+                    }
+
+                    Debug.WriteLine(response.Message);
+                    return;
+                }
+
+                switch (response.Action)
+                {
+                    case Progress.PrepareDisk:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                    case Progress.ApplyImage:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                    case Progress.InstallBootloader:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                    case Progress.InstallRecovery:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.InstallRecovery, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                    case Progress.InstallUnattend:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.InstallUnattend, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                    case Progress.InstallDrivers:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.InstallDrivers, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                    case Progress.InstallUefiSeven:
+                    {
+                        ProgrText.Text = response.Message;
+                        if (response.IsIndeterminate)
+                            ProgrBar.IsIndeterminate = true;
+                        else
+                        {
+                            ProgrBar.IsIndeterminate = false;
+                            ProgrBar.Value = e.ProgressPercentage;
+                        }
+
+                        Debug.RefreshProgressBar(Progress.InstallUefiSeven, e.ProgressPercentage, response.Message);
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                case Progress.PrepareDisk:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
-                    break;
-                }
-                case Progress.ApplyImage:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
-                    break;
-                }
-                case Progress.InstallBootloader:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
-                    break;
-                }
-                case Progress.InstallRecovery:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.InstallRecovery, e.ProgressPercentage, response.Message);
-                    break;
-                }
-                case Progress.InstallUnattend:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.InstallUnattend, e.ProgressPercentage, response.Message);
-                    break;
-                }
-                case Progress.InstallDrivers:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.InstallDrivers, e.ProgressPercentage, response.Message);
-                    break;
-                }
-                case Progress.InstallUefiSeven:
-                {
-                    ProgrText.Text = response.Message;
-                    if (response.IsIndeterminate)
-                        ProgrBar.IsIndeterminate = true;
-                    else
-                    {
-                        ProgrBar.IsIndeterminate = false;
-                        ProgrBar.Value = e.ProgressPercentage;
-                    }
-                    Debug.RefreshProgressBar(Progress.InstallUefiSeven, e.ProgressPercentage, response.Message);
-                    break;
-                }
+                Debug.WriteLine($"Error while parsing JSON response: {ex.Message}", ConsoleColor.Red);
             }
         }
 
@@ -239,12 +255,12 @@ namespace Dive.UI.Pages.ApplyPages
             #region Environment definition
 
             var worker = sender as BackgroundWorker;
-            var firmware = Common.ApplyDetails.UseEFI switch // Firmware definition
+            var firmware = ApplyDetails.UseEFI switch // Firmware definition
             {
                 true => Entities.Firmware.EFI,
                 false => Entities.Firmware.BIOS
             };
-            var bootloader = Common.ApplyDetails.UseNTLDR switch // Bootloader definition
+            var bootloader = ApplyDetails.UseNTLDR switch // Bootloader definition
             {
                 true => Entities.Bootloader.NTLDR,
                 false => Entities.Bootloader.BOOTMGR,
@@ -259,7 +275,7 @@ namespace Dive.UI.Pages.ApplyPages
             // [1] = Boot drive
             // [2] = Recovery
 
-            switch (Common.ApplyDetails.UseNTLDR)
+            switch (ApplyDetails.UseNTLDR)
             {
                 // pre-Vista
                 case true:
@@ -269,7 +285,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                 case false:
                 {
-                    switch (Common.ApplyDetails.UseRecovery)
+                    switch (ApplyDetails.UseRecovery)
                     {
                             case true:
                                 letters = Actions.GetSystemLetters(Entities.PartitionStyle.Full);
@@ -278,10 +294,10 @@ namespace Dive.UI.Pages.ApplyPages
 
                             case false:
                                 // If Vista is used, we need to use the Single partition layout
-                                if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
+                                if (ApplyDetails.Name.ToLower().Contains("windows vista"))
                                 {
                                     // Except if EFI is used, then we need to use the SeparateBoot partition layout
-                                    if (Common.ApplyDetails.UseEFI)
+                                    if (ApplyDetails.UseEFI)
                                     {
                                         letters = Actions.GetSystemLetters(Entities.PartitionStyle.SeparateBoot);
                                         partStyle = Entities.PartitionStyle.SeparateBoot;
@@ -322,25 +338,26 @@ namespace Dive.UI.Pages.ApplyPages
                     throw new ArgumentOutOfRangeException();
             }
 
-            Common.Debug.Write("New Windows drive: ");
-            Common.Debug.Write($"{windowsDrive}\n", true, ConsoleColor.DarkYellow);
 
-            Common.Debug.Write("New Boot drive: ");
-            Common.Debug.Write($"{bootDrive}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("Using partition style: ");
+            Debug.Write($"{partStyle}\n", true, ConsoleColor.DarkYellow);
 
-            Common.Debug.Write("New Recovery drive: ");
-            Common.Debug.Write($"{recoveryDrive}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("New Windows drive: ");
+            Debug.Write($"{windowsDrive}\n", true, ConsoleColor.DarkYellow);
 
-            Common.Debug.Write("Using partition style: ");
-            Common.Debug.Write($"{partStyle}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("New Boot drive: ");
+            Debug.Write($"{bootDrive}\n", true, ConsoleColor.DarkYellow);
+
+            Debug.Write("New Recovery drive: ");
+            Debug.Write($"{recoveryDrive}\n", true, ConsoleColor.DarkYellow);
 
             #endregion
 
             #region Prepare Disk
 
             // Prepare disk
-            Actions.PrepareDisk(firmware, bootloader, Common.ApplyDetails.DiskIndex, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
-            if (IsCanceled)
+            Actions.PrepareDisk(firmware, bootloader, ApplyDetails.DiskIndex, partStyle, ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
+            if (_isCanceled)
             {
                 e.Cancel = true;
                 return;
@@ -351,8 +368,8 @@ namespace Dive.UI.Pages.ApplyPages
             #region Apply Image
 
             // Apply image
-            Actions.ApplyWim(windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
-            if (IsCanceled)
+            Actions.ApplyWim(windowsDrive, ApplyDetails.FileName, ApplyDetails.Index, worker);
+            if (_isCanceled)
             {
                 e.Cancel = true;
                 return;
@@ -372,9 +389,11 @@ namespace Dive.UI.Pages.ApplyPages
                 case Entities.PartitionStyle.Single:
                     Actions.InstallBootloader(firmware, bootloader, windowsDrive, windowsDrive, worker);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            if (IsCanceled)
+            if (_isCanceled)
             {
                 e.Cancel = true;
                 return;
@@ -385,11 +404,11 @@ namespace Dive.UI.Pages.ApplyPages
             #region Install Recovery (only for Vista and higher)
 
             // Install Recovery (only for Vista and higher)
-            if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
+            if (bootloader == Entities.Bootloader.BOOTMGR && ApplyDetails.UseRecovery)
             {
-                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
+                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, DeploymentOption.AddDiveToWinRE, worker);
             
-                if (IsCanceled)
+                if (_isCanceled)
                 {
                     e.Cancel = true;
                     return;
@@ -401,65 +420,63 @@ namespace Dive.UI.Pages.ApplyPages
             #region Install unattend file (only for Vista and higher)
 
             // Install unattend file (only for Vista and higher)
-            if (Common.DeploymentInfo.UseUserInfo || Common.OemInfo.UseOemInfo)
+            if (DeploymentInfo.UseUserInfo || OemInfo.UseOemInfo)
             {
+                Debug.WriteLine("Building config...");
+
                 // Building config
                 var config = "";
-                Common.UnattendMode? um = null;
+                UnattendMode? um = null;
 
-                if (!Common.DeploymentInfo.UseUserInfo && Common.OemInfo.UseOemInfo)
+                if (!DeploymentInfo.UseUserInfo && OemInfo.UseOemInfo)
                 {
-                    um = Common.UnattendMode.OnlyOem;
+                    um = UnattendMode.OnlyOem;
                 }
                 else
                 {
                     // Administrator / User with OEM infos
-                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo)
+                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
+                        && !string.IsNullOrEmpty(DeploymentInfo.Password)
+                        && OemInfo.UseOemInfo)
                     {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
+                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
                     }
 
                     // Administrator / User with OEM infos, but without password
-                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo)
+                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
+                        && string.IsNullOrEmpty(DeploymentInfo.Password)
+                        && OemInfo.UseOemInfo)
                     {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
+                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
                     }
 
                     // Administrator / User without OEM infos
-                    if (Common.DeploymentInfo.Username == "Administrator"
-                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo == false)
+                    if (DeploymentInfo.Username == "Administrator"
+                        && !string.IsNullOrEmpty(DeploymentInfo.Password)
+                        && OemInfo.UseOemInfo == false)
                     {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
+                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
                     }
 
                     // Administrator without OEM infos and password
-                    if (Common.DeploymentInfo.Username == "Administrator"
-                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo == false)
+                    if (DeploymentInfo.Username == "Administrator"
+                        && string.IsNullOrEmpty(DeploymentInfo.Password)
+                        && OemInfo.UseOemInfo == false)
                     {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;
+                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;
                     }
                 }
                 
                 // Custom file
-                if (File.Exists(Common.DeploymentInfo.CustomFilePath))
-                {
-                    config = File.ReadAllText(Common.DeploymentInfo.CustomFilePath);
-                }
+                config = File.Exists(DeploymentInfo.CustomFilePath) ? File.ReadAllText(DeploymentInfo.CustomFilePath) : UnattendBuilder.Build(um);
 
-                if (config == "")
-                    config = Common.UnattendBuilder.Build(um);
-
+                if (string.IsNullOrEmpty(config)) 
+                    throw new Exception("Could not build or read unattend configuration file.");
                 Debug.WriteLine(config);
                  
-                Actions.InstallUnattend($"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
+                Actions.InstallUnattend($"{windowsDrive}Windows", config, OemInfo.LogoPath, DeploymentOption.UseSMode, worker);
 
-                if (IsCanceled)
+                if (_isCanceled)
                 {
                     e.Cancel = true;
                     return;
@@ -472,12 +489,12 @@ namespace Dive.UI.Pages.ApplyPages
             #region Install Drivers (only for Vista and higher)
             
             // Install Drivers (only for Vista and higher)
-            if (Common.ApplyDetails.DriverList != null)
+            if (ApplyDetails.DriverList != null)
             {
-                _driverCount = Common.ApplyDetails.DriverList.Count;
-                Actions.InstallDriver(windowsDrive, Common.ApplyDetails.DriverList, worker);
+                _driverCount = ApplyDetails.DriverList.Count;
+                Actions.InstallDriver(windowsDrive, ApplyDetails.DriverList, worker);
 
-                if (IsCanceled)
+                if (_isCanceled)
                 {
                     e.Cancel = true;
                     return;
@@ -489,16 +506,16 @@ namespace Dive.UI.Pages.ApplyPages
             #region Install UefiSeven (only for Vista and 7 with EFI)
 
             // Install UefiSeven (only for Vista and 7 with EFI)
-            if (Common.WindowsModification.InstallUefiSeven)
+            if (WindowsModification.InstallUefiSeven)
             {
                 Dive.Core.Action.UefiSeven.InstallUefiSeven(bootDrive, 
-                    Common.WindowsModification.UsToggleSkipErros, 
-                    Common.WindowsModification.UsToggleFakeVesa,
-                    Common.WindowsModification.UsToggleVerbose,
-                    Common.WindowsModification.UsToggleLog, 
+                    WindowsModification.UsToggleSkipErros, 
+                    WindowsModification.UsToggleFakeVesa,
+                    WindowsModification.UsToggleVerbose,
+                    WindowsModification.UsToggleLog, 
                     worker);
 
-                if (IsCanceled)
+                if (_isCanceled)
                 {
                     e.Cancel = true;
                     return;

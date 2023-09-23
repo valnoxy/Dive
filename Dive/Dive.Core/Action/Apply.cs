@@ -185,7 +185,7 @@ namespace Dive.Core.Action
                         Action = Progress.ApplyImage,
                         IsError = true,
                         IsIndeterminate = false,
-                        Message = $"Error: {(object)wimMessageError.Path} {(object)wimMessageError.Win32ErrorCode}"
+                        Message = $"Error: {wimMessageError.Path} {wimMessageError.Win32ErrorCode}"
                     }));
                     break;
 
@@ -196,7 +196,7 @@ namespace Dive.Core.Action
                         Action = Progress.PrepareDisk,
                         IsWarning = true,
                         IsIndeterminate = false,
-                        Message = $"Error: {(object)wimMessageWarning.Path} {(object)wimMessageWarning.Win32ErrorCode}"
+                        Message = $"Error: {wimMessageWarning.Path} {wimMessageWarning.Win32ErrorCode}"
                     })); 
                     break;
             }

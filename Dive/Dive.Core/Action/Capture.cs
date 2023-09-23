@@ -1,9 +1,11 @@
 ﻿using Dive.Core.Common;
 using Microsoft.Wim;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 using System.Xml;
 using Newtonsoft.Json;
@@ -13,19 +15,12 @@ namespace Dive.Core.Action
     internal class Capture
     {
         internal static BackgroundWorker Bw = null;
+
+        private static string[] _excludedPaths;
+
         public static void CreateWim(string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker)
         {
             Bw = worker;
-            var excludedPaths = new List<string>() {
-                "C:\\$ntfs.log",
-                "C:\\hiberfil.sys",
-                "C:\\pagefile.sys",
-                "C:\\swapfile.sys",
-                "C:\\System Volume Information",
-                "C:\\RECYCLER",
-                "C:\\Windows\\CSC"
-            };
-
             using var wimHandle = WimgApi.CreateFile(pathToImage,
                 WimFileAccess.Write,
                 WimCreationDisposition.CreateAlways,
@@ -33,6 +28,19 @@ namespace Dive.Core.Action
                 WimCompressionType.Xpress);
             WimgApi.SetTemporaryPath(wimHandle, Environment.GetEnvironmentVariable("TEMP"));
             WimgApi.RegisterMessageCallback(wimHandle, CaptureCallbackMethod);
+
+            // Exclude paths
+            _excludedPaths = new []{
+                $"{pathToCapture}$ntfs.log",
+                $"{pathToCapture}hiberfil.sys",
+                $"{pathToCapture}pagefile.sys",
+                $"{pathToCapture}swapfile.sys",
+                $"{pathToCapture}System Volume Information",
+                $"{pathToCapture}RECYCLER",
+                $"{pathToCapture}$RECYCLE.BIN",
+                $"{pathToCapture}Windows\\CSC"
+            };
+
             try
             {
                 using var imageHandle = WimgApi.CaptureImage(wimHandle, pathToCapture, WimCaptureImageOptions.None);
@@ -101,6 +109,13 @@ namespace Dive.Core.Action
 
                 case WimMessageType.Process:
                     var processMessage = (WimMessageProcess)message;
+
+                    var b = _excludedPaths.Any(s => processMessage.Path.Contains(s));
+                    if (b)
+                    {
+                        processMessage.Process = false;
+                    }
+
                     Bw?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
                     {
                         IsDebug = true,
