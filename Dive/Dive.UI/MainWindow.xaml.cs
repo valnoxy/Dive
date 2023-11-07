@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Security.Principal;
 using System.Windows;
+using System.Windows.Threading;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Navigation;
@@ -15,6 +17,10 @@ namespace Dive.UI
     public partial class MainWindow
     {
         private bool _displayDebugConsole;
+        private readonly DispatcherTimer _timer = new()
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
 
         public MainWindow()
         {
@@ -24,15 +30,32 @@ namespace Dive.UI
             DebugString.Visibility = Visibility.Visible;
             DebugString.Text = "Debug build - This is not a production ready build.";
             _displayDebugConsole = true;
+            Branch.Text = "Development";
 #else
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Public Beta Build 6";
+            DebugString.Text = "Public Beta Build 7";
+            Branch.Text = "Stable";
 #endif
             // Get version
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var assembly = Assembly.GetExecutingAssembly();
             var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             var version = fvi.FileVersion;
-            VersionString.Text = $"[{version}]";
+            Version.Text = $"Version {version}";
+
+            // Get User
+            var accountToken = WindowsIdentity.GetCurrent().Token;
+            var windowsIdentity = new WindowsIdentity(accountToken);
+            UserName.Text = windowsIdentity.Name;
+
+            // Time & Date
+            _timer.Tick += UpdateTimeAndDate_Tick!;
+            _timer.Start();
+        }
+
+        private void UpdateTimeAndDate_Tick(object sender, EventArgs e)
+        {
+            Time.Text = DateTime.Now.ToShortTimeString();
+            Date.Text = DateTime.Now.ToShortDateString();
         }
 
         private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)

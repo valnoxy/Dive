@@ -35,29 +35,29 @@
         </Grid>
 
         <ui:Card Grid.Row="1">
-            <ListBox Name="SKUListView" 
-                     Margin="-15"
+            <ListView Name="SkuListView" 
+                     Margin="-10"
                      VerticalAlignment="Center"
                      SelectionChanged="SKUListView_Selected"
                      ItemsSource="{Binding ImageList}" 
                      Height="335">
-                <ListBox.ItemTemplate>
+                <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition Width="45" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
+                            <Image Grid.Column="0" Margin="5,2,2,0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
                             <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
                             <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                             <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                         </Grid>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ListView.ItemTemplate>
+            </ListView>
         </ui:Card>
 
         <TextBlock Grid.Row="2" VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="#FFFFFF"/>

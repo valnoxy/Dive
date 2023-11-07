@@ -190,12 +190,12 @@ namespace Dive.UI.Pages.ApplyPages
 
             ImageCounter.Text = string.Format(localizedImageCounter, counter);
             this.DataContext = this;
-            SKUListView.ItemsSource = images;
+            SkuListView.ItemsSource = images;
         }
 
         private void SKUListView_Selected(object sender, RoutedEventArgs e)
         {
-            if (SKUListView.SelectedItem is not Image item) return;
+            if (SkuListView.SelectedItem is not Image item) return;
             Common.ApplyDetails.Name = item.Name;
             Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
             Common.ApplyDetails.FileName = item.ImageFile;

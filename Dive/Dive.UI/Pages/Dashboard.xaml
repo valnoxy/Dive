@@ -150,26 +150,7 @@
                     </StackPanel>
                 </wpfui:CardAction>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <Grid Grid.Column="0">
-                        <wpfui:Anchor
-                            Content="{DynamicResource SourceCodeBtn}"
-                            Margin="0,0,8,0"
-                            Icon="Link48"
-                            NavigateUri="https://github.com/valnoxy/dive" />
-                    </Grid>
-                    <Grid Grid.Column="1">
-                        <wpfui:Anchor
-                            Content="{DynamicResource ProjectBtn}"
-                            Icon="Link48"
-                            NavigateUri="https://exploitox.de/dive" />
-                    </Grid>
-                </Grid>
+                <Label Content="Made with ❤️ by valnoxy"/>
             </StackPanel>
         </Grid>
     </Grid>
