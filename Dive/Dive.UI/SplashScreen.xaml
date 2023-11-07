@@ -28,7 +28,7 @@
                     CornerRadius="0">
                     <Border.Background>
                         <ImageBrush
-                            ImageSource="pack://application:,,,/Assets/pexels-johannes-plenio-1103970.bmp"
+                            ImageSource="pack://application:,,,/Assets/banner.jpg"
                             RenderOptions.BitmapScalingMode="HighQuality"
                             Stretch="UniformToFill" />
                     </Border.Background>

@@ -24,6 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Assets\banner.jpg" />
 		<None Remove="Assets\Fadi_Loop_f.gif" />
 		<None Remove="Assets\icon-aios-40.png" />
 		<None Remove="Assets\icon-hdd-40.png" />
@@ -36,7 +37,6 @@
 		<None Remove="Assets\icon-windows-server-2012-40.png" />
 		<None Remove="Assets\icon-windows-vista-40.png" />
 		<None Remove="Assets\icon-windows-xp-40.png" />
-		<None Remove="Assets\pexels-johannes-plenio-1103970.bmp" />
 		<None Remove="Assets\pexels-johannes-plenio-1103970.png" />
 		<None Remove="Dive.ico" />
 	</ItemGroup>
@@ -47,6 +47,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Assets\banner.jpg" />
 		<Resource Include="Assets\Fadi_Loop_f.gif" />
 		<Resource Include="Assets\icon-hdd-40.png" />
 	</ItemGroup>
@@ -62,7 +63,6 @@
 		<Resource Include="Assets\icon-windows-server-2012-40.png" />
 		<Resource Include="Assets\icon-windows-vista-40.png" />
 		<Resource Include="Assets\icon-windows-xp-40.png" />
-		<Resource Include="Assets\pexels-johannes-plenio-1103970.bmp" />
 		<Resource Include="dive.ico" />
 		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
 		<Resource Include="Localization\ResourceDictionary.xaml" />
