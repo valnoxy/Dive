@@ -77,7 +77,7 @@ namespace Dive.Core
                             partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                             partDest.StandardInput.WriteLine("active");
                             partDest.StandardInput.WriteLine("create partition primary");
-                            partDest.StandardInput.WriteLine("shrink minimum=650");
+                            partDest.StandardInput.WriteLine("shrink minimum=800");
                             partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
                             partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                             partDest.StandardInput.WriteLine("create partition primary");
@@ -95,7 +95,7 @@ namespace Dive.Core
                             partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                             partDest.StandardInput.WriteLine("create partition msr size=16");
                             partDest.StandardInput.WriteLine("create partition primary");
-                            partDest.StandardInput.WriteLine("shrink minimum=650");
+                            partDest.StandardInput.WriteLine("shrink minimum=800");
                             partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
                             partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
                             partDest.StandardInput.WriteLine("create partition primary");
@@ -344,7 +344,7 @@ namespace Dive.Core
                     return;
                 }
             }
-            catch
+            catch (Exception ex )
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
@@ -352,7 +352,7 @@ namespace Dive.Core
                     Action = Progress.InstallRecovery,
                     IsError = true,
                     IsIndeterminate = false,
-                    Message = "Failed to copy recovery image."
+                    Message = "Failed to copy recovery image: " + ex.Message
                 }));
             }
 
