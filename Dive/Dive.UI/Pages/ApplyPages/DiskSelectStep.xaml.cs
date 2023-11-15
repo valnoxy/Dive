@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,6 +38,18 @@ namespace Dive.UI.Pages.ApplyPages
             // - Windows is installed in legacy BIOS mode
             // If the system supports UEFI and Windows is installed in UEFI mode it doesn't throw the above error, but a more specific UEFI error
         }
+
+        public class Disk
+        {
+            public string Picture { get; set; }
+            public string Model { get; set; }
+            public string Size { get; set; }
+            public string DiskId { get; set; }
+        }
+
+        private List<Disk> disks;
+        public List<Disk> DiskList => disks;
+
 
         public DiskSelectStep()
         {
@@ -103,7 +116,7 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void LoadDisks()
         {
-            DiskListView.Items.Clear();
+            disks = new List<Disk>();
             try
             {
                 var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
@@ -111,7 +124,7 @@ namespace Dive.UI.Pages.ApplyPages
                 {
                     var deviceId = info["DeviceID"].ToString();
                     var model = info["Model"].ToString();
-                    var sizeInGb = ByteToGB(Convert.ToDouble(info["Size"])).ToString();
+                    var sizeInGb = ByteToGb(Convert.ToDouble(info["Size"])).ToString();
                     var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System)[..1]);
 
                     // Check for Dive Medium
@@ -132,7 +145,7 @@ namespace Dive.UI.Pages.ApplyPages
                         // Add to list
                         var driveId = deviceId;
                         driveId = Regex.Match(driveId!, @"\d+").Value;
-                        var drive = $"{model} | {sizeInGb} GB | Disk {driveId}";
+
                         if (blackListedDisks.Contains(driveId))
                         {
                             Common.Debug.Write(" will be skipped (", true);
@@ -140,7 +153,14 @@ namespace Dive.UI.Pages.ApplyPages
                             Common.Debug.Write(").\n", true);
                             continue;
                         }
-                        DiskListView.Items.Add(drive);
+                        disks.Add(new Disk
+                        {
+                            Picture = "pack://application:,,,/assets/icon-hdd-40.png",
+                            Model = model!,
+                            Size = $"{sizeInGb} GB",
+                            DiskId = $"Disk {driveId}"
+                        });
+
                         Common.Debug.Write(" is available.\n", true);
                     }
                     else
@@ -150,6 +170,8 @@ namespace Dive.UI.Pages.ApplyPages
                         Common.Debug.Write(").\n", true);
                     }
                 }
+                this.DataContext = this;
+                DiskListView.ItemsSource = disks;
             }
             catch
             {
@@ -157,14 +179,14 @@ namespace Dive.UI.Pages.ApplyPages
             }
         }
 
-        private int ByteToGB(double bytes) // Convert Bytes to GB
+        private static int ByteToGb(double bytes) // Convert Bytes to GB
         {
             var gb = bytes / Math.Pow(10, 9);
             var i = (int)Math.Round(gb);
             return i;
         }
 
-        public string GetDiskNumber(string letter)
+        private static string GetDiskNumber(string letter)
         {
             var ret = "";
             var scope = new ManagementScope("\\\\.\\ROOT\\cimv2");
@@ -183,15 +205,14 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void DiskListView_Selected(object sender, RoutedEventArgs e)
         {
-            if (DiskListView.SelectedItem == null) return;
-            var itemData = DiskListView.SelectedItem.ToString();
-            const string toBeSearched = "| Disk ";
-            var ix = itemData!.IndexOf(toBeSearched, StringComparison.Ordinal);
+            if (DiskListView.SelectedItem is not Disk item) return;
 
+            const string toBeSearched = "Disk ";
+            var ix = item.DiskId!.IndexOf(toBeSearched, StringComparison.Ordinal);
             if (ix == -1) return;
-            var diskIndex = itemData[(ix + toBeSearched.Length)..];
+            var diskIndex = item.DiskId[(ix + toBeSearched.Length)..];
             Common.ApplyDetails.DiskIndex = Convert.ToInt32(diskIndex);
-            
+
             Common.Debug.Write("The disk with ID ");
             Common.Debug.Write(Common.ApplyDetails.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" will be used for deployment.\n", true);

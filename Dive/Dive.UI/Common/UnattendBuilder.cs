@@ -781,7 +781,7 @@ namespace Dive.UI.Common
     {
         public static string Build(Common.UnattendMode? mode)
         {
-            Common.Debug.WriteLine($"[UnattendBuilder] Entering Build process with mode {mode.Value} ...");
+            Common.Debug.WriteLine($"[UnattendBuilder] Entering Build process with mode: {mode.Value} ...");
 
             var synchronousCommands = new List<UnattendXmlClass.unattendSettingsComponentSynchronousCommand>();
             var synchronousCommandCount = 0;
@@ -817,7 +817,7 @@ namespace Dive.UI.Common
                     Username = "Administrator"
                 };
 
-                if (mode is not (Common.UnattendMode.AdminWithoutPassword and Common.UnattendMode.AdminWithoutPasswordAndOem))
+                if (mode is not (UnattendMode.AdminWithoutPassword and UnattendMode.AdminWithoutPasswordAndOem))
                 {
                     Common.Debug.WriteLine("[UnattendBuilder] Define Admin password");
                     uc.settings[0].component.AutoLogon.Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword

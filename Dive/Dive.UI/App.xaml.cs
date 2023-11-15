@@ -31,10 +31,10 @@ namespace Dive.UI
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
-        public static FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
-        public static string ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public static readonly FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
+        public static readonly string Ver = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 
         #region Parser options
         [Verb("Apply", HelpText = "Add file contents to the index.")]
@@ -90,7 +90,7 @@ namespace Dive.UI
             var helpText = HelpText.AutoBuild(result, h =>
             {
                 h.AdditionalNewLineAfterOption = false; // Remove the extra newline between options
-                h.Heading = $"{VersionInfo.ProductName} [Version: {ver}]"; // Header
+                h.Heading = $"{VersionInfo.ProductName} [Version: {Ver}]"; // Header
                 h.Copyright = VersionInfo.LegalCopyright; // Copyright text
                 return HelpText.DefaultParsingErrorsHandler(result, h);
             }, e => e);

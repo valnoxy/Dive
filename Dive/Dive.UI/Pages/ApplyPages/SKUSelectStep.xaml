@@ -40,17 +40,17 @@
                      VerticalAlignment="Center"
                      SelectionChanged="SKUListView_Selected"
                      ItemsSource="{Binding ImageList}" 
-                     Height="330">
+                     Height="332">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid Margin="5,3,0,3" >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="45" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Image Grid.Column="0" Margin="5,2,2,0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
+                            <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
                             <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
                             <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                             <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>

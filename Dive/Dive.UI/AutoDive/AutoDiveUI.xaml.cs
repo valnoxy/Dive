@@ -18,7 +18,7 @@ namespace Dive.UI.AutoDive
     public partial class AutoDiveUi
     {
         // AutoDive config
-        private static string _version = null;
+        private static string? _version = null;
         private static string? _diskId = null;
         private static string? _diskName = null;
         private static string _bootloader = null;
