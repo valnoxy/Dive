@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<RootNamespace>Dive.AutoInit</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>
@@ -29,18 +29,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Update="Resources\StartMenu.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>StartMenu.resx</DependentUpon>
-	  </Compile>
+		<Compile Update="Resources\StartMenu.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>StartMenu.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Resources\StartMenu.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>StartMenu.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Resources\StartMenu.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>StartMenu.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>

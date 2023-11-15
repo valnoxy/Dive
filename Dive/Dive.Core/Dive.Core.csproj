@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<RootNamespace>Dive.Core</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>
@@ -28,7 +28,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\WinREConfig.xml" />
+		<None Remove="Resources\WinREConfig.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,31 +38,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="Resources\WinREConfig.xml" />
+		<Resource Include="Resources\WinREConfig.xml" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Assets\UefiSevenResources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>UefiSevenResources.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Assets\WinRE.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>WinRE.resx</DependentUpon>
-	  </Compile>
+		<Compile Update="Assets\UefiSevenResources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>UefiSevenResources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Assets\WinRE.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>WinRE.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Assets\UefiSevenResources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>UefiSevenResources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Assets\WinRE.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>WinRE.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Assets\UefiSevenResources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>UefiSevenResources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Assets\WinRE.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>WinRE.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

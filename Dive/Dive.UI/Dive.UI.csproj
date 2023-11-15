@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
@@ -22,7 +21,6 @@
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
-
 	<ItemGroup>
 		<None Remove="Assets\banner.jpg" />
 		<None Remove="Assets\Fadi_Loop_f.gif" />
@@ -40,18 +38,15 @@
 		<None Remove="Assets\pexels-johannes-plenio-1103970.png" />
 		<None Remove="Dive.ico" />
 	</ItemGroup>
-
 	<ItemGroup>
-	  <Page Remove="Localization\ResourceDictionary.de-DE.xaml" />
-	  <Page Remove="Localization\ResourceDictionary.xaml" />
+		<Page Remove="Localization\ResourceDictionary.de-DE.xaml" />
+		<Page Remove="Localization\ResourceDictionary.xaml" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<Resource Include="Assets\banner.jpg" />
 		<Resource Include="Assets\Fadi_Loop_f.gif" />
 		<Resource Include="Assets\icon-hdd-40.png" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<Resource Include="Assets\icon-aios-40.png" />
 		<Resource Include="Assets\icon-windows-10-40.png" />
@@ -67,31 +62,28 @@
 		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
 		<Resource Include="Localization\ResourceDictionary.xaml" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="7.0.2" />
 		<PackageReference Include="WPF-UI" Version="3.0.0-preview.1" />
 		<PackageReference Include="XamlAnimatedGif" Version="2.2.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Management" Version="8.0.0" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\Dive.AutoInit\Dive.AutoInit.csproj" />
 		<ProjectReference Include="..\Dive.Core\Dive.Core.csproj" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<Page Update="Pages\ApplyPages\CloudSelectStep.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
 		<Page Update="Pages\CapturePages\CaptureStep.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
 		<Page Update="Pages\TweaksContent.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
 		<Page Update="Pages\CloudContent.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -104,12 +96,10 @@
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
 		<Page Update="Pages\TweaksPages\TweaksActionScreen.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
 	</ItemGroup>
-
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe&quot; sign /sha1 &quot;a80fd11ec378d1985237ee2b346fc5d63304c50d&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
 	</Target>
-
 </Project>
