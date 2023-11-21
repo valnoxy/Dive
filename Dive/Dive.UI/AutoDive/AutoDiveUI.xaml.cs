@@ -516,59 +516,8 @@ namespace Dive.UI.AutoDive
                 worker?.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
-                var config = "";
-                Common.UnattendMode? um = null;
-
-                if (!Common.DeploymentInfo.UseUserInfo && Common.OemInfo.UseOemInfo)
-                {
-                    um = Common.UnattendMode.OnlyOem;
-                }
-                else
-                {
-                    // Administrator / User with OEM infos
-                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo)
-                    {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
-                    }
-
-                    // Administrator / User with OEM infos, but without password
-                    if (!string.IsNullOrEmpty(Common.DeploymentInfo.Username)
-                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo)
-                    {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
-                    }
-
-                    // Administrator / User without OEM infos
-                    if (Common.DeploymentInfo.Username == "Administrator"
-                        && !string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo == false)
-                    {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
-                    }
-
-                    // Administrator without OEM infos and password
-                    if (Common.DeploymentInfo.Username == "Administrator"
-                        && string.IsNullOrEmpty(Common.DeploymentInfo.Password)
-                        && Common.OemInfo.UseOemInfo == false)
-                    {
-                        um = Common.DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;
-                    }
-                }
-
-                // Custom file
-                if (File.Exists(Common.DeploymentInfo.CustomFilePath))
-                {
-                    config = File.ReadAllText(Common.DeploymentInfo.CustomFilePath);
-                }
-
-                if (config == "")
-                    config = Common.UnattendBuilder.Build(um);
-
+                var config = File.Exists(Common.DeploymentInfo.CustomFilePath) ? File.ReadAllText(Common.DeploymentInfo.CustomFilePath) : Common.UnattendBuilder.Build();
                 Debug.WriteLine(config);
-
                 Actions.InstallUnattend($"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
 
                 if (IsCanceled)
@@ -614,6 +563,5 @@ namespace Dive.UI.AutoDive
             // Installation complete
             worker?.ReportProgress(250, "");     // Installation complete Text
         }
-
     }
 }

@@ -52,18 +52,48 @@ namespace Dive.UI.Common
         public static string SupportURL { get; set; }
     }
 
+    public static class DeviceInfo
+    {
+        public static bool UseDeviceInfo { get; set; }
+        public static string DeviceName { get; set; }
+        public static string ProductKey { get; set; }
+        public static string RegisteredOwner { get; set; }
+        public static string RegisteredOrganization { get; set; }
+        public static string TimeZone { get; set; }
+    }
+
+    public static class DomainInfo
+    {
+        public static bool UseDomainInfo { get; set; }
+        public static string UserName { get; set; }
+        public static string Password { get; set; }
+        public static string Domain { get; set; }
+    }
+
+    public static class OutOfBoxExperienceInfo
+    {
+        public static bool UseOOBEInfo { get; set; }
+        public static bool HideEULAPage { get; set; }
+        public static bool HideOEMRegistrationScreen { get; set; }
+        public static bool HideOnlineAccountScreens { get; set; }
+        public static bool HideWirelessSetupInOOBE { get; set; }
+        public static string NetworkLocation { get; set; }
+        public static bool SkipMachineOOBE { get; set; }
+        public static bool SkipUserOOBE { get; set; }
+        public static bool HideLocalAccountScreen { get; set; }
+    }
+
     public static class DeploymentOption
     {
         public static bool UseSMode { get; set; }
         public static bool UseCopyProfile { get; set; }
-        public static bool AddDiveToWinRE { get; set;}
+        public static bool AddDiveToWinRE { get; set; }
     }
 
     public static class Tweaks
     {
         public static TweakMode CurrentMode { get; set; }
         public static int DiskIndex { get; set; }
-        public static string ImageName { get; set; }
     }
 
     public static class WindowsModification
@@ -74,20 +104,7 @@ namespace Dive.UI.Common
         public static bool UsToggleFakeVesa { get; set; }
         public static bool UsToggleSkipErros { get; set; }
     }
-
-    public enum UnattendMode
-    {
-        Admin,
-        User,
-        AdminWithoutOem,
-        UserWithoutOem,
-        AdminWithoutPassword,
-        AdminWithoutPasswordAndOem,
-        UserWithoutPassword,
-        UserWithoutPasswordAndOem,
-        OnlyOem
-    }
-
+    
     public enum TweakMode
     {
         AutoInit,

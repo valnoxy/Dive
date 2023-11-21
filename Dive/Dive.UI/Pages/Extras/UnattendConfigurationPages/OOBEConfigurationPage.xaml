@@ -7,71 +7,372 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Margin="10,15,10,15">
-        <ui:CardExpander Icon="Person24" IsExpanded="False" IsEnabled="false" >
-            <ui:CardExpander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
+        <StackPanel Margin="10,15,10,15">
+            <ui:CardExpander Icon="Person24" IsExpanded="False" >
+                <ui:CardExpander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="Owner Information" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Text="Set Full Name and Organization to this device." />
+                        </StackPanel>
+                    </Grid>
+                </ui:CardExpander.Header>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
                         <TextBlock
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            FontSize="14"
+                            VerticalAlignment="Center"
+                            Margin="0,0,0,5"
+                            Text="Full Name" />
+                        <ui:TextBox 
+                            x:Name="TbUser" 
+                            Grid.Column="1" 
+                            Grid.Row="0"
+                            Icon="Person24" 
+                            PlaceholderText="Full Name" 
+                            IsEnabled="true"
+                            TextChanged="TbUser_OnTextChanged"
+                            Margin="0,0,0,5"/>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            FontSize="14"
+                            VerticalAlignment="Center"
+                            Text="Organization" />
+                        <ui:TextBox
+                            x:Name="TbOrganization" 
+                            Grid.Column="1" 
+                            Grid.Row="1"
+                            Icon="Building24"
+                            PlaceholderText="Organization"
+                            TextChanged="TbOrganization_OnTextChanged"
+                            IsEnabled="True" />
+                    </Grid>
+                </StackPanel>
+            </ui:CardExpander>
+
+            <ui:CardExpander Icon="VirtualNetwork20" Margin="0,5,0,0" IsExpanded="False" >
+                <ui:CardExpander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="Domain Information" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Text="Join a domain on this device." />
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" x:Name="ToggleDomain" Click="ToggleDomain_OnClick"/>
+                    </Grid>
+                </ui:CardExpander.Header>
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            FontSize="14"
+                            VerticalAlignment="Center"
+                            Margin="0,0,0,5"
+                            Text="Username" />
+                        <ui:TextBox 
+                            x:Name="TbDomainUser" 
+                            Grid.Column="1" 
+                            Grid.Row="0"
+                            Icon="Person24" 
+                            PlaceholderText="Domain User Name" 
+                            IsEnabled="true"
+                            TextChanged="TbDomainUser_OnTextChanged"
+                            Margin="0,0,0,5"/>
+
+                        <TextBlock
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            FontSize="14"
+                            VerticalAlignment="Center"
+                            Text="Password" />
+                        <ui:TextBox
+                            x:Name="TbDomainPassword" 
+                            Grid.Column="1" 
+                            Grid.Row="1"
+                            Icon="Key24"
+                            PlaceholderText="Password" 
+                            IsEnabled="True"
+                            TextChanged="TbDomainPassword_OnTextChanged"
+                            Margin="0,0,0,5" />
+
+                        <TextBlock
+                            Grid.Column="0"
+                            Grid.Row="2"
+                            FontSize="14"
+                            VerticalAlignment="Center"
+                            Text="Domain" />
+                        <ui:TextBox
+                            x:Name="TbDomain" 
+                            Grid.Column="1"
+                            Grid.Row="2"
+                            Icon="VirtualNetwork20"
+                            PlaceholderText="Domain"
+                            TextChanged="TbDomain_OnTextChanged"
+                            IsEnabled="True" />
+                    </Grid>
+                </StackPanel>
+            </ui:CardExpander>
+
+            <ui:CardExpander Icon="CheckboxPerson24" IsExpanded="False" Margin="0,5,0,0">
+                <ui:CardExpander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="OOBE Screens" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Text="Specifies whether certain OOBE screens will be hidden." />
+                        </StackPanel>
+                        <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" x:Name="ToggleOobeSetup" Click="ToggleOobeSetup_OnClick"/>
+                    </Grid>
+                </ui:CardExpander.Header>
+                <StackPanel>
+                    <ui:CardControl>
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
                                         FontSize="13"
                                         FontWeight="Medium"
-                                        Text="Owner Information" />
-                        <TextBlock
+                                        Text="Hide EULA Page" />
+                                    <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Set Full Name and Organization to this device." />
-                    </StackPanel>
-                    <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" x:Name="ToggleUser"/>
-                </Grid>
-            </ui:CardExpander.Header>
-            <StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="5*"/>
-                    </Grid.ColumnDefinitions>
+                                        Text="Hide the Microsoft Software License Terms page." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="HideEulaPageSwitch" Grid.Column="1" Margin="0,0,8,0" Click="HideEulaPageSwitch_OnClick"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                    <ui:CardControl Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Hide OEM Registration Page" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Hide the OEM registration page if specified in the OOBE.xml file." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="HideOemRegistrationPageSwitch" Grid.Column="1" Margin="0,0,8,0" Click="HideOemRegistrationPageSwitch_OnClick"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                    <ui:CardControl Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Hide Online Account Page" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Hide the online sign-in to Microsoft Account page." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="HideOnlineAccountPageSwitch" Grid.Column="1" Margin="0,0,8,0" Click="HideOnlineAccountPageSwitch_OnClick" />
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                    <ui:CardControl Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Hide Wireless Setup Page" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Hide the online sign-in to Microsoft Account page." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="HideWirelessSetupPageSwitch" Grid.Column="1" Margin="0,0,8,0" Click="HideWirelessSetupPageSwitch_OnClick"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                    <ui:CardControl Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Network Location" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Hide the Network Location page by setting the location here." />
+                                </StackPanel>
+                                <ComboBox x:Name="NetworkLocationDropDown" Grid.Column="1" Margin="0,0,8,0" SelectionChanged="NetworkLocationDropDown_OnSelected"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                    <ui:CardControl Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Skip Machine OOBE" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Skip the Machine part of the OOBE Setup. [Deprecated since Windows 10]" />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="SkipMachineOOBESwitch" Grid.Column="1" Margin="0,0,8,0" Click="SkipMachineOOBESwitch_OnClick"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                    <ui:CardControl Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Skip User OOBE" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Skip the User part of the OOBE Setup. [Deprecated since Windows 10]" />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="SkipUserOOBESwitch" Grid.Column="1" Margin="0,0,8,0" Click="SkipUserOOBESwitch_OnClick"/>
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+                </StackPanel>
+            </ui:CardExpander>
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+            <ui:CardControl Icon="Key24" Margin="0,5,0,0">
+                <ui:CardControl.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="Product Key" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Text="Activate Windows using a product key." />
+                        </StackPanel>
+                        <ui:TextBox x:Name="ProductKeyTextBox" Grid.Column="1" Width="255" PlaceholderText="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" Margin="0,0,8,0" TextChanged="ProductKeyTextBox_OnTextChanged"/>
+                    </Grid>
+                </ui:CardControl.Header>
+            </ui:CardControl>
 
-                    <TextBlock
-                                    Grid.Column="0"
-                                    Grid.Row="0"
-                                    FontSize="14"
-                                    VerticalAlignment="Center"
-                                    Margin="0,0,0,5"
-                                    Text="Full Name" />
-                    <ui:TextBox 
-                                    x:Name="TbUser" 
-                                    Grid.Column="1" 
-                                    Grid.Row="0"
-                                    Icon="Person24" 
-                                    PlaceholderText="Full Name" 
-                                    IsEnabled="true"
-                                    Margin="0,0,0,5"/>
-
-                    <TextBlock
-                                    Grid.Column="0"
-                                    Grid.Row="1"
-                                    FontSize="14"
-                                    VerticalAlignment="Center"
-                                    Text="Organization" />
-                    <ui:TextBox
-                                    x:Name="TbPassword" 
-                                    Grid.Column="1" 
-                                    Grid.Row="1"
-                                    Icon="Building24"
-                                    PlaceholderText="Organization" 
-                                    IsEnabled="True" />
-                </Grid>
-
-            </StackPanel>
-        </ui:CardExpander>
-    </StackPanel>
+            <ui:CardControl Icon="Earth24" IsEnabled="False" Margin="0,5,0,0">
+                <ui:CardControl.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="Time Zone" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Text="Specify the time zone where you are located." />
+                        </StackPanel>
+                        <ComboBox x:Name="TimeZoneDropDown" Grid.Column="1" Margin="0,0,8,0" />
+                    </Grid>
+                </ui:CardControl.Header>
+            </ui:CardControl>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

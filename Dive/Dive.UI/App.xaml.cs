@@ -195,8 +195,8 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
                 var config = "";
-                Common.UnattendMode? um = Common.UnattendMode.Admin;
-                Common.DeploymentInfo.Username = "Administrator";
+                Common.DeploymentInfo.UseUserInfo = true;
+                Common.DeploymentInfo.Username = "User";
                 Common.DeploymentInfo.Password = "Pa$$w0rd";
                 Common.DeploymentOption.UseCopyProfile = true;
                 Common.DeploymentOption.UseSMode = true;
@@ -207,7 +207,7 @@ namespace Dive.UI
                 Common.OemInfo.SupportURL = "https://fabrikam.com";
                 Common.OemInfo.SupportPhone = "+1 111 11111111";
 
-                Common.Debug.WriteLine("Unattend Mode: " + um.Value);
+                Common.Debug.WriteLine("Use User: " + Common.DeploymentInfo.UseUserInfo);
                 Common.Debug.WriteLine("Username: " + Common.DeploymentInfo.Username);
                 Common.Debug.WriteLine("Password: " + Common.DeploymentInfo.Password);
                 Common.Debug.WriteLine("Use S Mode: " + Common.DeploymentOption.UseSMode);
@@ -220,7 +220,7 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Support URL: " + Common.OemInfo.SupportURL);
 
                 Common.Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
-                config = Common.UnattendBuilder.Build(um);
+                config = Common.UnattendBuilder.Build();
                 Console.WriteLine(config);
 
                 Environment.Exit(0);

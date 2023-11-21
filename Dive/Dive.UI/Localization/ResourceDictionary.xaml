@@ -71,7 +71,7 @@
     <system:String x:Key="InjectDriversNoSource">No source directory selected.</system:String>
 
     <system:String x:Key="MoreSettingsTitle">More Settings</system:String>
-    <system:String x:Key="MoreSettingsDescription">not implemented yet</system:String>
+    <system:String x:Key="MoreSettingsDescription">See a list of other settings for deployment.</system:String>
     <system:String x:Key="MoreSettingsBtn">Configure</system:String>
 
     <system:String x:Key="SettingsImportExportTitle">Settings Import &amp; Export</system:String>

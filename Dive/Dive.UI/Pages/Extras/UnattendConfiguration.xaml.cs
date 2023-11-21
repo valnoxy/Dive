@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
+using Dive.UI.Common;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Navigation;
@@ -63,6 +65,26 @@ namespace Dive.UI.Pages.Extras
         private void UnattendConfiguration_OnContentRendered(object? sender, EventArgs e)
         {
             NavView.Navigate("deployment"); // Workaround
+        }
+
+        private void UnattendConfiguration_OnClosing(object? sender, CancelEventArgs e)
+        {
+            // Define state of DeviceInfo
+            if (!string.IsNullOrEmpty(DeviceInfo.RegisteredOwner) ||
+                !string.IsNullOrEmpty(DeviceInfo.RegisteredOrganization) ||
+                !string.IsNullOrEmpty(DeviceInfo.ProductKey) || 
+                !string.IsNullOrEmpty(DeviceInfo.DeviceName))
+            {
+                DeviceInfo.UseDeviceInfo = true;
+                Debug.Write("Use DeviceInfo in Unattend: ");
+                Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
+            }
+            else
+            {
+                DeviceInfo.UseDeviceInfo = false;
+                Debug.Write("Use DeviceInfo in Unattend: ");
+                Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
+            }
         }
     }
 }

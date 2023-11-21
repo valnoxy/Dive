@@ -120,51 +120,8 @@ namespace Dive.UI.Common.Deployment
             if (DeploymentInfo.UseUserInfo || OemInfo.UseOemInfo)
             {
                 Debug.WriteLine("Building config...");
-
-                // Building config
-                UnattendMode? um = null;
-
-                if (!DeploymentInfo.UseUserInfo && OemInfo.UseOemInfo)
-                {
-                    um = UnattendMode.OnlyOem;
-                }
-                else
-                {
-                    // Administrator / User with OEM infos
-                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
-                        && !string.IsNullOrEmpty(DeploymentInfo.Password)
-                        && OemInfo.UseOemInfo)
-                    {
-                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.User : UnattendMode.Admin;
-                    }
-
-                    // Administrator / User with OEM infos, but without password
-                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
-                        && string.IsNullOrEmpty(DeploymentInfo.Password)
-                        && OemInfo.UseOemInfo)
-                    {
-                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPassword : UnattendMode.AdminWithoutPassword;
-                    }
-
-                    // Administrator / User without OEM infos
-                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
-                        && !string.IsNullOrEmpty(DeploymentInfo.Password)
-                        && OemInfo.UseOemInfo == false)
-                    {
-                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutOem : UnattendMode.AdminWithoutOem;
-                    }
-
-                    // Administrator / User without OEM infos and password
-                    if (!string.IsNullOrEmpty(DeploymentInfo.Username)
-                        && string.IsNullOrEmpty(DeploymentInfo.Password)
-                        && OemInfo.UseOemInfo == false)
-                    {
-                        um = DeploymentInfo.Username != "Administrator" ? UnattendMode.UserWithoutPasswordAndOem : UnattendMode.AdminWithoutPasswordAndOem;
-                    }
-                }
-
-                // Custom file
-                var config = File.Exists(DeploymentInfo.CustomFilePath) ? File.ReadAllText(DeploymentInfo.CustomFilePath) : UnattendBuilder.Build(um);
+                var config = File.Exists(Common.DeploymentInfo.CustomFilePath) ? File.ReadAllText(Common.DeploymentInfo.CustomFilePath) : Common.UnattendBuilder.Build();
+                Debug.WriteLine(config);
 
                 if (string.IsNullOrEmpty(config))
                     throw new Exception("Could not build or read unattended configuration file.");

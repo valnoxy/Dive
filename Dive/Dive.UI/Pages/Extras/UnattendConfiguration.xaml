@@ -13,7 +13,8 @@
         WindowBackdropType="Mica"
         WindowCornerPreference="Round"
         ResizeMode="NoResize"
-        ContentRendered="UnattendConfiguration_OnContentRendered">
+        ContentRendered="UnattendConfiguration_OnContentRendered"
+        Closing="UnattendConfiguration_OnClosing">
 
     <Grid>
         <Grid.RowDefinitions>
