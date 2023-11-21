@@ -121,7 +121,6 @@ namespace Dive.UI.Common.Deployment
             {
                 Debug.WriteLine("Building config...");
                 var config = File.Exists(Common.DeploymentInfo.CustomFilePath) ? File.ReadAllText(Common.DeploymentInfo.CustomFilePath) : Common.UnattendBuilder.Build();
-                Debug.WriteLine(config);
 
                 if (string.IsNullOrEmpty(config))
                     throw new Exception("Could not build or read unattended configuration file.");
@@ -143,7 +142,7 @@ namespace Dive.UI.Common.Deployment
             }
 
             // Install Drivers (only for Vista and higher)
-            if (ApplyDetails.DriverList.Count > 0)
+            if (ApplyDetails.DriverList != null && ApplyDetails.DriverList.Count > 0)
             {
                 Configuration.DriverCount = ApplyDetails.DriverList.Count;
                 Actions.InstallDriver(Configuration.WindowsDrive, ApplyDetails.DriverList, worker);

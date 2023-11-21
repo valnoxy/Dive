@@ -42,7 +42,7 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
             SkipMachineOOBESwitch.IsChecked = OutOfBoxExperienceInfo.SkipMachineOOBE;
             SkipUserOOBESwitch.IsChecked = OutOfBoxExperienceInfo.SkipUserOOBE;
             ProductKeyTextBox.Text = DeviceInfo.ProductKey;
-            // TODO: Add Device Name (already included in the XML Builder)
+            DeviceNameTextBox.Text = DeviceInfo.DeviceName;
         }
 
         private void TbUser_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -146,6 +146,11 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         private void ProductKeyTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             DeviceInfo.ProductKey = ProductKeyTextBox.Text;
+        }
+
+        private void DeviceNameTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            DeviceInfo.DeviceName = DeviceNameTextBox.Text;
         }
     }
 }

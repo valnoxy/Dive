@@ -330,6 +330,28 @@
                 </StackPanel>
             </ui:CardExpander>
 
+            <ui:CardControl Icon="GlobeDesktop24" Margin="0,5,0,0">
+                <ui:CardControl.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Text="Device Name" />
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                Text="Specify the device name to be displayed in the network." />
+                        </StackPanel>
+                        <ui:TextBox x:Name="DeviceNameTextBox" Grid.Column="1" Width="200" PlaceholderText="My-PC" Margin="0,0,8,0" TextChanged="DeviceNameTextBox_OnTextChanged"/>
+                    </Grid>
+                </ui:CardControl.Header>
+            </ui:CardControl>
+
             <ui:CardControl Icon="Key24" Margin="0,5,0,0">
                 <ui:CardControl.Header>
                     <Grid>

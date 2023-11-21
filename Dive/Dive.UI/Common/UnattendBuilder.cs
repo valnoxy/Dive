@@ -1109,27 +1109,26 @@ namespace Dive.UI.Common
 
             // Calculate Settings Array Size
             var settingsArraySize = 0;
-            if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo)
+            if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo || DeploymentOption.UseCopyProfile)
                 settingsArraySize++; // pass="specialize"
             if (DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo || DeploymentInfo.UseUserInfo)
                 settingsArraySize++; // pass="oobeSystem"
             if (DeploymentOption.UseSMode)
                 settingsArraySize++; // pass="offlineServicing"
-            if (DeploymentOption.UseCopyProfile)
-                settingsArraySize++; // pass="specialize"
 
             var uc = new UnattendXmlClass.unattend
             {
                 settings = new UnattendXmlClass.unattendSettings[settingsArraySize]
             };
 
-            #region oobeSetup (single component)
+            #region oobeSystem (single component)
             if (DeploymentInfo.UseUserInfo || DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo ||
                 OutOfBoxExperienceInfo.UseOOBEInfo)
             {
+                Debug.WriteLine("Entered region: oobeSystem (single component)");
                 uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
                 {
-                    pass = "oobeSetup",
+                    pass = "oobeSystem",
                     component = new UnattendXmlClass.unattendSettingsComponent[1]
                 };
                 uc.settings[currentSettings].component[0] = new UnattendXmlClass.unattendSettingsComponent
@@ -1144,7 +1143,7 @@ namespace Dive.UI.Common
                 if (!string.IsNullOrEmpty(DeviceInfo.RegisteredOwner))
                     uc.settings[currentSettings].component[0].RegisteredOwner = DeviceInfo.RegisteredOwner;
                 if (!string.IsNullOrEmpty(DeviceInfo.RegisteredOrganization))
-                    uc.settings[currentSettings].component[0].RegisteredOwner = DeviceInfo.RegisteredOrganization;
+                    uc.settings[currentSettings].component[0].RegisteredOrganization = DeviceInfo.RegisteredOrganization;
 
                 // OOBE Information
                 if (OutOfBoxExperienceInfo.UseOOBEInfo)
@@ -1165,10 +1164,17 @@ namespace Dive.UI.Common
                 // OEM Information
                 if (OemInfo.UseOemInfo)
                 {
+                    var oemLogo = "";
+                    if (!string.IsNullOrEmpty(OemInfo.LogoPath))
+                    {
+                        Debug.WriteLine("[UnattendBuilder v2] OEM Logo found: " + OemInfo.LogoPath);
+                        oemLogo = "%WINDIR%\\System32\\logo.bmp";
+                    }
+
                     uc.settings[currentSettings].component[0].OEMInformation =
                         new UnattendXmlClass.unattendSettingsComponentOEMInformation
                         {
-                            Logo = OemInfo.LogoPath,
+                            Logo = oemLogo,
                             Manufacturer = OemInfo.Manufacturer,
                             Model = OemInfo.Model,
                             SupportHours = OemInfo.SupportHours,
@@ -1245,26 +1251,30 @@ namespace Dive.UI.Common
                 }
 
                 currentSettings++;
+                Debug.WriteLine("Completed region: oobeSetup (single component)");
             }
             #endregion
 
             #region specialize (2 components)
-            if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo)
+            if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo || DeploymentOption.UseCopyProfile)
             {
-                // Calculate component Array size
+                Debug.WriteLine("Entered region: specialize (2 component)");
                 var currentComponent = 0;
-                if (DeviceInfo.UseDeviceInfo)
-                    currentComponent++;
+
+                // Calculate component Array size
+                var componentArraySize = 0;
+                if (DeviceInfo.UseDeviceInfo || DeploymentOption.UseCopyProfile)
+                    componentArraySize++;
                 if (DomainInfo.UseDomainInfo)
-                    currentComponent++;
+                    componentArraySize++;
 
                 uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
                 {
-                    pass = "oobeSetup",
-                    component = new UnattendXmlClass.unattendSettingsComponent[currentComponent]
+                    pass = "specialize",
+                    component = new UnattendXmlClass.unattendSettingsComponent[componentArraySize]
                 };
 
-                if (DeviceInfo.UseDeviceInfo)
+                if (DeviceInfo.UseDeviceInfo || DeploymentOption.UseCopyProfile)
                 {
                     uc.settings[currentSettings].component[currentComponent] = new UnattendXmlClass.unattendSettingsComponent
                     {
@@ -1274,14 +1284,25 @@ namespace Dive.UI.Common
                         language = "neutral",
                         versionScope = "nonSxS"
                     };
-                    uc.settings[currentComponent].component[currentComponent].ComputerName = DeviceInfo.DeviceName;
-                    uc.settings[currentComponent].component[currentComponent].ProductKey = DeviceInfo.ProductKey;
-                    uc.settings[currentComponent].component[currentComponent].RegisteredOwner = DeviceInfo.RegisteredOwner;
-                    uc.settings[currentComponent].component[currentComponent].RegisteredOrganization= DeviceInfo.RegisteredOrganization;
-                    uc.settings[currentComponent].component[currentComponent].TimeZone = DeviceInfo.TimeZone;
+
+                    if (DeviceInfo.UseDeviceInfo)
+                    {
+                        uc.settings[currentSettings].component[currentComponent].ComputerName = DeviceInfo.DeviceName;
+                        uc.settings[currentSettings].component[currentComponent].ProductKey = DeviceInfo.ProductKey;
+                        uc.settings[currentSettings].component[currentComponent].RegisteredOwner = DeviceInfo.RegisteredOwner;
+                        uc.settings[currentSettings].component[currentComponent].RegisteredOrganization= DeviceInfo.RegisteredOrganization;
+                        uc.settings[currentSettings].component[currentComponent].TimeZone = DeviceInfo.TimeZone;
+                    }
+
+                    if (DeploymentOption.UseCopyProfile)
+                    {
+                        uc.settings[currentSettings].component[currentComponent].CopyProfile = true;
+                        uc.settings[currentSettings].component[currentComponent].CopyProfileSpecified = true;
+                    }
+
                     currentComponent++;
                 }
-                
+
                 if (DomainInfo.UseDomainInfo)
                 {
                     uc.settings[currentSettings].component[currentComponent] = new UnattendXmlClass.unattendSettingsComponent
@@ -1292,7 +1313,7 @@ namespace Dive.UI.Common
                         language = "neutral",
                         versionScope = "nonSxS"
                     };
-                    uc.settings[currentComponent].component[currentComponent].Identification =
+                    uc.settings[currentSettings].component[currentComponent].Identification =
                         new UnattendXmlClass.unattendSettingsComponentIdentification
                         {
                             Credentials = new UnattendXmlClass.unattendSettingsComponentIdentificationCredentials
@@ -1305,12 +1326,17 @@ namespace Dive.UI.Common
                         };
                     //currentComponent++;
                 }
+
+                currentSettings++;
+                Debug.WriteLine("Completed region: specialize (2 component)");
             }
             #endregion
 
             #region offlineServicing (single component)
             if (DeploymentOption.UseSMode)
             {
+                Debug.WriteLine("Entered region: offlineServicing (single component)");
+
                 uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
                 {
                     pass = "offlineServicing",
@@ -1326,29 +1352,8 @@ namespace Dive.UI.Common
                     SkuPolicyRequired = 1,
                     SkuPolicyRequiredSpecified = true
                 };
-                currentSettings++;
-            }
-            #endregion
-
-            #region specialize (single component)
-            if (DeploymentOption.UseCopyProfile)
-            {
-                uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
-                {
-                    pass = "specialize",
-                    component = new UnattendXmlClass.unattendSettingsComponent[1]
-                };
-                uc.settings[currentSettings].component[0] = new UnattendXmlClass.unattendSettingsComponent
-                {
-                    name = "Microsoft-Windows-Shell-Setup",
-                    processorArchitecture = "amd64",
-                    publicKeyToken = "31bf3856ad364e35",
-                    language = "neutral",
-                    versionScope = "nonSxS",
-                    CopyProfile = true,
-                    CopyProfileSpecified = true
-                };
                 //currentSettings++;
+                Debug.WriteLine("Completed region: offlineServicing (single component)");
             }
             #endregion
 
