@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Dive.UI.Common
+namespace Dive.UI.Common.Configuration
 {
     internal class IniFile   // revision 12
     {

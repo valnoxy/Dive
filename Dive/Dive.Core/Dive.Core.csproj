@@ -17,7 +17,7 @@
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PackageId>Dive.Core</PackageId>
-		<Version>12.0.0.461</Version>
+		<Version>12.0.0.464</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>
 		<Product>Dive</Product>

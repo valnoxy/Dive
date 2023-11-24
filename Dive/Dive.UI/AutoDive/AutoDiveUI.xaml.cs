@@ -4,11 +4,11 @@ using Dive.Core;
 using System.Xml;
 using Dive.UI.Common;
 using System.Management;
-using System.Reflection;
 using System.Windows.Media;
 using System.ComponentModel;
 using Dive.UI.Pages;
 using Dive.Core.Common;
+using Dive.UI.Common.Configuration;
 
 namespace Dive.UI.AutoDive
 {

@@ -60,6 +60,7 @@ namespace Dive.UI.Common
         public static string RegisteredOwner { get; set; }
         public static string RegisteredOrganization { get; set; }
         public static string TimeZone { get; set; }
+        public static int TimeZoneId { get; set; }
     }
 
     public static class DomainInfo

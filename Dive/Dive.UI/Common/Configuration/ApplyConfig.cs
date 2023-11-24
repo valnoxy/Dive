@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dive.UI.Common
+﻿namespace Dive.UI.Common
 {
-    public class XMLSetting
+    public class ApplyConfig
     {
         [System.SerializableAttribute()]
         [System.ComponentModel.DesignerCategoryAttribute("code")]

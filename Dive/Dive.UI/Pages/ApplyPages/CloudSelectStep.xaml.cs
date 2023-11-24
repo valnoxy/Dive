@@ -1,5 +1,6 @@
 ﻿using Dive.Core;
 using Dive.UI.Common;
+using Dive.UI.Common.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace Dive.UI.Pages.ApplyPages
                         try
                         {
                             var cloudConfigFile = File.ReadAllText(Path.Combine(d.Name, "Dive.conf"));
-                            var cloudConfig = JsonConvert.DeserializeObject<Common.CloudConfig>(cloudConfigFile);
+                            var cloudConfig = JsonConvert.DeserializeObject<CloudConfig>(cloudConfigFile);
                             if (string.IsNullOrEmpty(cloudConfig!.Username) || string.IsNullOrEmpty(cloudConfig.Password) || string.IsNullOrEmpty(cloudConfig.Hostname))
                                 return; // Empty config
                             else
