@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Dive.UI.Pages.ApplyPages.DeploymentSettingsStep"
+﻿<UserControl x:Class="Dive.UI.Pages.ApplyPages.DeploymentSettingsStepNew"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -35,10 +35,6 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
                 
             </ScrollViewer>
-            <ui:Snackbar
-                x:Name="RootSnackbar"
-                MaxWidth="600"
-                Timeout="15000" />
         </Grid>
     </Grid>
 </UserControl>

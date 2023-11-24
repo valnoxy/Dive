@@ -5,9 +5,7 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Threading;
-using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.Navigation;
 
 namespace Dive.UI
 {
@@ -25,7 +23,7 @@ namespace Dive.UI
         public MainWindow()
         {
             InitializeComponent();
-            
+
 #if DEBUG
             DebugString.Visibility = Visibility.Visible;
             DebugString.Text = "Debug build - This is not a production ready build.";
@@ -58,95 +56,6 @@ namespace Dive.UI
             Date.Text = DateTime.Now.ToShortDateString();
         }
 
-        private void RootNavigation_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            // Build navigation menu
-           
-            var navItems = new List<INavigationViewItem>
-            {
-                new NavigationViewItem
-                {
-                    Content = Common.LocalizationManager.LocalizeValue("Home"),
-                    Icon = new SymbolIcon
-                    {
-                        Symbol = SymbolRegular.Home24
-                    },
-                    TargetPageTag = "dashboard",
-                    TargetPageType = new TypeDelegator(typeof(Pages.Dashboard)),
-
-                },
-                new NavigationViewItem
-                {
-                    Content = Common.LocalizationManager.LocalizeValue("Apply"),
-                    Icon = new SymbolIcon
-                    {
-                        Symbol = SymbolRegular.WindowApps24
-                    },
-                    TargetPageTag = "apply",
-                    TargetPageType = new TypeDelegator(typeof(Pages.ApplyContent))
-                },
-                new NavigationViewItem
-                {
-                    Content = Common.LocalizationManager.LocalizeValue("Capture"),
-                    Icon = new SymbolIcon
-                    {
-                        Symbol = SymbolRegular.Copy24
-                    },
-                    TargetPageTag = "capture",
-                    TargetPageType = new TypeDelegator(typeof(Pages.CaptureContent))
-                },
-                new NavigationViewItem
-                {
-                    Content = Common.LocalizationManager.LocalizeValue("Cloud"),
-                    Icon = new SymbolIcon
-                    {
-                        Symbol = SymbolRegular.Cloud24
-                    },
-                    TargetPageTag = "cloud",
-                    TargetPageType = new TypeDelegator(typeof(Pages.CloudContent))
-                },
-                new NavigationViewItem
-                {
-                    Content = Common.LocalizationManager.LocalizeValue("Tweaks"),
-                    Icon = new SymbolIcon
-                    {
-                        Symbol = SymbolRegular.Toolbox24
-                    },
-                    TargetPageTag = "tweaks",
-                    TargetPageType = new TypeDelegator(typeof(Pages.TweaksContent))
-                }
-            };
-            var footerNavItems = new List<INavigationViewItem>();
-            var consoleItem = new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("Console"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.WindowConsole20
-                },
-                TargetPageTag = "console",
-            };
-            footerNavItems.Add(consoleItem);
-            consoleItem.Click += CommandLine_Click;
-            footerNavItems.Add(new NavigationViewItem
-            {
-                Content = Common.LocalizationManager.LocalizeValue("About"),
-                Icon = new SymbolIcon
-                {
-                    Symbol = SymbolRegular.QuestionCircle24
-                },
-                TargetPageTag = "about",
-                TargetPageType = new TypeDelegator(typeof(Pages.AboutPage))
-            });
-            
-            RootNavigation.MenuItems = navItems;
-            RootNavigation.FooterMenuItems = footerNavItems;
-        
-            RootNavigation.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
-            RootNavigation.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
-            RootNavigation.Navigate(new TypeDelegator(typeof(Pages.AboutPage)));
-        }
-
         private void CommandLine_Click(object sender, RoutedEventArgs e)
         {
             var handle = App.GetConsoleWindow();
@@ -165,7 +74,7 @@ namespace Dive.UI
 
         private void MainWindow_OnLoaded(object? sender, EventArgs eventArgs)
         {
-            RootNavigation.Navigate("dashboard"); // Workaround
+            RootNavigation.Navigate(typeof(Pages.Dashboard));
         }
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)
@@ -176,6 +85,11 @@ namespace Dive.UI
         private void UIElement_OnDragEnter(object sender, DragEventArgs e)
         {
             Common.Debug.WriteLine("DragEnter");
+        }
+
+        private void ThemeSwitch_Click(object sender, RoutedEventArgs e)
+        {
+            WindowBackdropType = WindowBackdropType == WindowBackdropType.Mica ? WindowBackdropType.Tabbed : WindowBackdropType.Mica;
         }
     }
 }

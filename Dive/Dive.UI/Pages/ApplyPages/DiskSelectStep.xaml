@@ -37,7 +37,7 @@
                        Click="ReloadBtn_Click"
                        HorizontalAlignment="Right"
                        Content="{DynamicResource ReloadBtn}"
-                       Icon="ArrowReset24" 
+                       Icon="{ui:SymbolIcon ArrowReset24}" 
                        Margin="0,0,0,0"/>
         </Grid>
 

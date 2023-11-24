@@ -43,7 +43,7 @@
             </Grid>
 
             <Grid Grid.Row="2">
-                <ui:Card Height="203">
+                <ui:Card Height="170">
                     <StackPanel>
                         <Label x:Name="LabelTitle"
                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -77,7 +77,6 @@
                                HorizontalAlignment="Left"
                                Margin="0,-5,0,0"
                                FontFamily="Segoe UI Variable Display"/>
-                        <Label x:Name="ValueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" VerticalAlignment="Top" HorizontalAlignment="Left" FontFamily="Segoe UI Variable Display"/>
                         <TextBlock x:Name="LicenseText" Foreground="{DynamicResource TextFillColorTertiaryBrush}" VerticalAlignment="Top" FontSize="15" TextWrapping="WrapWithOverflow" FontFamily="Segoe UI Variable Display" Height="100">
                             This program is free software: you can redistribute it and/or modify
                             it under the terms of the GNU General Public License as published by
@@ -97,13 +96,14 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock
-                                        FontSize="13"
-                                        FontWeight="Medium"
-                                        Text="Dive is up-to-date!" />
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Horizontal">
+                                    <ui:Image Source="pack://application:,,,/Dive.ico" Width="30" Margin="0,0,10,0"/>
+                                    <StackPanel>
+                                        <Label Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive" FontSize="15" Margin="0,0,0,-5"/>
+                                        <Label x:Name="ValueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" FontFamily="Segoe UI Variable Display"/>
+                                    </StackPanel>
                                 </StackPanel>
-                                <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <ui:Button Margin="0,0,8,0" 
                                                Content="Website"
                                                Click="Homepage_OnClick"/>

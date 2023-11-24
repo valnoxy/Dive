@@ -4,16 +4,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Dive.UI.Pages"
-    xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     mc:Ignorable="d"
     d:DesignHeight="549" d:DesignWidth="728">
 
     <StackPanel Margin="0,-20,0,0">
-        <wpfui:CardAction
+        <ui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToAutoInit"
             IsEnabled="true"
-            Icon="Broom28">
+            Icon="{ui:SymbolIcon Broom24}">
             <StackPanel>
                 <TextBlock
                     Margin="0,0,0,4"
@@ -24,12 +24,12 @@
                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                     Text="Clean-up your Windows Instance with AutoInit." />
             </StackPanel>
-        </wpfui:CardAction>
-        <wpfui:CardAction
+        </ui:CardAction>
+        <ui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToMigratePage"
             IsEnabled="false"
-            Icon="ArrowCircleRight28">
+            Icon="{ui:SymbolIcon ArrowCircleRight24}">
             <StackPanel>
                 <TextBlock
                     Margin="0,0,0,4"
@@ -40,12 +40,12 @@
                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                     Text="Migrate your legacy (CSM) Windows installation to EFI based systems." />
             </StackPanel>
-        </wpfui:CardAction>
-        <wpfui:CardAction
+        </ui:CardAction>
+        <ui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToRepairPage"
             IsEnabled="false"
-            Icon="WrenchScrewdriver20">
+            Icon="{ui:SymbolIcon WrenchScrewdriver24}">
             <StackPanel>
                 <TextBlock
                     Margin="0,0,0,4"
@@ -56,6 +56,6 @@
                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                     Text="Repair the Bootloader of your current Windows installation." />
             </StackPanel>
-        </wpfui:CardAction>
+        </ui:CardAction>
     </StackPanel>
 </UserControl>

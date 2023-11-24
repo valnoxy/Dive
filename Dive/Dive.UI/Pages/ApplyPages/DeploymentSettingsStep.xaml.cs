@@ -18,9 +18,9 @@ namespace Dive.UI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für DeploymentSettingsStep.xaml
     /// </summary>
-    public partial class DeploymentSettingsStep : UserControl
+    public partial class DeploymentSettingsStepNew : UserControl
     {
-        public DeploymentSettingsStep()
+        public DeploymentSettingsStepNew()
         {
             InitializeComponent();
         }

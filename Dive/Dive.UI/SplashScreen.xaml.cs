@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Threading;
 
 namespace Dive.UI
 {
@@ -14,13 +12,20 @@ namespace Dive.UI
     /// </summary>
     public partial class SplashScreen
     {
-        public class Language
+        private static bool _switchToDashboard = false;
+        
+        public new class Language
         {
-            public string Name { get; set; }
-            public string Code { get; set; }
+            public string? Name { get; set; }
+            public string? Code { get; set; }
         }
+        
+        private readonly List<Language> _languages = new()
+        {
+            new Language { Name = "English", Code = "en-US" }, // Default language
+            new Language { Name = "Deutsch", Code = "de-DE" }
+        };
 
-        private List<Language> languages;
         public SplashScreen()
         { 
             InitializeComponent();
@@ -34,12 +39,7 @@ namespace Dive.UI
             VersionLabel.Text = $"Version {version} - Debug build";
 #endif
 
-            languages = new List<Language>()
-            {
-                new Language {Name = "English", Code = "en-US"}, // Default language
-                new Language {Name = "Deutsch", Code = "de-DE"}
-            };
-            foreach (var language in languages)
+            foreach (var language in _languages)
             {
                 LanguageDropDown.Items.Add(language.Name);
             }
@@ -48,7 +48,8 @@ namespace Dive.UI
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            _switchToDashboard = true;
+            Close();
         }
 
         private void LanguageDropDown_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -59,7 +60,7 @@ namespace Dive.UI
                 var language = LanguageDropDown.SelectedValue.ToString();
                 if (string.IsNullOrEmpty(language)) return;
 
-                var languageCode = languages.Find(x => x.Name == language)?.Code;
+                var languageCode = _languages.Find(x => x.Name == language)?.Code;
                 Common.Debug.WriteLine($"Trying to load language '{language}' with code '{languageCode}' ...");
                 Common.LocalizationManager.LoadLanguage(languageCode!);
             }
@@ -67,6 +68,12 @@ namespace Dive.UI
             {
                 Common.Debug.WriteLine(ex.ToString(), ConsoleColor.Red);
             }
+        }
+
+        private void SplashScreen_OnClosing(object? sender, CancelEventArgs e)
+        {
+            if (!_switchToDashboard)
+                Environment.Exit(0);
         }
     }
 }

@@ -28,7 +28,7 @@
         <Grid Grid.Row="1" Height="350">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
                 <StackPanel>
-                    <ui:CardExpander Icon="Database24" IsExpanded="True">
+                    <ui:CardExpander Icon="{ui:SymbolIcon Database24}" IsExpanded="True">
                         <ui:CardExpander.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -58,7 +58,7 @@
                                     FontSize="14"
                                     Margin="0,6,0,0"
                                     Text="Name" />
-                                <ui:TextBox x:Name="TbName" Grid.Column="1" Icon="TextCaseTitle20" PlaceholderText="My Image" IsEnabled="true" TextChanged="TbName_OnTextChanged"/>
+                                <ui:TextBox x:Name="TbName" Grid.Column="1" Icon="{ui:SymbolIcon TextCaseTitle24}" PlaceholderText="My Image" IsEnabled="true" TextChanged="TbName_OnTextChanged"/>
                             </Grid>
 
                             <Grid Margin="0,10,0,0">
@@ -71,13 +71,13 @@
                                     FontSize="14"
                                     Margin="0,6,0,0"
                                     Text="Description" />
-                                <ui:TextBox x:Name="TbDescription" Grid.Column="1" Icon="TextDescription24" PlaceholderText="Captured with Dive" TextChanged="TbDescription_OnTextChanged"/>
+                                <ui:TextBox x:Name="TbDescription" Grid.Column="1" Icon="{ui:SymbolIcon TextDescription24}" PlaceholderText="Captured with Dive" TextChanged="TbDescription_OnTextChanged"/>
                             </Grid>
 
                         </StackPanel>
                     </ui:CardExpander>
 
-                    <ui:CardControl Icon="HardDrive20" Margin="0,5,0,0">
+                    <ui:CardControl Icon="{ui:SymbolIcon HardDrive20}" Margin="0,5,0,0">
                         <ui:CardControl.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -102,20 +102,12 @@
                                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                     x:Name="TbPath"
                                     Text="No source directory selected." />
-                                <ui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="DocumentSearch24" Click="Source_OpenFolderClick"/>
+                                <ui:Button Grid.Column="2" Width="35" Height="35" Margin="10,0,0,0" Icon="{ui:SymbolIcon DocumentSearch24}" Click="Source_OpenFolderClick"/>
                             </Grid>
                         </ui:CardControl.Header>
                     </ui:CardControl>
                 </StackPanel>
             </ScrollViewer>
-            <ui:Snackbar
-                x:Name="RootSnackbar"
-                Title="Hello World!"
-                MaxWidth="600"
-                Appearance="Danger"
-                Icon="Warning24"
-                Message="Remember that the Heat Death of Universe is coming someday, no time to explain - let's go!"
-                Timeout="15000" />
         </Grid>
     </Grid>
 

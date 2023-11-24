@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Dive.UI.Pages"
-      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d" 
       d:DesignHeight="549" d:DesignWidth="728"
       Title="Dashboard">
@@ -28,8 +28,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" 
-                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <ui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" 
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -49,8 +49,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" 
-                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <ui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" 
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -70,8 +70,8 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <wpfui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24"
-                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                <ui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                 <StackPanel
                     Grid.Column="1"
                     Margin="19,0,0,0"
@@ -89,10 +89,10 @@
         
         <Grid Grid.Row="2" Margin="0,25,0,0">
             <StackPanel>
-                <wpfui:CardAction
+                <ui:CardAction
                     Margin="0,0,0,8"
                     Click="SwitchToApplyPage"
-                    Icon="WindowApps24">
+                    Icon="{ui:SymbolIcon WindowApps24}">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,4"
@@ -103,11 +103,11 @@
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource ApplyImageDescription}" />
                     </StackPanel>
-                </wpfui:CardAction>
-                <wpfui:CardAction
+                </ui:CardAction>
+                <ui:CardAction
                     Margin="0,0,0,8"
                     Click="SwitchToCapturePage"
-                    Icon="Copy24">
+                    Icon="{ui:SymbolIcon Copy24}">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,4"
@@ -118,11 +118,11 @@
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource CaptureWindowsDescription}" />
                     </StackPanel>
-                </wpfui:CardAction>
-                <wpfui:CardAction
+                </ui:CardAction>
+                <ui:CardAction
                     Margin="0,0,0,8"
                     Click="SwitchToCloudPage"
-                    Icon="Cloud24">
+                    Icon="{ui:SymbolIcon Cloud24}">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,4"
@@ -133,11 +133,11 @@
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource CloudInstallationDescription}" />
                     </StackPanel>
-                </wpfui:CardAction>
-                <wpfui:CardAction
+                </ui:CardAction>
+                <ui:CardAction
                     Margin="0,0,0,8"
                     Click="SwitchToRepairPage"
-                    Icon="Toolbox24">
+                    Icon="{ui:SymbolIcon Toolbox24}">
                     <StackPanel>
                         <TextBlock
                             Margin="0,0,0,4"
@@ -148,7 +148,7 @@
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Text="{DynamicResource RepairAndTweaksDescription}" />
                     </StackPanel>
-                </wpfui:CardAction>
+                </ui:CardAction>
 
                 <Label Content="Made with ❤️ by valnoxy"/>
             </StackPanel>

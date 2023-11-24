@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Margin="10,15,10,15">
-        <ui:CardControl Icon="StoreMicrosoft24" Margin="0,5,0,0">
+        <ui:CardControl Icon="{ui:SymbolIcon StoreMicrosoft24}" Margin="0,5,0,0">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -30,7 +30,7 @@
             </ui:CardControl.Header>
         </ui:CardControl>
 
-        <ui:CardControl Icon="PersonAccounts24" Margin="0,5,0,0">
+        <ui:CardControl Icon="{ui:SymbolIcon PersonAccounts24}" Margin="0,5,0,0">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -52,7 +52,7 @@
             </ui:CardControl.Header>
         </ui:CardControl>
 
-        <ui:CardControl Icon="ArrowReset24" Margin="0,5,0,0">
+        <ui:CardControl Icon="{ui:SymbolIcon HomeAdd24}" Margin="0,5,0,0">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -4,9 +4,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using Dive.UI.Common;
-using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.Navigation;
 
 namespace Dive.UI.Pages.Extras
 {
@@ -59,12 +57,12 @@ namespace Dive.UI.Pages.Extras
             NavView.MenuItems = navItems;
             NavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             NavView.IsBackButtonVisible = NavigationViewBackButtonVisible.Collapsed;
-            NavView.Navigate("application");
+            NavView.Navigate(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage));
         }
 
         private void UnattendConfiguration_OnContentRendered(object? sender, EventArgs e)
         {
-            NavView.Navigate("deployment"); // Workaround
+            NavView.Navigate(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage)); // Workaround
         }
 
         private void UnattendConfiguration_OnClosing(object? sender, CancelEventArgs e)

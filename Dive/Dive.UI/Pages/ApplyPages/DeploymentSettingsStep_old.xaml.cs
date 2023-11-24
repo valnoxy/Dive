@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using Path = System.IO.Path;
-using Wpf.Ui.Common;
 using System.Xml;
 using Dive.UI.Pages.Extras;
 using Wpf.Ui.Controls;
@@ -18,9 +17,9 @@ namespace Dive.UI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für DeploymentSettingsStep.xaml
     /// </summary>
-    public partial class DeploymentSettingsStepOld : UserControl
+    public partial class DeploymentSettingsStep : UserControl
     {
-        public DeploymentSettingsStepOld()
+        public DeploymentSettingsStep()
         {
             InitializeComponent();
             Common.DeploymentInfo.UseUserInfo = false;
@@ -171,9 +170,7 @@ namespace Dive.UI.Pages.ApplyPages
                         }
                         else
                         {
-                            RootSnackbar.Appearance = ControlAppearance.Caution;
-                            RootSnackbar.Icon = SymbolRegular.ImageOff24;
-                            RootSnackbar.Show("An error has occurred.", $"OEM logo does not exists in the same location as the configuration.");
+
                         }
                     }
 
@@ -287,9 +284,7 @@ namespace Dive.UI.Pages.ApplyPages
                 }
                 catch
                 {
-                    RootSnackbar.Appearance = ControlAppearance.Caution;
-                    RootSnackbar.Icon = SymbolRegular.ImageOff24;
-                    RootSnackbar.Show("An error has occurred.", $"Cannot copy OEM logo to the location of the exported configuration.");
+
                 }
             }
 
@@ -378,9 +373,6 @@ namespace Dive.UI.Pages.ApplyPages
                         Common.ApplyDetails.DriverList = infFiles;
                         break;
                     case 0:
-                        RootSnackbar.Appearance = ControlAppearance.Danger;
-                        RootSnackbar.Icon = SymbolRegular.Settings32;
-                        RootSnackbar.Show("An error has occurred.", $"No inf files found in the selected directory.");
                         Common.Debug.Write("No drivers was found in the selected directory.");
                         Common.ApplyDetails.DriverList = null;
                         break;

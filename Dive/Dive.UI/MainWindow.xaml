@@ -8,12 +8,14 @@
                  Title="Dive" Height="620" Width="800"
                  MinHeight="620" MinWidth="800"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:pages="clr-namespace:Dive.UI.Pages"
                  WindowStartupLocation="CenterScreen"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round"
                  ResizeMode="NoResize"
                  ContentRendered="MainWindow_OnLoaded">
+    
     <Grid AllowDrop="True" Drop="UIElement_OnDrop" DragEnter="UIElement_OnDragEnter">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -26,12 +28,49 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <ui:NavigationView
-                x:Name="RootNavigation"
-                Grid.Column="0"
-                Margin="6,0,6,0"
-                Loaded="RootNavigation_OnLoaded"
-                AllowDrop="True"/>
+            <ui:NavigationView x:Name="RootNavigation" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" Margin="6,0" Grid.Row="0">
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem Content="{DynamicResource Home}" TargetPageType="{x:Type pages:Dashboard}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Home24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="{DynamicResource Apply}" TargetPageType="{x:Type pages:ApplyContent}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="WindowApps24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="{DynamicResource Capture}" TargetPageType="{x:Type pages:CaptureContent}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Copy24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="{DynamicResource Cloud}" TargetPageType="{x:Type pages:CloudContent}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Cloud24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="{DynamicResource Tweaks}" TargetPageType="{x:Type pages:TweaksContent}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Toolbox24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.MenuItems>
+                
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem Click="ThemeSwitch_Click">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="PaintBrush24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem TargetPageType="{x:Type pages:AboutPage}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="QuestionCircle24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.FooterMenuItems>
+            </ui:NavigationView>
+
 
             <StatusBar
                 x:Name="RootStatusBar"
@@ -53,55 +92,62 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </ItemsPanelTemplate>
                 </StatusBar.ItemsPanel>
 
                 <StatusBarItem>
-                    <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="Person24" />
+                    <ui:SymbolIcon FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="Person24" />
                 </StatusBarItem>
                 <StatusBarItem Grid.Column="1" Margin="0,0,4,0">
                     <TextBlock x:Name="UserName" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 </StatusBarItem>
 
                 <StatusBarItem Grid.Column="2" Margin="4,0,0,0">
-                    <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="BranchFork24" />
+                    <ui:SymbolIcon FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="BranchFork24" />
                 </StatusBarItem>
                 <StatusBarItem Grid.Column="3" Margin="0,0,4,0">
                     <TextBlock x:Name="Branch" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 </StatusBarItem>
 
                 <StatusBarItem Grid.Column="4" Margin="4,0,0,0">
-                    <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="Info12" />
+                    <ui:SymbolIcon FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="Info24" />
                 </StatusBarItem>
                 <StatusBarItem Grid.Column="5" Margin="0,0,4,0">
                     <TextBlock x:Name="Version" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 </StatusBarItem>
 
-                <StatusBarItem Grid.Column="6" Margin="4,0,0,0">
-                    <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="CalendarLtr12" />
+                <StatusBarItem Grid.Column="6" Margin="4,0,0,0" MouseDoubleClick="CommandLine_Click">
+                    <ui:SymbolIcon FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="WindowConsole20" />
                 </StatusBarItem>
-                <StatusBarItem Grid.Column="7" Margin="0,0,4,0">
+
+                <StatusBarItem Grid.Column="7" Margin="4,0,0,0">
+                    <ui:SymbolIcon FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="CalendarLtr16" />
+                </StatusBarItem>
+                <StatusBarItem Grid.Column="8" Margin="0,0,4,0">
                     <TextBlock x:Name="Date" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 </StatusBarItem>
 
-                <StatusBarItem Grid.Column="8" Margin="4,0,0,0">
-                    <ui:SymbolIcon Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="Clock12" />
+                <StatusBarItem Grid.Column="9" Margin="4,0,0,0">
+                    <ui:SymbolIcon FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Symbol="Clock16" />
                 </StatusBarItem>
-                <StatusBarItem Grid.Column="9" Margin="0,0,4,0">
+                <StatusBarItem Grid.Column="10" Margin="0,0,4,0">
                     <TextBlock x:Name="Time" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                 </StatusBarItem>
-
             </StatusBar>
         </Grid>
 
         <ui:TitleBar
             Title="Dive - Deployment is very easy"
-            ShowMaximize="False"
-            Icon="pack://application:,,,/Dive.ico"
             ShowMinimize="False"
-            Grid.Row="0"/>
+            ShowMaximize="False"
+            Grid.Row="0">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/dive.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
