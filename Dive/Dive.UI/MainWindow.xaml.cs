@@ -30,9 +30,9 @@ namespace Dive.UI
             _displayDebugConsole = true;
             Branch.Text = "Development";
 #else
-            DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Public Beta Build 7";
-            Branch.Text = "Stable";
+            DebugString.Visibility = Visibility.Hidden;
+            //DebugString.Text = "Pre-Release 1";
+            Branch.Text = "Pre-Release 1";
 #endif
             // Get version
             var assembly = Assembly.GetExecutingAssembly();

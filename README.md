@@ -1,12 +1,12 @@
-<h1 align="center"><br><img src="https://dl.exploitox.de/other/dive.png" alt="Dive Logo" width=100></h1>
+<h1 align="center"><br><img src="https://dl.exploitox.de/other/diveV2.png" alt="Dive Logo" width=100></h1>
 
 <h3 align="center">Dive - Deployment is very easy</h3>
 <p align="center">
     Easy OS Deployment for Windows
     <br />
-    <strong>Version: </strong>1.0.0.441 (Beta 6)
+    <strong>Version: </strong>1.0.0.513 (Pre-Release 1)
     <br/>
-    <strong>Core: </strong>12.0.0.461
+    <strong>Core: </strong>12.0.0.464
     <br />
     <br />
     <a href="https://github.com/valnoxy/dive/releases"><strong>Download now »</strong></a>

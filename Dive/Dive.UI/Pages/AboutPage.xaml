@@ -97,7 +97,7 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Horizontal">
-                                    <ui:Image Source="pack://application:,,,/Dive.ico" Width="30" Margin="0,0,10,0"/>
+                                    <ui:Image Source="pack://application:,,,/DiveV2.ico" Width="30" Margin="0,0,10,0"/>
                                     <StackPanel>
                                         <Label Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Dive" FontSize="15" Margin="0,0,0,-5"/>
                                         <Label x:Name="ValueCopyright" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Content="Copyright © Exploitox." FontSize="15" FontFamily="Segoe UI Variable Display"/>

@@ -89,7 +89,7 @@
                                     FontSize="14"
                                     VerticalAlignment="Center"
                                     Text="{DynamicResource Password}" />
-                                <ui:PasswordBox
+                                <ui:TextBox
                                     x:Name="TbPassword" 
                                     Grid.Column="1" 
                                     Grid.Row="1"

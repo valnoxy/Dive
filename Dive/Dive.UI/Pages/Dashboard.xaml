@@ -134,6 +134,7 @@
                             Text="{DynamicResource CloudInstallationDescription}" />
                     </StackPanel>
                 </ui:CardAction>
+                <!--
                 <ui:CardAction
                     Margin="0,0,0,8"
                     Click="SwitchToRepairPage"
@@ -149,7 +150,7 @@
                             Text="{DynamicResource RepairAndTweaksDescription}" />
                     </StackPanel>
                 </ui:CardAction>
-
+                -->
                 <Label Content="Made with ❤️ by valnoxy"/>
             </StackPanel>
         </Grid>

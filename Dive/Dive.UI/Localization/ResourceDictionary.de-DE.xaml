@@ -70,7 +70,7 @@
     <system:String x:Key="InjectDriversNoSource">Kein Quellverzeichnis ausgewählt.</system:String>
 
     <system:String x:Key="MoreSettingsTitle">Weitere Einstellungen</system:String>
-    <system:String x:Key="MoreSettingsDescription">Aktuell nicht implementiert</system:String>
+    <system:String x:Key="MoreSettingsDescription">Eine Liste mit weiteren Einstellungen für die Bereitstellung.</system:String>
     <system:String x:Key="MoreSettingsBtn">Konfigurieren</system:String>
 
     <system:String x:Key="SettingsImportExportTitle">Einstellungen Import- &amp; Exportieren</system:String>

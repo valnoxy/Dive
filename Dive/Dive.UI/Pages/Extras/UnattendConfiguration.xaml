@@ -7,13 +7,14 @@
         mc:Ignorable="d"
         Title="Dive - Deployment Settings" MinHeight="600" MinWidth="650" MaxHeight="600" MaxWidth="650"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:unattendConfigurationPages="clr-namespace:Dive.UI.Pages.Extras.UnattendConfigurationPages"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         WindowStartupLocation="CenterScreen"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
         WindowCornerPreference="Round"
         ResizeMode="NoResize"
-        ContentRendered="UnattendConfiguration_OnContentRendered"
+        Loaded="UnattendConfiguration_OnLoaded"
         Closing="UnattendConfiguration_OnClosing">
 
     <Grid>
@@ -27,18 +28,37 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ui:NavigationView
-                x:Name="NavView"
-                Grid.Column="0"
-                Margin="6,0,6,0"
-                Loaded="NavView_OnLoaded"/>
+            <ui:NavigationView x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Auto" Margin="6,0" Grid.Row="0">
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem Content="{DynamicResource Deployment}" TargetPageType="{x:Type unattendConfigurationPages:DeploymentConfigurationPage}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="HardDrive20" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="{DynamicResource OOBE}" TargetPageType="{x:Type unattendConfigurationPages:OOBEConfigurationPage}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="CheckboxPerson24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <!-- Not implemented
+                    <ui:NavigationViewItem Content="{DynamicResource Application}" TargetPageType="{x:Type unattendConfigurationPages:ApplicationConfigurationPage}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="AppGeneric24" />
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    -->
+                </ui:NavigationView.MenuItems>
+            </ui:NavigationView>
         </Grid>
 
         <ui:TitleBar
             Title="Deployment Settings"
-            ShowMaximize="False"
-            Icon="pack://application:,,,/Dive.ico"
             ShowMinimize="False"
-            Grid.Row="0"/>
+            ShowMaximize="False"
+            Grid.Row="0">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/DiveV2.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
     </Grid>
 </ui:FluentWindow>

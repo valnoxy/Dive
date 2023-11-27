@@ -1,16 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using Dive.UI.Common;
+using Dive.UI.Pages.Extras;
+using Microsoft.Win32;
+using Path = System.IO.Path;
 using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using Dive.UI.Common;
 using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
-using Path = System.IO.Path;
 using System.Xml;
-using Dive.UI.Pages.Extras;
-using Wpf.Ui.Controls;
+using System.Xml.Serialization;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -22,8 +20,8 @@ namespace Dive.UI.Pages.ApplyPages
         public DeploymentSettingsStep()
         {
             InitializeComponent();
-            Common.DeploymentInfo.UseUserInfo = false;
-            Common.OemInfo.UseOemInfo = false;
+            DeploymentInfo.UseUserInfo = false;
+            OemInfo.UseOemInfo = false;
         }
 
         private void TbUser_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -36,13 +34,13 @@ namespace Dive.UI.Pages.ApplyPages
             else
             {
                 TbPassword.IsEnabled = true;
-                Common.DeploymentInfo.Username = TbUser.Text;
+                DeploymentInfo.Username = TbUser.Text;
             }
         }
 
         private void TbPassword_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.DeploymentInfo.Password = TbPassword.Text;
+            DeploymentInfo.Password = TbPassword.Text;
         }
 
         private void OEMLogo_OpenFileClick(object sender, RoutedEventArgs e)
@@ -60,37 +58,37 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void TbLogo_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.OemInfo.LogoPath = TbLogo.Text;
+            OemInfo.LogoPath = TbLogo.Text;
         }
 
         private void TbManufacturer_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.OemInfo.Manufacturer = TbManufacturer.Text;
+            OemInfo.Manufacturer = TbManufacturer.Text;
         }
 
         private void TbModel_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.OemInfo.Model = TbModel.Text;
+            OemInfo.Model = TbModel.Text;
         }
 
         private void TbSupportHours_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.OemInfo.SupportHours = TbSupportHours.Text;
+            OemInfo.SupportHours = TbSupportHours.Text;
         }
 
         private void TbPhone_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.OemInfo.SupportPhone = TbPhone.Text;
+            OemInfo.SupportPhone = TbPhone.Text;
         }
 
         private void TbUrl_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Common.OemInfo.SupportURL = TbUrl.Text;
+            OemInfo.SupportURL = TbUrl.Text;
         }
 
         private void User_Switch(object sender, RoutedEventArgs e)
         {
-            Common.DeploymentInfo.UseUserInfo = ToggleUser.IsChecked.Value;
+            DeploymentInfo.UseUserInfo = ToggleUser.IsChecked.Value;
             if (ToggleUser.IsChecked.Value)
             {
                 Debug.Write("Use User Information in Unattend: ");
@@ -105,7 +103,7 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void Oem_Switch(object sender, RoutedEventArgs e)
         {
-            Common.OemInfo.UseOemInfo = ToggleOem.IsChecked.Value;
+            OemInfo.UseOemInfo = ToggleOem.IsChecked.Value;
             if (ToggleOem.IsChecked.Value)
             {
                 Debug.Write("Use OEM Information in Unattend: ");
@@ -170,7 +168,7 @@ namespace Dive.UI.Pages.ApplyPages
                         }
                         else
                         {
-
+                            // TODO: Add Error handling
                         }
                     }
 
@@ -284,7 +282,7 @@ namespace Dive.UI.Pages.ApplyPages
                 }
                 catch
                 {
-
+                    // TODO: Add error handling
                 }
             }
 
@@ -367,14 +365,14 @@ namespace Dive.UI.Pages.ApplyPages
                             var driverWindow = new LoadDriversLiveSystem(infFiles);
                             driverWindow.ShowDialog();
                         }
-                        Common.Debug.Write("Found");
-                        Common.Debug.Write(infFiles.Count.ToString(), true, ConsoleColor.DarkYellow);
-                        Common.Debug.Write("drivers.", true);
-                        Common.ApplyDetails.DriverList = infFiles;
+                        Debug.Write("Found");
+                        Debug.Write(infFiles.Count.ToString(), true, ConsoleColor.DarkYellow);
+                        Debug.Write("drivers.", true);
+                        ApplyDetails.DriverList = infFiles;
                         break;
                     case 0:
-                        Common.Debug.Write("No drivers was found in the selected directory.");
-                        Common.ApplyDetails.DriverList = null;
+                        Debug.Write("No drivers was found in the selected directory.");
+                        ApplyDetails.DriverList = null;
                         break;
                 }
             }

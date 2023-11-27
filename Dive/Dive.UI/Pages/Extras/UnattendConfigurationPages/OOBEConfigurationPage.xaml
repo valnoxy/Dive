@@ -131,7 +131,7 @@
                             FontSize="14"
                             VerticalAlignment="Center"
                             Text="Password" />
-                        <ui:PasswordBox
+                        <ui:TextBox
                             x:Name="TbDomainPassword" 
                             Grid.Column="1" 
                             Grid.Row="1"

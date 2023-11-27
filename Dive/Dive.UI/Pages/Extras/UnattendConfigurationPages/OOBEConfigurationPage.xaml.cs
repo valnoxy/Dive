@@ -206,6 +206,7 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         private void TbDomainPassword_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             DomainInfo.Password = TbDomainPassword.Text;
+            Debug.WriteLine("Password: " + DomainInfo.Password);
         }
 
         private void TbDomain_OnTextChanged(object sender, TextChangedEventArgs e)

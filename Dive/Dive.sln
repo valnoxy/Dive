@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dive.UI", "Dive.UI\Dive.UI.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dive.AutoInit", "Dive.AutoInit\Dive.AutoInit.csproj", "{07AEC7A6-E3E6-4CD2-AEF4-58B6EBC2F3CB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutoInit", "AutoInit", "{0A12C0A9-AB0C-4584-94F7-6A0E480DFE2E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Addons", "Addons", "{0A12C0A9-AB0C-4584-94F7-6A0E480DFE2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

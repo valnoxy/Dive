@@ -50,11 +50,14 @@
                             <ui:SymbolIcon Symbol="Cloud24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
+                    
+                    <!-- Not implemented
                     <ui:NavigationViewItem Content="{DynamicResource Tweaks}" TargetPageType="{x:Type pages:TweaksContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Toolbox24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
+                    -->
                 </ui:NavigationView.MenuItems>
                 
                 <ui:NavigationView.FooterMenuItems>
@@ -70,7 +73,6 @@
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>
             </ui:NavigationView>
-
 
             <StatusBar
                 x:Name="RootStatusBar"
@@ -145,7 +147,7 @@
             ShowMaximize="False"
             Grid.Row="0">
             <ui:TitleBar.Icon>
-                <ui:ImageIcon Source="pack://application:,,,/dive.ico" />
+                <ui:ImageIcon Source="pack://application:,,,/DiveV2.ico" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
