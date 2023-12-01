@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -30,7 +31,7 @@ namespace Dive.Core.Action
             WimgApi.RegisterMessageCallback(wimHandle, CaptureCallbackMethod);
 
             // Exclude paths
-            _excludedPaths = new []{
+            _excludedPaths = new[] {
                 $"{pathToCapture}$ntfs.log",
                 $"{pathToCapture}hiberfil.sys",
                 $"{pathToCapture}pagefile.sys",
@@ -44,7 +45,8 @@ namespace Dive.Core.Action
             try
             {
                 using var imageHandle = WimgApi.CaptureImage(wimHandle, pathToCapture, WimCaptureImageOptions.None);
-                var xmlDocument = BuildImageInfo(name, description);
+                var pathToKernel = Path.Combine(pathToCapture, "Windows", "System32", "ntoskrnl.exe");
+                var xmlDocument = BuildImageInfo(name, description, pathToKernel);
                 WimgApi.SetImageInformation(imageHandle, xmlDocument);
             }
             catch (Exception ex)
@@ -64,13 +66,40 @@ namespace Dive.Core.Action
             }
         }
 
-        internal static string BuildImageInfo(string name, string description)
+        internal static string BuildImageInfo(string name, string description, string pathToKernel)
         {
-            var wimDescription = new Dive.Core.Common.WIMDescription.WIMIMAGE()
+            // Gather infos from Kernel
+            if (!File.Exists(pathToKernel))
+            {
+                return "Error";
+            }
+
+            var kernelInfo = FileVersionInfo.GetVersionInfo(pathToKernel);
+            var blocks = kernelInfo.ProductVersion!.Split('.');
+            if (blocks.Length != 4)
+            {
+                return "Error";
+            }
+
+            var arch = GetArchFromFile(pathToKernel);
+
+            var wimDescription = new WIMDescription.WIMIMAGE
             {
                 NAME = name,
                 DESCRIPTION = description,
-                INDEX = 1
+                INDEX = 1,
+                WINDOWS = new WIMDescription.WIMIMAGEWINDOWS
+                {
+                    ARCH = arch,
+                    VERSION = new WIMDescription.WIMIMAGEWINDOWSVERSION
+                    {
+                        MAJOR = Convert.ToUInt16(blocks[0]),
+                        MINOR = Convert.ToUInt16(blocks[1]),
+                        BUILD = Convert.ToUInt16(blocks[2]),
+                        SPBUILD = Convert.ToUInt16(blocks[3]),
+                        BRANCH = "" // TODO
+                    }
+                }
             };
 
             var emptyNamespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
@@ -85,6 +114,44 @@ namespace Dive.Core.Action
             using var writer = XmlWriter.Create(stream, settings);
             serializer.Serialize(writer, wimDescription, emptyNamespaces);
             return stream.ToString();
+        }
+
+        private static int GetArchFromFile(string filePath)
+        {
+            try
+            {
+                const int MACHINE_OFFSET = 4;
+                const int PE_POINTER_OFFSET = 60;
+
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    var data = new byte[4096];
+                    stream.Read(data, 0, PE_POINTER_OFFSET);
+
+                    var peHeaderAddr = BitConverter.ToInt32(data, PE_POINTER_OFFSET);
+                    var machineUint = BitConverter.ToUInt16(data, peHeaderAddr + MACHINE_OFFSET);
+
+                    // Mapping der Maschinenarchitekturen
+                    string[] machineTypes = { "Unknown", "I386", "Itanium", "x64", "ARM", "ARM64" };
+
+                    if (machineUint >= machineTypes.Length) return -1;
+                    var architecture = machineTypes[machineUint];
+                    var productArch = architecture switch
+                    {
+                        "x86" => 0,
+                        "arm" => 5,
+                        "ia64" => 6,
+                        "x64" => 9,
+                        "arm64" => 1,
+                        _ => -1
+                    };
+                    return productArch;
+                }
+            }
+            catch
+            {
+                return -1;
+            }
         }
 
         private static WimMessageResult CaptureCallbackMethod(WimMessageType messageType, object message, object userData)
