@@ -22,6 +22,7 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<ItemGroup>
+		<None Remove="Assets\autodive_background.jpg" />
 		<None Remove="Assets\banner.jpg" />
 		<None Remove="Assets\Fadi_Loop_f.gif" />
 		<None Remove="Assets\icon-aios-40.png" />
@@ -43,6 +44,7 @@
 		<Page Remove="Localization\ResourceDictionary.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+		<Resource Include="Assets\autodive_background.jpg" />
 		<Resource Include="Assets\banner.jpg" />
 		<Resource Include="Assets\Fadi_Loop_f.gif" />
 		<Resource Include="Assets\icon-hdd-40.png" />

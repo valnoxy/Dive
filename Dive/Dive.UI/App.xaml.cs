@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * Dive (formally deploya) - Fast and Easy way to deploy Windows
  * Copyright (c) 2018 - 2022 Exploitox.
  * 
@@ -116,8 +116,8 @@ namespace Dive.UI
 
         private static void ShowAutoDive()
         {
-            var wnd = new AutoDiveUi();
-            wnd.ShowDialog();
+            //var wnd = new AutoDiveUi();
+            //wnd.ShowDialog();
             Environment.Exit(0);
         }
 
@@ -239,6 +239,15 @@ namespace Dive.UI
                 var config = Initialization.ConfigurationLoader.LoadConfiguration(testConfigJson);
 
                 ShowAutoInitBoot(config);
+            }
+
+            if (args.Contains("--autodive"))
+            {
+                Common.Debug.InitializeConsole();
+                Common.Debug.WriteLine("Loading AutoDive UI ...");
+                var adUi = new AutoDiveUI();
+                adUi.ShowDialog();
+                Environment.Exit(0);
             }
 
             var parser = new Parser(with => with.HelpWriter = null);
