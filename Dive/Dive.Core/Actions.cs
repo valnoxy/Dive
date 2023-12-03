@@ -32,12 +32,13 @@ namespace Dive.Core
         /// <param name="firmware">Firmware type of the device</param>
         /// <param name="bootloader">Windows Bootloader</param>
         /// <param name="disk">Disk Identifier</param>
+        /// <param name="isRemovable">Is Disk removable or not</param>
         /// <param name="useRecovery">Install native recovery partition</param>
         /// <param name="windowsDrive">Drive letter of the Windows partition</param>
         /// <param name="bootDrive">Drive letter of the Boot partition</param>
         /// <param name="recoveryDrive">Drive letter of the Recovery partition</param>
         /// <param name="worker">Background worker for Graphical user interface</param>
-        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, int disk, Entities.PartitionStyle partitionStyle, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
+        public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, int disk, bool isRemovable, Entities.PartitionStyle partitionStyle, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
         {
             // General message
             worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
@@ -90,7 +91,9 @@ namespace Dive.Core
                             partDest.StandardInput.WriteLine("select disk " + disk);
                             partDest.StandardInput.WriteLine("clean");
                             partDest.StandardInput.WriteLine("convert gpt");
-                            partDest.StandardInput.WriteLine("create partition efi size=100");
+                            partDest.StandardInput.WriteLine(isRemovable
+                                ? "create partition primary size=100"
+                                : "create partition efi size=100");
                             partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
                             partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                             partDest.StandardInput.WriteLine("create partition msr size=16");
@@ -127,8 +130,9 @@ namespace Dive.Core
                             partDest.StandardInput.WriteLine("select disk " + disk);
                             partDest.StandardInput.WriteLine("clean");
                             partDest.StandardInput.WriteLine("convert gpt");
-                            partDest.StandardInput.WriteLine("create partition efi size=100");
-                            partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
+                            partDest.StandardInput.WriteLine(isRemovable
+                                ? "create partition primary size=100"
+                                : "create partition efi size=100"); partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
                             partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
                             partDest.StandardInput.WriteLine("create partition msr size=16");
                             partDest.StandardInput.WriteLine("create partition primary");

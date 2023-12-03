@@ -45,6 +45,7 @@ namespace Dive.UI.Common.Deployment
                 Configuration.Firmware,
                 Configuration.BootLoader,
                 ApplyDetails.DiskIndex,
+                ApplyDetails.IsDriveRemovable,
                 Configuration.PartitionStyle,
                 ApplyDetails.UseRecovery,
                 Configuration.WindowsDrive,

@@ -45,6 +45,7 @@ namespace Dive.UI.Pages.ApplyPages
             public string Model { get; set; }
             public string Size { get; set; }
             public string DiskId { get; set; }
+            public bool IsRemovableMedia { get; set; }
         }
 
         private List<Disk> disks;
@@ -126,6 +127,7 @@ namespace Dive.UI.Pages.ApplyPages
                     var model = info["Model"].ToString();
                     var sizeInGb = ByteToGb(Convert.ToDouble(info["Size"])).ToString();
                     var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System)[..1]);
+                    var deviceType = info["MediaType"].ToString();
 
                     // Check for Dive Medium
                     var allDrives = DriveInfo.GetDrives();
@@ -144,6 +146,7 @@ namespace Dive.UI.Pages.ApplyPages
                     {
                         // Add to list
                         var driveId = deviceId;
+                        var isRemovable = false;
                         driveId = Regex.Match(driveId!, @"\d+").Value;
 
                         if (blackListedDisks.Contains(driveId))
@@ -153,15 +156,29 @@ namespace Dive.UI.Pages.ApplyPages
                             Common.Debug.Write(").\n", true);
                             continue;
                         }
+                        if (deviceType == "Removable Media")
+                        {
+                            isRemovable = true;
+                        }
+
                         disks.Add(new Disk
                         {
                             Picture = "pack://application:,,,/assets/icon-hdd-40.png",
                             Model = model!,
                             Size = $"{sizeInGb} GB",
-                            DiskId = $"Disk {driveId}"
+                            DiskId = $"Disk {driveId}",
+                            IsRemovableMedia = isRemovable
                         });
 
-                        Common.Debug.Write(" is available.\n", true);
+                        Common.Debug.Write(" is available", true);
+                        if (isRemovable)
+                        {
+                            Common.Debug.Write(" (", true);
+                            Common.Debug.Write("removable", true, ConsoleColor.DarkYellow);
+                            Common.Debug.Write(").\n", true);
+                        }
+                        else
+                            Common.Debug.Write(".\n", true);
                     }
                     else
                     {
@@ -212,6 +229,7 @@ namespace Dive.UI.Pages.ApplyPages
             if (ix == -1) return;
             var diskIndex = item.DiskId[(ix + toBeSearched.Length)..];
             Common.ApplyDetails.DiskIndex = Convert.ToInt32(diskIndex);
+            Common.ApplyDetails.IsDriveRemovable = item.IsRemovableMedia;
 
             Common.Debug.Write("The disk with ID ");
             Common.Debug.Write(Common.ApplyDetails.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);

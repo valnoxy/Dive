@@ -9,6 +9,7 @@ namespace Dive.UI.Common
         public static string IconPath { get; set; }
         public static int Index { get; set; }
         public static int DiskIndex { get; set; }
+        public static bool IsDriveRemovable { get; set; }
         public static bool UseEFI { get; set; }
         public static bool UseNTLDR { get; set; }
         public static bool UseRecovery { get; set; }
