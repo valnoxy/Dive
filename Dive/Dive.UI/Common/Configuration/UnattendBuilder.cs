@@ -1148,17 +1148,30 @@ namespace Dive.UI.Common
                 // OOBE Information
                 if (OutOfBoxExperienceInfo.UseOOBEInfo)
                 {
-                    uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
-                    {
-                        HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
-                        HideOEMRegistrationScreen = OutOfBoxExperienceInfo.HideOEMRegistrationScreen,
-                        HideOnlineAccountScreens = OutOfBoxExperienceInfo.HideOnlineAccountScreens,
-                        HideWirelessSetupInOOBE = OutOfBoxExperienceInfo.HideWirelessSetupInOOBE,
-                        NetworkLocation = OutOfBoxExperienceInfo.NetworkLocation,
-                        SkipMachineOOBE = OutOfBoxExperienceInfo.SkipMachineOOBE,
-                        SkipUserOOBE = OutOfBoxExperienceInfo.SkipUserOOBE,
-                        HideLocalAccountScreen = OutOfBoxExperienceInfo.HideLocalAccountScreen
-                    };
+                    // Windows Vista / 7
+                    if (ApplyDetails.NTVersion == "6.0" || ApplyDetails.NTVersion == "6.1")
+                        uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
+                        {
+                            HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
+                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfo.HideWirelessSetupInOOBE,
+                            NetworkLocation = OutOfBoxExperienceInfo.NetworkLocation,
+                            SkipMachineOOBE = OutOfBoxExperienceInfo.SkipMachineOOBE,
+                            SkipUserOOBE = OutOfBoxExperienceInfo.SkipUserOOBE,
+                        };
+
+                    // Windows 10 / 11 
+                    if (ApplyDetails.NTVersion == "6.2" || ApplyDetails.NTVersion == "6.3" || ApplyDetails.NTVersion.Contains("10."))
+                        uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
+                        {
+                            HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
+                            HideOEMRegistrationScreen = OutOfBoxExperienceInfo.HideOEMRegistrationScreen,
+                            HideOnlineAccountScreens = OutOfBoxExperienceInfo.HideOnlineAccountScreens,
+                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfo.HideWirelessSetupInOOBE,
+                            NetworkLocation = OutOfBoxExperienceInfo.NetworkLocation,
+                            SkipMachineOOBE = OutOfBoxExperienceInfo.SkipMachineOOBE,
+                            SkipUserOOBE = OutOfBoxExperienceInfo.SkipUserOOBE,
+                            HideLocalAccountScreen = OutOfBoxExperienceInfo.HideLocalAccountScreen
+                        };
                 }
 
                 // OEM Information

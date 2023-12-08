@@ -31,8 +31,8 @@ namespace Dive.UI
             Branch.Text = "Development";
 #else
             DebugString.Visibility = Visibility.Hidden;
-            //DebugString.Text = "Pre-Release 1";
-            Branch.Text = "Pre-Release 1";
+            //DebugString.Text = "Pre-Release 2";
+            Branch.Text = "Pre-Release 2";
 #endif
             // Get version
             var assembly = Assembly.GetExecutingAssembly();

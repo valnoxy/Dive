@@ -68,7 +68,7 @@
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
-		<PackageReference Include="WPF-UI" Version="3.0.0-preview.11" />
+		<PackageReference Include="WPF-UI" Version="3.0.0-preview.12" />
 		<PackageReference Include="XamlAnimatedGif" Version="2.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Management" Version="8.0.0" />
