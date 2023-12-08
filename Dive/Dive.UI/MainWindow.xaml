@@ -30,22 +30,22 @@
 
             <ui:NavigationView x:Name="RootNavigation" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" Margin="6,0" Grid.Row="0">
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="{DynamicResource Home}" TargetPageType="{x:Type pages:Dashboard}">
+                    <ui:NavigationViewItem Content="{DynamicResource Home}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:Dashboard}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Home24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem Content="{DynamicResource Apply}" TargetPageType="{x:Type pages:ApplyContent}">
+                    <ui:NavigationViewItem Content="{DynamicResource Apply}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:ApplyContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="WindowApps24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem Content="{DynamicResource Capture}" TargetPageType="{x:Type pages:CaptureContent}">
+                    <ui:NavigationViewItem Content="{DynamicResource Capture}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:CaptureContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Copy24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem Content="{DynamicResource Cloud}" TargetPageType="{x:Type pages:CloudContent}">
+                    <ui:NavigationViewItem Content="{DynamicResource Cloud}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:CloudContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Cloud24" />
                         </ui:NavigationViewItem.Icon>
@@ -66,7 +66,7 @@
                             <ui:SymbolIcon Symbol="PaintBrush24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem TargetPageType="{x:Type pages:AboutPage}">
+                    <ui:NavigationViewItem TargetPageType="{x:Type pages:AboutPage}" NavigationCacheMode="Enabled">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="QuestionCircle24" />
                         </ui:NavigationViewItem.Icon>
