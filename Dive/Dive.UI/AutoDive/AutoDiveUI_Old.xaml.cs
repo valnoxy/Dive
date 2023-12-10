@@ -35,6 +35,9 @@ namespace Dive.UI.AutoDive
         // AutoDive Drive
         private static string _driveLetter = null;
 
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+
         public AutoDiveUi_Old()
         {
             InitializeComponent();
@@ -86,11 +89,11 @@ namespace Dive.UI.AutoDive
             try
             {
                 // ApplyDetails
-                Common.ApplyDetails.Index = Convert.ToInt32(_imageIndex);
-                Common.ApplyDetails.UseEFI = _firmware.ToLower() == "efi";
-                Common.ApplyDetails.UseNTLDR = _bootloader.ToLower() == "ntldr";
-                Common.ApplyDetails.UseRecovery = _useRecovery;
-                Common.ApplyDetails.DiskIndex = Convert.ToInt32(_diskId);
+                ApplyDetailsInstance.Index = Convert.ToInt32(_imageIndex);
+                ApplyDetailsInstance.UseEFI = _firmware.ToLower() == "efi";
+                ApplyDetailsInstance.UseNTLDR = _bootloader.ToLower() == "ntldr";
+                ApplyDetailsInstance.UseRecovery = _useRecovery;
+                ApplyDetailsInstance.DiskIndex = Convert.ToInt32(_diskId);
 
                 _imageFile = Path.Combine(_driveLetter, "WIMs", _imageFile);
 
@@ -99,21 +102,21 @@ namespace Dive.UI.AutoDive
                 if (LoadDisks(_diskId) == false)
                     Modules.ExceptionMessage("The specified disk was not found on this system.");
 
-                ImageName.Text = Common.ApplyDetails.Name;
-                ImageFile.Text = Common.ApplyDetails.FileName;
+                ImageName.Text = ApplyDetailsInstance.Name;
+                ImageFile.Text = ApplyDetailsInstance.FileName;
                 HDDName.Text = _diskName;
 
                 UseDeploymentInfo.Text = _defaultUsername != null || _defaultPassword != null
                     ? "Using Deployment Info"
                     : "Standard Installation";
                 UseAutoInit.Text = _useAutoInit ? "Using AutoInit" : "No AutoInit";
-                Firmware.Text = Common.ApplyDetails.UseEFI ? "EFI" : "BIOS";
-                Bootloader.Text = Common.ApplyDetails.UseNTLDR ? "NTLDR" : "BOOTMGR";
+                Firmware.Text = ApplyDetailsInstance.UseEFI ? "EFI" : "BIOS";
+                Bootloader.Text = ApplyDetailsInstance.UseNTLDR ? "NTLDR" : "BOOTMGR";
 
                 try
                 {
                     var img = new ImageSourceConverter();
-                    ImageIcon.Source = (ImageSource)img.ConvertFromString(Common.ApplyDetails.IconPath)!;
+                    ImageIcon.Source = (ImageSource)img.ConvertFromString(ApplyDetailsInstance.IconPath)!;
                 }
                 catch
                 {
@@ -121,8 +124,8 @@ namespace Dive.UI.AutoDive
                 }
 
                 // Deployment Info
-                Common.DeploymentInfo.Password = _defaultPassword;
-                Common.DeploymentInfo.Username = _defaultUsername;
+                DeploymentInfoInstance.Password = _defaultPassword;
+                DeploymentInfoInstance.Username = _defaultUsername;
 
             }
             catch (Exception ex)
@@ -216,9 +219,9 @@ namespace Dive.UI.AutoDive
                         imageVersion = "windows-10";
 
                     if (product_id != imageIndex) continue;
-                    Common.ApplyDetails.Name = product_name;
-                    Common.ApplyDetails.IconPath = $"pack://application:,,,/assets/icon-{imageVersion}-40.png";
-                    Common.ApplyDetails.FileName = _imageFile;
+                    ApplyDetailsInstance.Name = product_name;
+                    ApplyDetailsInstance.IconPath = $"pack://application:,,,/assets/icon-{imageVersion}-40.png";
+                    ApplyDetailsInstance.FileName = _imageFile;
                     return true;
                 }
 
@@ -359,12 +362,12 @@ namespace Dive.UI.AutoDive
             #region Environment definition
 
             var worker = sender as BackgroundWorker;
-            var firmware = Common.ApplyDetails.UseEFI switch // Firmware definition
+            var firmware = ApplyDetailsInstance.UseEFI switch // Firmware definition
             {
                 true => Entities.Firmware.EFI,
                 false => Entities.Firmware.BIOS
             };
-            var bootloader = Common.ApplyDetails.UseNTLDR switch // Bootloader definition
+            var bootloader = ApplyDetailsInstance.UseNTLDR switch // Bootloader definition
             {
                 true => Entities.Bootloader.NTLDR,
                 false => Entities.Bootloader.BOOTMGR,
@@ -379,7 +382,7 @@ namespace Dive.UI.AutoDive
             // [1] = Boot drive
             // [2] = Recovery
 
-            switch (Common.ApplyDetails.UseNTLDR)
+            switch (ApplyDetailsInstance.UseNTLDR)
             {
                 // pre-Vista
                 case true:
@@ -389,7 +392,7 @@ namespace Dive.UI.AutoDive
 
                 case false:
                     {
-                        switch (Common.ApplyDetails.UseRecovery)
+                        switch (ApplyDetailsInstance.UseRecovery)
                         {
                             case true:
                                 letters = Actions.GetSystemLetters(Entities.PartitionStyle.Full);
@@ -398,10 +401,10 @@ namespace Dive.UI.AutoDive
 
                             case false:
                                 // If Vista is used, we need to use the Single partition layout
-                                if (Common.ApplyDetails.Name.ToLower().Contains("windows vista"))
+                                if (ApplyDetailsInstance.Name.ToLower().Contains("windows vista"))
                                 {
                                     // Except if EFI is used, then we need to use the SeparateBoot partition layout
-                                    if (Common.ApplyDetails.UseEFI)
+                                    if (ApplyDetailsInstance.UseEFI)
                                     {
                                         letters = Actions.GetSystemLetters(Entities.PartitionStyle.SeparateBoot);
                                         partStyle = Entities.PartitionStyle.SeparateBoot;
@@ -461,7 +464,7 @@ namespace Dive.UI.AutoDive
 
             // Prepare disk
             worker?.ReportProgress(201, "");     // Prepare Disk Text
-            Actions.PrepareDisk(firmware, bootloader, Common.ApplyDetails.DiskIndex, false, partStyle, Common.ApplyDetails.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
+            Actions.PrepareDisk(firmware, bootloader, ApplyDetailsInstance.DiskIndex, false, partStyle, ApplyDetailsInstance.UseRecovery, windowsDrive, bootDrive, recoveryDrive, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -471,7 +474,7 @@ namespace Dive.UI.AutoDive
             // Apply image
             worker?.ReportProgress(202, "");     // Applying Image Text
             worker?.ReportProgress(0, "");       // Value 0
-            Actions.ApplyWim(windowsDrive, Common.ApplyDetails.FileName, Common.ApplyDetails.Index, worker);
+            Actions.ApplyWim(windowsDrive, ApplyDetailsInstance.FileName, ApplyDetailsInstance.Index, worker);
             if (IsCanceled)
             {
                 e.Cancel = true;
@@ -498,7 +501,7 @@ namespace Dive.UI.AutoDive
             }
 
             // Install Recovery (only for Vista and higher)
-            if (bootloader == Entities.Bootloader.BOOTMGR && Common.ApplyDetails.UseRecovery)
+            if (bootloader == Entities.Bootloader.BOOTMGR && ApplyDetailsInstance.UseRecovery)
             {
                 worker?.ReportProgress(204, "");     // Installing Bootloader Text
                 Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
@@ -511,12 +514,12 @@ namespace Dive.UI.AutoDive
             }
 
             // Install unattend file (only for Vista and higher)
-            if (Common.DeploymentInfo.UseUserInfo || Common.OemInfo.UseOemInfo)
+            if (DeploymentInfoInstance.UseUserInfo || Common.OemInfo.UseOemInfo)
             {
                 worker?.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
-                var config = File.Exists(Common.DeploymentInfo.CustomFilePath) ? File.ReadAllText(Common.DeploymentInfo.CustomFilePath) : Common.UnattendBuilder.Build();
+                var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : Common.UnattendBuilder.Build();
                 Debug.WriteLine(config);
                 Actions.InstallUnattend($"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
 
@@ -528,12 +531,12 @@ namespace Dive.UI.AutoDive
             }
 
             // Install Drivers (only for Vista and higher)
-            if (Common.ApplyDetails.DriverList != null)
+            if (ApplyDetailsInstance.DriverList != null)
             {
                 worker?.ReportProgress(207, "");     // Installing Drivers Text
 
-                var _driverCount = Common.ApplyDetails.DriverList.Count;
-                Actions.InstallDriver(windowsDrive, Common.ApplyDetails.DriverList, worker);
+                var _driverCount = ApplyDetailsInstance.DriverList.Count;
+                Actions.InstallDriver(windowsDrive, ApplyDetailsInstance.DriverList, worker);
 
                 if (IsCanceled)
                 {

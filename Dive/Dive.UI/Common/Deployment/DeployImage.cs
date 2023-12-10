@@ -10,6 +10,9 @@ namespace Dive.UI.Common.Deployment
 {
     internal class DeployImage
     {
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+
         internal class Configuration
         {
             internal static bool IsCanceled = false;
@@ -44,10 +47,10 @@ namespace Dive.UI.Common.Deployment
             Actions.PrepareDisk(
                 Configuration.Firmware,
                 Configuration.BootLoader,
-                ApplyDetails.DiskIndex,
-                ApplyDetails.IsDriveRemovable,
+                ApplyDetailsInstance.DiskIndex,
+                ApplyDetailsInstance.IsDriveRemovable,
                 Configuration.PartitionStyle,
-                ApplyDetails.UseRecovery,
+                ApplyDetailsInstance.UseRecovery,
                 Configuration.WindowsDrive,
                 Configuration.BootDrive,
                 Configuration.RecoveryDrive,
@@ -60,7 +63,7 @@ namespace Dive.UI.Common.Deployment
             Debug.WriteLine("Disk Preparation done.");
 
             // Applying image to Windows Partition
-            Actions.ApplyWim(Configuration.WindowsDrive, ApplyDetails.FileName, ApplyDetails.Index, worker);
+            Actions.ApplyWim(Configuration.WindowsDrive, ApplyDetailsInstance.FileName, ApplyDetailsInstance.Index, worker);
             if (Configuration.IsCanceled)
             {
                 e.Cancel = true;
@@ -101,7 +104,7 @@ namespace Dive.UI.Common.Deployment
 
 
             // Registering Recovery Image (only for Vista and higher)
-            if (Configuration.BootLoader == Bootloader.BOOTMGR && ApplyDetails.UseRecovery)
+            if (Configuration.BootLoader == Bootloader.BOOTMGR && ApplyDetailsInstance.UseRecovery)
             {
                 Actions.InstallRecovery(
                     $"{Configuration.WindowsDrive}Windows",
@@ -118,10 +121,10 @@ namespace Dive.UI.Common.Deployment
             }
 
             // Install unattended file (only for Vista and higher)
-            if (DeploymentInfo.UseUserInfo || OemInfo.UseOemInfo)
+            if (DeploymentInfoInstance.UseUserInfo || OemInfo.UseOemInfo)
             {
                 Debug.WriteLine("Building config...");
-                var config = File.Exists(Common.DeploymentInfo.CustomFilePath) ? File.ReadAllText(Common.DeploymentInfo.CustomFilePath) : Common.UnattendBuilder.Build();
+                var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : Common.UnattendBuilder.Build();
 
                 if (string.IsNullOrEmpty(config))
                     throw new Exception("Could not build or read unattended configuration file.");
@@ -143,10 +146,10 @@ namespace Dive.UI.Common.Deployment
             }
 
             // Install Drivers (only for Vista and higher)
-            if (ApplyDetails.DriverList != null && ApplyDetails.DriverList.Count > 0)
+            if (ApplyDetailsInstance.DriverList != null && ApplyDetailsInstance.DriverList.Count > 0)
             {
-                Configuration.DriverCount = ApplyDetails.DriverList.Count;
-                Actions.InstallDriver(Configuration.WindowsDrive, ApplyDetails.DriverList, worker);
+                Configuration.DriverCount = ApplyDetailsInstance.DriverList.Count;
+                Actions.InstallDriver(Configuration.WindowsDrive, ApplyDetailsInstance.DriverList, worker);
 
                 if (Configuration.IsCanceled)
                 {
@@ -196,12 +199,12 @@ namespace Dive.UI.Common.Deployment
         private static void InitializeWorkingEnvironment()
         {
             // BootLoader and Firmware Definition
-            Configuration.Firmware = ApplyDetails.UseEFI switch
+            Configuration.Firmware = ApplyDetailsInstance.UseEFI switch
             {
                 true => Firmware.EFI,
                 false => Firmware.BIOS,
             };
-            Configuration.BootLoader = ApplyDetails.UseNTLDR switch
+            Configuration.BootLoader = ApplyDetailsInstance.UseNTLDR switch
             {
                 true => Bootloader.NTLDR,
                 false => Bootloader.BOOTMGR,
@@ -214,7 +217,7 @@ namespace Dive.UI.Common.Deployment
             // [0] = Windows drive
             // [1] = Boot drive
             // [2] = Recovery
-            switch (ApplyDetails.UseNTLDR)
+            switch (ApplyDetailsInstance.UseNTLDR)
             {
                 // pre-Vista
                 case true:
@@ -223,7 +226,7 @@ namespace Dive.UI.Common.Deployment
                     break;
 
                 case false:
-                    switch (ApplyDetails.UseRecovery)
+                    switch (ApplyDetailsInstance.UseRecovery)
                     {
                         case true:
                             letters = Actions.GetSystemLetters(PartitionStyle.Full);
@@ -232,10 +235,10 @@ namespace Dive.UI.Common.Deployment
 
                         case false:
                             // If Vista is used, we need to use the Single partition layout
-                            if (ApplyDetails.NTVersion == "6.0") // Windows Vista NT Version
+                            if (ApplyDetailsInstance.NTVersion == "6.0") // Windows Vista NT Version
                             {
                                 // Except if EFI is used, then we need to use the SeparateBoot partition layout
-                                if (ApplyDetails.UseEFI)
+                                if (ApplyDetailsInstance.UseEFI)
                                 {
                                     letters = Actions.GetSystemLetters(PartitionStyle.SeparateBoot);
                                     Configuration.PartitionStyle = PartitionStyle.SeparateBoot;

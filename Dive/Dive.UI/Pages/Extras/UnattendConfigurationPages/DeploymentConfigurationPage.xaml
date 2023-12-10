@@ -4,9 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Dive.UI.Pages.Extras.UnattendConfigurationPages"
+             xmlns:common="clr-namespace:Dive.UI.Common"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <common:ApplyDetails x:Key="ApplyDetails"/>
+        <common:DeploymentInfo x:Key="DeploymentInfo"/>
+    </UserControl.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
         <StackPanel Margin="10,15,10,15">
             <ui:CardExpander Icon="{ui:SymbolIcon Person24}" IsExpanded="False">
@@ -18,13 +24,13 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock
-                                            FontSize="13"
-                                            FontWeight="Medium"
-                                            Text="{DynamicResource AdminAccountTitle}" />
+                                    FontSize="13"
+                                    FontWeight="Medium"
+                                    Text="{DynamicResource AdminAccountTitle}" />
                             <TextBlock
-                                            FontSize="12"
-                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                            Text="{DynamicResource AdminAccountDescription}" />
+                                    FontSize="12"
+                                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                    Text="{DynamicResource AdminAccountDescription}" />
                         </StackPanel>
                         <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="User_Switch" Unchecked="User_Switch" x:Name="ToggleUser" />
                     </Grid>
@@ -42,21 +48,22 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock
-                                        Grid.Column="0"
-                                        Grid.Row="0"
-                                        FontSize="14"
-                                        VerticalAlignment="Center"
-                                        Margin="0,0,0,5"
-                                        Text="{DynamicResource Username}" />
+                                Grid.Column="0"
+                                Grid.Row="0"
+                                FontSize="14"
+                                VerticalAlignment="Center"
+                                Margin="0,0,0,5"
+                                Text="{DynamicResource Username}" />
                         <ui:TextBox 
-                                        x:Name="TbUser" 
-                                        Grid.Column="1" 
-                                        Grid.Row="0"
-                                        Icon="{ui:SymbolIcon Person24}" 
-                                        PlaceholderText="{DynamicResource UsernamePlaceholder}" 
-                                        IsEnabled="true"
-                                        Margin="0,0,0,5"
-                                        TextChanged="TbUser_OnTextChanged"/>
+                                x:Name="TbUser" 
+                                Grid.Column="1" 
+                                Grid.Row="0"
+                                Icon="{ui:SymbolIcon Person24}" 
+                                PlaceholderText="{DynamicResource UsernamePlaceholder}"
+                                Text="{Binding Source={StaticResource DeploymentInfo}, Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="true"
+                                Margin="0,0,0,5"
+                                TextChanged="TbUser_OnTextChanged"/>
 
                         <TextBlock
                                         Grid.Column="0"

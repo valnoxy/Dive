@@ -1102,6 +1102,9 @@ namespace Dive.UI.Common
 
     public class UnattendBuilder
     {
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+
         public static string Build()
         {
             Common.Debug.WriteLine("[UnattendBuilder v2] Entering building process ...");
@@ -1111,7 +1114,7 @@ namespace Dive.UI.Common
             var settingsArraySize = 0;
             if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo || DeploymentOption.UseCopyProfile)
                 settingsArraySize++; // pass="specialize"
-            if (DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo || DeploymentInfo.UseUserInfo)
+            if (DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo || DeploymentInfoInstance.UseUserInfo)
                 settingsArraySize++; // pass="oobeSystem"
             if (DeploymentOption.UseSMode)
                 settingsArraySize++; // pass="offlineServicing"
@@ -1122,7 +1125,7 @@ namespace Dive.UI.Common
             };
 
             #region oobeSystem (single component)
-            if (DeploymentInfo.UseUserInfo || DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo ||
+            if (DeploymentInfoInstance.UseUserInfo || DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo ||
                 OutOfBoxExperienceInfo.UseOOBEInfo)
             {
                 Debug.WriteLine("Entered region: oobeSystem (single component)");
@@ -1149,7 +1152,7 @@ namespace Dive.UI.Common
                 if (OutOfBoxExperienceInfo.UseOOBEInfo)
                 {
                     // Windows Vista / 7
-                    if (ApplyDetails.NTVersion == "6.0" || ApplyDetails.NTVersion == "6.1")
+                    if (ApplyDetailsInstance.NTVersion == "6.0" || ApplyDetailsInstance.NTVersion == "6.1")
                         uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
                         {
                             HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
@@ -1160,7 +1163,7 @@ namespace Dive.UI.Common
                         };
 
                     // Windows 10 / 11 
-                    if (ApplyDetails.NTVersion == "6.2" || ApplyDetails.NTVersion == "6.3" || ApplyDetails.NTVersion.Contains("10."))
+                    if (ApplyDetailsInstance.NTVersion == "6.2" || ApplyDetailsInstance.NTVersion == "6.3" || ApplyDetailsInstance.NTVersion.Contains("10."))
                         uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
                         {
                             HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
@@ -1197,18 +1200,18 @@ namespace Dive.UI.Common
                 }
 
                 // User Accounts
-                if (DeploymentInfo.UseUserInfo)
+                if (DeploymentInfoInstance.UseUserInfo)
                 {
                     uc.settings[currentSettings].component[0].UserAccounts =
                         new UnattendXmlClass.unattendSettingsComponentUserAccounts();
 
-                    if (DeploymentInfo.Username == "Administrator")
+                    if (DeploymentInfoInstance.Username == "Administrator")
                     {
                         // Administrator Password
                         uc.settings[currentSettings].component[0].UserAccounts.AdministratorPassword =
                             new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
                             {
-                                Value = DeploymentInfo.Password,
+                                Value = DeploymentInfoInstance.Password,
                                 PlainText = true
                             };
                     }
@@ -1221,10 +1224,10 @@ namespace Dive.UI.Common
                                 LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
                                 {
                                     action = "add",
-                                    Name = DeploymentInfo.Username,
+                                    Name = DeploymentInfoInstance.Username,
                                     Password = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
                                     {
-                                        Value = DeploymentInfo.Password,
+                                        Value = DeploymentInfoInstance.Password,
                                         PlainText = true
                                     },
                                     Group = "Administrators"
@@ -1236,10 +1239,10 @@ namespace Dive.UI.Common
                     uc.settings[currentSettings].component[0].AutoLogon =
                         new UnattendXmlClass.unattendSettingsComponentAutoLogon
                         {
-                            Username = DeploymentInfo.Username,
+                            Username = DeploymentInfoInstance.Username,
                             Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
                             {
-                                Value = DeploymentInfo.Password,
+                                Value = DeploymentInfoInstance.Password,
                                 PlainText = true
                             },
                             Enabled = true,
@@ -1247,7 +1250,7 @@ namespace Dive.UI.Common
                         };
 
                     // First Logon Command (set PasswordExpires to false)
-                    if (DeploymentInfo.Username != "Administrator")
+                    if (DeploymentInfoInstance.Username != "Administrator")
                     {
                         uc.settings[currentSettings].component[0].FirstLogonCommands = new[]
                         {
@@ -1256,7 +1259,7 @@ namespace Dive.UI.Common
                                 Order = 1,
                                 RequiresUserInput = false,
                                 CommandLine =
-                                    $"cmd /C wmic useraccount where name=\"{DeploymentInfo.Username}\" set PasswordExpires=false",
+                                    $"cmd /C wmic useraccount where name=\"{DeploymentInfoInstance.Username}\" set PasswordExpires=false",
                                 Description = "Password never expires"
                             }
                         };

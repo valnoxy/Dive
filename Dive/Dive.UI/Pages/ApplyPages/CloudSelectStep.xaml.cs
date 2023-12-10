@@ -243,19 +243,20 @@ namespace Dive.UI.Pages.ApplyPages
         private void SKUListView_Selected(object sender, RoutedEventArgs e)
         {
             if (SkuListView.SelectedItem is not Image item) return;
-            Common.ApplyDetails.Name = item.Name;
-            Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
-            Common.ApplyDetails.FileName = item.ImageFile;
-            Common.ApplyDetails.IconPath = item.Picture;
-            Common.ApplyDetails.Build = item.Build;
-            Common.ApplyDetails.NTVersion = item.NTVersion;
+            var applyDetailInstance = Common.ApplyDetails.Instance;
+            applyDetailInstance.Name = item.Name;
+            applyDetailInstance.Index = Convert.ToInt32(item.Index);
+            applyDetailInstance.FileName = item.ImageFile;
+            applyDetailInstance.IconPath = item.Picture;
+            applyDetailInstance.Build = item.Build;
+            applyDetailInstance.NTVersion = item.NTVersion;
 
             Common.Debug.Write("Selected ");
-            Common.Debug.Write(Common.ApplyDetails.Name, true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(applyDetailInstance.Name, true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" with Index ", true);
-            Common.Debug.Write(Common.ApplyDetails.Index.ToString(), true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(applyDetailInstance.Index.ToString(), true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" in Image ", true);
-            Common.Debug.Write(Common.ApplyDetails.FileName, true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(applyDetailInstance.FileName, true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" for deployment.\n", true);
 
             CloudContent.ContentWindow!.NextBtn.IsEnabled = true;

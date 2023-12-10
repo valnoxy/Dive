@@ -1,12 +1,10 @@
-﻿using Dive.UI.Common;
-using Dive.UI.Pages.Extras;
-using System;
+﻿using System;
+using Dive.UI.Common;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Serialization;
 using System.Xml;
+using System.Xml.Serialization;
 using Microsoft.Win32;
 
 namespace Dive.UI.Pages.ApplyPages
@@ -16,16 +14,20 @@ namespace Dive.UI.Pages.ApplyPages
     /// </summary>
     public partial class DeploymentSettingsStep : UserControl
     {
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+
         public DeploymentSettingsStep()
         {
             InitializeComponent();
-            DeploymentInfo.UseUserInfo = false;
+            DeploymentInfoInstance.UseUserInfo = false;
             OemInfo.UseOemInfo = false;
+
+            DataContext = DeploymentInfo.Instance;
         }
 
         private void Import_OnClicked(object sender, RoutedEventArgs e)
         {
-            /*
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "Dive Configuration (*.xml)|*.xml"
@@ -41,21 +43,17 @@ namespace Dive.UI.Pages.ApplyPages
 
                 foreach (XmlNode node in imageNames!)
                 {
-                    DeploymentInfo.Username = node.SelectSingleNode("Username")!.InnerText;
-                    DeploymentInfo.Password = node.SelectSingleNode("Password")!.InnerText;
+                    DeploymentInfoInstance.Username = node.SelectSingleNode("Username")!.InnerText;
+                    DeploymentInfoInstance.Password = node.SelectSingleNode("Password")!.InnerText;
                 }
 
-                TbUser.Text = DeploymentInfo.Username;
-                TbPassword.Text = DeploymentInfo.Password;
-                if (DeploymentInfo.Username != "" || DeploymentInfo.Password != "")
+                if (DeploymentInfoInstance.Username != "" || DeploymentInfoInstance.Password != "")
                 {
-                    DeploymentInfo.UseUserInfo = true;
-                    ToggleUser.IsChecked = true;
+                    DeploymentInfoInstance.UseUserInfo = true;
                 }
                 else
                 {
-                    DeploymentInfo.UseUserInfo = false;
-                    ToggleUser.IsChecked = false;
+                    DeploymentInfoInstance.UseUserInfo = false;
                 }
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
@@ -87,13 +85,6 @@ namespace Dive.UI.Pages.ApplyPages
                     OemInfo.SupportURL = node.SelectSingleNode("Homepage")!.InnerText;
                 }
 
-                TbLogo.Text = OemInfo.LogoPath;
-                TbManufacturer.Text = OemInfo.Manufacturer;
-                TbModel.Text = OemInfo.Model;
-                TbSupportHours.Text = OemInfo.SupportHours;
-                TbPhone.Text = OemInfo.SupportPhone;
-                TbUrl.Text = OemInfo.SupportURL;
-
                 OemInfo.UseOemInfo = !string.IsNullOrEmpty(OemInfo.LogoPath) ||
                                      !string.IsNullOrEmpty(OemInfo.Manufacturer) ||
                                      !string.IsNullOrEmpty(OemInfo.Model) ||
@@ -101,7 +92,7 @@ namespace Dive.UI.Pages.ApplyPages
                                      !string.IsNullOrEmpty(OemInfo.SupportPhone) ||
                                      !string.IsNullOrEmpty(OemInfo.SupportURL);
 
-                ToggleOem.IsChecked = OemInfo.UseOemInfo;
+                //ToggleOem.IsChecked = OemInfo.UseOemInfo;
                 Debug.WriteLine("Successfully imported settings from file.");
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.DarkRed); }
@@ -170,7 +161,6 @@ namespace Dive.UI.Pages.ApplyPages
                                                      !string.IsNullOrEmpty(OutOfBoxExperienceInfo.NetworkLocation);
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
-            */
         }
 
         private void Export_OnClicked(object sender, RoutedEventArgs e)
@@ -182,12 +172,12 @@ namespace Dive.UI.Pages.ApplyPages
             };
 
             if (saveFileDialog.ShowDialog() != true) return;
-            var fileNameOfOemLogo = Path.GetFileName(ApplyDetails.IconPath);
+            var fileNameOfOemLogo = Path.GetFileName(ApplyDetailsInstance.IconPath);
             if (fileNameOfOemLogo != "")
             {
                 try
                 {
-                    File.Copy(ApplyDetails.IconPath,
+                    File.Copy(ApplyDetailsInstance.IconPath,
                         Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName)!, fileNameOfOemLogo));
                 }
                 catch
@@ -200,8 +190,8 @@ namespace Dive.UI.Pages.ApplyPages
             {
                 AdministratorAccount = new ApplyConfig.settingsAdministratorAccount
                 {
-                    Username = DeploymentInfo.Username,
-                    Password = DeploymentInfo.Password,
+                    Username = DeploymentInfoInstance.Username,
+                    Password = DeploymentInfoInstance.Password,
                 },
                 OEMSupport = new ApplyConfig.settingsOEMSupport
                 {

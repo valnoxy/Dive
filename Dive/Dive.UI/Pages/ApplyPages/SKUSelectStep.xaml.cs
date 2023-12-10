@@ -13,8 +13,10 @@ namespace Dive.UI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für SKUSelectStep.xaml
     /// </summary>
-    public partial class SKUSelectStep : UserControl
+    public partial class SKUSelectStep
     {
+        private static ApplyDetails _applyDetailsInstance = ApplyDetails.Instance;
+
         public class Image
         {
             public string Picture { get; set; }
@@ -196,19 +198,19 @@ namespace Dive.UI.Pages.ApplyPages
         private void SKUListView_Selected(object sender, RoutedEventArgs e)
         {
             if (SkuListView.SelectedItem is not Image item) return;
-            Common.ApplyDetails.Name = item.Name;
-            Common.ApplyDetails.Index = Convert.ToInt32(item.Index);
-            Common.ApplyDetails.FileName = item.ImageFile;
-            Common.ApplyDetails.IconPath = item.Picture;
-            Common.ApplyDetails.Build = item.Build;
-            Common.ApplyDetails.NTVersion = item.NTVersion;
+            _applyDetailsInstance.Name = item.Name;
+            _applyDetailsInstance.Index = Convert.ToInt32(item.Index);
+            _applyDetailsInstance.FileName = item.ImageFile;
+            _applyDetailsInstance.IconPath = item.Picture;
+            _applyDetailsInstance.Build = item.Build;
+            _applyDetailsInstance.NTVersion = item.NTVersion;
 
             Common.Debug.Write("Selected ");
-            Common.Debug.Write(Common.ApplyDetails.Name, true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(_applyDetailsInstance.Name, true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" with Index ", true);
-            Common.Debug.Write(Common.ApplyDetails.Index.ToString(), true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(_applyDetailsInstance.Index.ToString(), true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" in Image ", true);
-            Common.Debug.Write(Common.ApplyDetails.FileName, true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(_applyDetailsInstance.FileName, true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" for deployment.\n", true);
 
             ApplyContent.ContentWindow!.NextBtn.IsEnabled = true;

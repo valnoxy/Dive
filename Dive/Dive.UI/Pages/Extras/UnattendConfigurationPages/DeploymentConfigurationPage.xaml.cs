@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml.Serialization;
-using System.Xml;
 using Microsoft.Win32;
 
 namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
@@ -15,20 +13,23 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
     /// </summary>
     public partial class DeploymentConfigurationPage : UserControl
     {
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+
         public DeploymentConfigurationPage()
         {
             InitializeComponent();
 
-            if (Common.ApplyDetails.NTVersion == "10.0" && Common.ApplyDetails.Build >= 17134)
+            if (ApplyDetailsInstance.NTVersion == "10.0" && ApplyDetailsInstance.Build >= 17134)
                 SModeSwitch.IsEnabled = true;
             else
                 SModeSwitch.IsEnabled = false;
 
-            DiveToRecovery.IsEnabled = Common.ApplyDetails.NTVersion is "10.0" or "6.3" or "6.2";
+            DiveToRecovery.IsEnabled = ApplyDetailsInstance.NTVersion is "10.0" or "6.3" or "6.2";
 
-            SModeSwitch.IsChecked = Common.DeploymentOption.UseSMode;
-            CopyProfileToggle.IsChecked = Common.DeploymentOption.UseCopyProfile;
-            DiveToRecovery.IsChecked = Common.DeploymentOption.AddDiveToWinRE;
+            SModeSwitch.IsChecked = DeploymentOption.UseSMode;
+            CopyProfileToggle.IsChecked = DeploymentOption.UseCopyProfile;
+            DiveToRecovery.IsChecked = DeploymentOption.AddDiveToWinRE;
         }
 
         private void TbUser_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -41,13 +42,13 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
             else
             {
                 TbPassword.IsEnabled = true;
-                DeploymentInfo.Username = TbUser.Text;
+                DeploymentInfoInstance.Username = TbUser.Text;
             }
         }
 
         private void TbPassword_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            DeploymentInfo.Password = TbPassword.Text;
+            DeploymentInfoInstance.Password = TbPassword.Text;
         }
 
         private void OEMLogo_OpenFileClick(object sender, RoutedEventArgs e)
@@ -95,7 +96,7 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
 
         private void User_Switch(object sender, RoutedEventArgs e)
         {
-            DeploymentInfo.UseUserInfo = ToggleUser.IsChecked.Value;
+            DeploymentInfoInstance.UseUserInfo = ToggleUser.IsChecked.Value;
             if (ToggleUser.IsChecked.Value)
             {
                 Debug.Write("Use User Information in Unattend: ");
@@ -151,11 +152,11 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
                         Debug.Write("Found");
                         Debug.Write(infFiles.Count.ToString(), true, ConsoleColor.DarkYellow);
                         Debug.Write("drivers.", true);
-                        ApplyDetails.DriverList = infFiles;
+                        ApplyDetailsInstance.DriverList = infFiles;
                         break;
                     case 0:
                         Debug.Write("No drivers was found in the selected directory.");
-                        ApplyDetails.DriverList = null;
+                        ApplyDetailsInstance.DriverList = null;
                         break;
                 }
             }
@@ -166,15 +167,15 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         {
             if (SModeSwitch.IsChecked == true)
             {
-                Common.DeploymentOption.UseSMode = true;
-                Common.Debug.Write("Using S Mode in Unattend: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
+                DeploymentOption.UseSMode = true;
+                Debug.Write("Using S Mode in Unattend: ");
+                Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                Common.DeploymentOption.UseSMode = false;
-                Common.Debug.Write("Using S Mode in Unattend: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
+                DeploymentOption.UseSMode = false;
+                Debug.Write("Using S Mode in Unattend: ");
+                Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
         }
 
@@ -182,15 +183,15 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         {
             if (CopyProfileToggle.IsChecked == true)
             {
-                Common.DeploymentOption.UseCopyProfile = true;
-                Common.Debug.Write("Using CopyProfile in Unattend: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
+                DeploymentOption.UseCopyProfile = true;
+                Debug.Write("Using CopyProfile in Unattend: ");
+                Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                Common.DeploymentOption.UseCopyProfile = false;
-                Common.Debug.Write("Using CopyProfile in Unattend: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
+                DeploymentOption.UseCopyProfile = false;
+                Debug.Write("Using CopyProfile in Unattend: ");
+                Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
         }
 
@@ -198,15 +199,15 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         {
             if (DiveToRecovery.IsChecked == true)
             {
-                Common.DeploymentOption.AddDiveToWinRE = true;
-                Common.Debug.Write("Implement Dive into Windows RE image: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
+                DeploymentOption.AddDiveToWinRE = true;
+                Debug.Write("Implement Dive into Windows RE image: ");
+                Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                Common.DeploymentOption.AddDiveToWinRE = false;
-                Common.Debug.Write("Implement Dive into Windows RE image: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
+                DeploymentOption.AddDiveToWinRE = false;
+                Debug.Write("Implement Dive into Windows RE image: ");
+                Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
         }
     }

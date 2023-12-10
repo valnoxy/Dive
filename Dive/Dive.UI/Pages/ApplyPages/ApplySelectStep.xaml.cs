@@ -15,6 +15,8 @@ namespace Dive.UI.Pages.ApplyPages
     public partial class ApplySelectStep
     {
         private readonly BackgroundWorker _applyBackgroundWorker = new();
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
 
         public ApplySelectStep()
         {
@@ -33,8 +35,8 @@ namespace Dive.UI.Pages.ApplyPages
                 CloudContent.ContentWindow.CancelBtn.IsEnabled = false;
             }
 
-            ApplyDetails.UseNTLDR = DiskSelectStep.ContentWindow!.IsNTLDRChecked();
-            ApplyDetails.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
+            ApplyDetailsInstance.UseNTLDR = DiskSelectStep.ContentWindow!.IsNTLDRChecked();
+            ApplyDetailsInstance.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
 
             // Validate deployment settings
             if (OemInfo.UseOemInfo)
@@ -50,23 +52,23 @@ namespace Dive.UI.Pages.ApplyPages
                 }
             }
 
-            if (DeploymentInfo.UseUserInfo)
+            if (DeploymentInfoInstance.UseUserInfo)
             {
-                if (string.IsNullOrEmpty(DeploymentInfo.Username)
-                    && string.IsNullOrEmpty(DeploymentInfo.Password))
+                if (string.IsNullOrEmpty(DeploymentInfoInstance.Username)
+                    && string.IsNullOrEmpty(DeploymentInfoInstance.Password))
                 {
-                    DeploymentInfo.UseUserInfo = false;
+                    DeploymentInfoInstance.UseUserInfo = false;
                 }
             }
 
 
             // Set active Image to card
-            ImageName.Text = ApplyDetails.Name;
-            ImageFile.Text = ApplyDetails.FileName;
+            ImageName.Text = ApplyDetailsInstance.Name;
+            ImageFile.Text = ApplyDetailsInstance.FileName;
             var img = new ImageSourceConverter();
             try
             {
-                ImageIcon.Source = (ImageSource)img.ConvertFromString(ApplyDetails.IconPath)!;
+                ImageIcon.Source = (ImageSource)img.ConvertFromString(ApplyDetailsInstance.IconPath)!;
             }
             catch
             {

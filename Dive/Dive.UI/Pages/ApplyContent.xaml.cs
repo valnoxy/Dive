@@ -1,4 +1,5 @@
-﻿using Dive.UI.Pages.ApplyPages;
+﻿using Dive.UI.Common;
+using Dive.UI.Pages.ApplyPages;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,9 +12,10 @@ namespace Dive.UI.Pages
     public partial class ApplyContent : UserControl
     {
         public static ApplyContent? ContentWindow;
+        private static ApplyDetails _applyDetailsInstance = ApplyDetails.Instance;
 
-        SKUSelectStep SKUSS = new SKUSelectStep();
-        DeploymentSettingsStep deploymentSettingsStep = new DeploymentSettingsStep();
+        SKUSelectStep SKUSS = new();
+        DeploymentSettingsStep deploymentSettingsStep = new();
         
         public ApplyContent()
         {
@@ -38,7 +40,7 @@ namespace Dive.UI.Pages
                     FrameWindow.Content = DiskSS;
                     break;
                 case DiskSelectStep:
-                    if ((Common.ApplyDetails.Name.ToLower().Contains("windows 7") || Common.ApplyDetails.Name.ToLower().Contains("vista")) && Common.ApplyDetails.UseEFI)
+                    if ((_applyDetailsInstance.Name.ToLower().Contains("windows 7") || _applyDetailsInstance.Name.ToLower().Contains("vista")) && _applyDetailsInstance.UseEFI)
                     {
                         Common.Debug.WriteLine("Detected Windows Vista / 7 with EFI - Showing UefiSeven Installation prompt ...");
 

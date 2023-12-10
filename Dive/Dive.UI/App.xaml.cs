@@ -1,4 +1,4 @@
-/* 
+﻿/* 
  * Dive (formally deploya) - Fast and Easy way to deploy Windows
  * Copyright (c) 2018 - 2022 Exploitox.
  * 
@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
 using System.Windows.Threading;
+using Dive.UI.Common;
 using Dive.UI.Initialization;
 using Action = System.Action;
 using Application = System.Windows.Application;
@@ -194,10 +195,12 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
                 Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
+                var deploymentInfoInstance = DeploymentInfo.Instance;
+
                 var config = "";
-                Common.DeploymentInfo.UseUserInfo = true;
-                Common.DeploymentInfo.Username = "User";
-                Common.DeploymentInfo.Password = "Pa$$w0rd";
+                deploymentInfoInstance.UseUserInfo = true;
+                deploymentInfoInstance.Username = "User";
+                deploymentInfoInstance.Password = "Pa$$w0rd";
                 Common.DeploymentOption.UseCopyProfile = true;
                 Common.DeploymentOption.UseSMode = true;
                 Common.OemInfo.UseOemInfo = true;
@@ -207,9 +210,9 @@ namespace Dive.UI
                 Common.OemInfo.SupportURL = "https://fabrikam.com";
                 Common.OemInfo.SupportPhone = "+1 111 11111111";
 
-                Common.Debug.WriteLine("Use User: " + Common.DeploymentInfo.UseUserInfo);
-                Common.Debug.WriteLine("Username: " + Common.DeploymentInfo.Username);
-                Common.Debug.WriteLine("Password: " + Common.DeploymentInfo.Password);
+                Common.Debug.WriteLine("Use User: " + deploymentInfoInstance.UseUserInfo);
+                Common.Debug.WriteLine("Username: " + deploymentInfoInstance.Username);
+                Common.Debug.WriteLine("Password: " + deploymentInfoInstance.Password);
                 Common.Debug.WriteLine("Use S Mode: " + Common.DeploymentOption.UseSMode);
                 Common.Debug.WriteLine("Use Copy Path: " + Common.DeploymentOption.UseCopyProfile);
                 Common.Debug.WriteLine("Use OEM: " + Common.OemInfo.UseOemInfo);
@@ -247,6 +250,12 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Loading AutoDive UI ...");
                 var adUi = new AutoDiveUI();
                 adUi.ShowDialog();
+                Environment.Exit(0);
+            }
+
+            if (args.Contains("--fuck"))
+            {
+                Dive.Core.Action.CaptureTest.TestBuildInfo();
                 Environment.Exit(0);
             }
 
