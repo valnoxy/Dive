@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using System.Xml;
 using Newtonsoft.Json;
@@ -97,7 +98,7 @@ namespace Dive.Core.Action
                         MINOR = Convert.ToUInt16(blocks[1]),
                         BUILD = Convert.ToUInt16(blocks[2]),
                         SPBUILD = Convert.ToUInt16(blocks[3]),
-                        BRANCH = "" // TODO
+                        //BRANCH = "" // TODO
                     }
                 }
             };
@@ -116,37 +117,32 @@ namespace Dive.Core.Action
             return stream.ToString();
         }
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        static extern bool GetBinaryType(string lpApplicationName,
+            out BinaryType lpBinaryType);
+        public enum BinaryType : uint
+        {
+            SCS_32BIT_BINARY = 0, // A 32-bit Windows-based application
+            SCS_64BIT_BINARY = 6, // A 64-bit Windows-based application.
+            SCS_DOS_BINARY = 1, // An MS-DOS – based application
+            SCS_OS216_BINARY = 5, // A 16-bit OS/2-based application
+            SCS_PIF_BINARY = 3, // A PIF file that executes an MS-DOS – based application
+            SCS_POSIX_BINARY = 4, // A POSIX – based application
+            SCS_WOW_BINARY = 2 // A 16-bit Windows-based application
+        }
+
         private static int GetArchFromFile(string filePath)
         {
             try
             {
-                const int MACHINE_OFFSET = 4;
-                const int PE_POINTER_OFFSET = 60;
-
-                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                GetBinaryType(filePath, out var architecture);
+                var productArch = architecture switch
                 {
-                    var data = new byte[4096];
-                    stream.Read(data, 0, PE_POINTER_OFFSET);
-
-                    var peHeaderAddr = BitConverter.ToInt32(data, PE_POINTER_OFFSET);
-                    var machineUint = BitConverter.ToUInt16(data, peHeaderAddr + MACHINE_OFFSET);
-
-                    // Mapping der Maschinenarchitekturen
-                    string[] machineTypes = { "Unknown", "I386", "Itanium", "x64", "ARM", "ARM64" };
-
-                    if (machineUint >= machineTypes.Length) return -1;
-                    var architecture = machineTypes[machineUint];
-                    var productArch = architecture switch
-                    {
-                        "x86" => 0,
-                        "arm" => 5,
-                        "ia64" => 6,
-                        "x64" => 9,
-                        "arm64" => 1,
-                        _ => -1
-                    };
-                    return productArch;
-                }
+                    BinaryType.SCS_32BIT_BINARY => 0,
+                    BinaryType.SCS_64BIT_BINARY => 9,
+                    _ => -1
+                };
+                return productArch;
             }
             catch
             {

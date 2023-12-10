@@ -25,7 +25,6 @@
 		<None Remove="Assets\autodive_background.jpg" />
 		<None Remove="Assets\banner.jpg" />
 		<None Remove="Assets\Fadi_Loop_f.gif" />
-		<None Remove="Assets\icon-aios-40.png" />
 		<None Remove="Assets\icon-hdd-40.png" />
 		<None Remove="Assets\icon-windows-10-40.png" />
 		<None Remove="Assets\icon-windows-11-40.png" />
@@ -36,6 +35,7 @@
 		<None Remove="Assets\icon-windows-server-2012-40.png" />
 		<None Remove="Assets\icon-windows-vista-40.png" />
 		<None Remove="Assets\icon-windows-xp-40.png" />
+		<None Remove="Assets\icon-xorie-40.png" />
 		<None Remove="Assets\pexels-johannes-plenio-1103970.png" />
 		<None Remove="DiveV2.ico" />
 	</ItemGroup>
@@ -50,7 +50,6 @@
 		<Resource Include="Assets\icon-hdd-40.png" />
 	</ItemGroup>
 	<ItemGroup>
-		<Resource Include="Assets\icon-aios-40.png" />
 		<Resource Include="Assets\icon-windows-10-40.png" />
 		<Resource Include="Assets\icon-windows-11-40.png" />
 		<Resource Include="Assets\icon-windows-2000-40.png" />
@@ -60,6 +59,7 @@
 		<Resource Include="Assets\icon-windows-server-2012-40.png" />
 		<Resource Include="Assets\icon-windows-vista-40.png" />
 		<Resource Include="Assets\icon-windows-xp-40.png" />
+		<Resource Include="Assets\icon-xorie-40.png" />
 		<Resource Include="DiveV2.ico" />
 		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
 		<Resource Include="Localization\ResourceDictionary.xaml" />

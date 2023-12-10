@@ -20,7 +20,7 @@ namespace Dive.UI.Pages.ApplyPages
         public DeploymentSettingsStepOld()
         {
             InitializeComponent();
-            DeploymentInfo.UseUserInfo = false;
+            //DeploymentInfo.UseUserInfo = false;
             OemInfo.UseOemInfo = false;
         }
 

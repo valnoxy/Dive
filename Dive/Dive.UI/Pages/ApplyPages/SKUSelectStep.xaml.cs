@@ -89,11 +89,11 @@ namespace Dive.UI.Pages.ApplyPages
                                 "6" => "ia64",
                                 "9" => "x64",
                                 "12" => "arm64",
-                                _ => $"Unknown architecture ({productArch})"
+                                _ => "Unknown architecture"
                             };
 
                             if (!string.IsNullOrEmpty(productBuild))
-                                productArch = $"Build {productBuild} - {productArch}";
+                                productArch = $"NT {productMajor}.{productMinor}.{productBuild} - {productArch}";
 
                             // Skip if image is Windows PE
                             if (productName?.ToLower().Contains("pe") == true)
@@ -162,9 +162,10 @@ namespace Dive.UI.Pages.ApplyPages
                             }
 
                             // Exploitox Internal
-                            if (productName.ToLower().Contains("ai operating system") ||
-                                productName.ToLower().Contains("aios"))
-                                imageVersion = "aios";
+                            if (productName!.ToLower().Contains("ai operating system") ||
+                                productName.ToLower().Contains("aios") ||
+                                productName.ToLower().Contains("xorie"))
+                                imageVersion = "xorie";
 
                             images.Add(new Image
                             {

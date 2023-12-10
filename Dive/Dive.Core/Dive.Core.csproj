@@ -25,6 +25,7 @@
 		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<PackageReleaseNotes>Dive Core</PackageReleaseNotes>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
