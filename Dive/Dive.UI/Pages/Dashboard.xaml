@@ -16,76 +16,28 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Center" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <ui:Card Margin="12,0,12,0">
+                <StackPanel Width="130" Height="130">
+                    <ui:TextBlock x:Name="ImageCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
+                    <ui:TextBlock Text="OS Images" HorizontalAlignment="Center" FontTypography="Subtitle" />
+                </StackPanel>
+            </ui:Card>
             
-            <Grid Grid.Column="0" Margin="15,0,15,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <ui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="FastForward24" 
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="19,0,0,0"
-                    VerticalAlignment="Center">
-                    <TextBlock
-                        Margin="0,0,0,4"
-                        FontSize="16"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="{DynamicResource FastDeployment}" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource FastDeploymentDescription}" />
+            <ui:Card Margin="12,0,12,0">
+                <StackPanel Width="130" Height="130">
+                    <ui:TextBlock x:Name="DriverPackCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
+                    <ui:TextBlock Text="Driver Packs" HorizontalAlignment="Center" FontTypography="Subtitle" />
                 </StackPanel>
-            </Grid>
+            </ui:Card>
             
-            <Grid Grid.Column="1" Margin="15,0,15,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <ui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="DesignIdeas24" 
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="19,0,0,0"
-                    VerticalAlignment="Center">
-                    <TextBlock
-                        Margin="0,0,0,4"
-                        FontSize="16"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="{DynamicResource Compatibility}" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource CompatibilityDescription}" />
+            <ui:Card Margin="12,0,12,0">
+                <StackPanel Width="130" Height="130">
+                    <ui:TextBlock x:Name="ConfigCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
+                    <ui:TextBlock Text="Configs" HorizontalAlignment="Center" FontTypography="Subtitle" />
                 </StackPanel>
-            </Grid>
-
-            <Grid Grid.Column="2" Margin="15,0,15,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <ui:SymbolIcon Grid.Column="0" FontSize="19" Symbol="Heart24"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                <StackPanel
-                    Grid.Column="1"
-                    Margin="19,0,0,0"
-                    VerticalAlignment="Center">
-                    <TextBlock
-                        Margin="0,0,0,4"
-                        FontSize="16"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                        Text="{DynamicResource OpenSource}" />
-                    <TextBlock Foreground="{DynamicResource TextFillColorTertiaryBrush}" Text="{DynamicResource OpenSourceDescription}" />
-                </StackPanel>
-            </Grid>
-        </Grid>
+            </ui:Card>
+        </StackPanel>
         
         <Grid Grid.Row="2" Margin="0,25,0,0">
             <StackPanel>
@@ -134,24 +86,6 @@
                             Text="{DynamicResource CloudInstallationDescription}" />
                     </StackPanel>
                 </ui:CardAction>
-                <!--
-                <ui:CardAction
-                    Margin="0,0,0,8"
-                    Click="SwitchToRepairPage"
-                    Icon="{ui:SymbolIcon Toolbox24}">
-                    <StackPanel>
-                        <TextBlock
-                            Margin="0,0,0,4"
-                            FontWeight="Medium"
-                            Text="{DynamicResource RepairAndTweaks}"/>
-                        <TextBlock
-                            FontSize="12"
-                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                            Text="{DynamicResource RepairAndTweaksDescription}" />
-                    </StackPanel>
-                </ui:CardAction>
-                -->
-                <Label Content="Made with ❤️ by valnoxy"/>
             </StackPanel>
         </Grid>
     </Grid>
