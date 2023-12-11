@@ -16,16 +16,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Capturing Windows
-            </TextBlock>
-
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
-                    Dive will now capture the specified source. This might take a while.
-            </TextBlock>
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource CapturingTitle}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource CapturingDescription}"/>
         </StackPanel>
-        <Grid Grid.Row="1">
 
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -50,9 +45,7 @@
             <Grid Grid.Row="1">
                 <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF">
-                        Waiting ...
-                    </TextBlock>
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF" Text="{DynamicResource CapturingWaiting}"/>
                 </StackPanel>
             </Grid>
         </Grid>

@@ -2,12 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <!-- Dashboard -->
-    <system:String x:Key="FastDeployment">Schnelle Bereitstellung</system:String>
-    <system:String x:Key="FastDeploymentDescription">Installiere Windows in wenigen Minuten</system:String>
-    <system:String x:Key="Compatibility">Kompatibilität</system:String>
-    <system:String x:Key="CompatibilityDescription">Legacy &amp; Moderne Systeme</system:String>
-    <system:String x:Key="OpenSource">Open Source</system:String>
-    <system:String x:Key="OpenSourceDescription">Finde mich auf GitHub!</system:String>
+    <system:String x:Key="OSImages">OS Abbilder</system:String>
+    <system:String x:Key="DriverPacks">Treiber Pakete</system:String>
+    <system:String x:Key="Configs">Konfigs</system:String>
+
 
     <system:String x:Key="ApplyImage">Abbild installieren</system:String>
     <system:String x:Key="ApplyImageDescription">Installiere Windows auf diesem Gerät.</system:String>
@@ -67,7 +65,7 @@
     <system:String x:Key="OEMHomepagePlaceholder">Webseite des Herstellers</system:String>
     <system:String x:Key="InjectDriversTitle">Treiber installieren</system:String>
     <system:String x:Key="InjectDriversDescription">Laden und Installieren mehrerer Treiber (ab Vista).</system:String>
-    <system:String x:Key="InjectDriversNoSource">Kein Quellverzeichnis ausgewählt.</system:String>
+    <system:String x:Key="NoSourceSelected">Kein Quellverzeichnis ausgewählt.</system:String>
 
     <system:String x:Key="MoreSettingsTitle">Weitere Einstellungen</system:String>
     <system:String x:Key="MoreSettingsDescription">Eine Liste mit weiteren Einstellungen für die Bereitstellung.</system:String>
@@ -82,5 +80,41 @@
     <system:String x:Key="Deployment">Deployment</system:String>
     <system:String x:Key="OOBE">Out-Of-Box-Experience</system:String>
     <system:String x:Key="Application">Application</system:String>
-    
+
+    <!-- Disk Selection Page -->
+    <system:String x:Key="DiskSelectTitle">Wo soll Windows installiert werden?</system:String>
+    <system:String x:Key="DiskSelectDescription">Wählen Sie eines der verfügbaren Laufwerke aus, um fortzufahren.</system:String>
+    <system:String x:Key="AddRecovery">Wiederherstellungspartition anlegen</system:String>
+    <system:String x:Key="UseNTLDR">Verwende NTLDR (XP)</system:String>
+
+    <!-- Installing Page -->
+    <system:String x:Key="InstallPageTitle">Windows wird installiert</system:String>
+    <system:String x:Key="InstallPageDescription">Ihr Computer startet einige Male neu, was eine Weile dauern kann.</system:String>
+    <system:String x:Key="InstallPageWaiting">Warten ...</system:String>
+
+    <!-- Capture Settings Page -->
+    <system:String x:Key="CaptureSettingsTitle">Wie soll die Erfassung konfiguriert werden?</system:String>
+    <system:String x:Key="CaptureSettingsDescription">Bitte konfigurieren Sie den Erfassungsprozess, um fortzufahren.</system:String>
+    <system:String x:Key="CaptureSettingsImageCardTitle">Abbild Information</system:String>
+    <system:String x:Key="CaptureSettingsImageCardDescription">Details zu Ihrem Abbild.</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoName">Name</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoNamePlaceholder">Mein Abbild</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoDescription">Beschreibung</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoDescriptionPlaceholder">Erfasst mit Dive</system:String>
+    <system:String x:Key="CaptureSettingsCaptureDirTitle">Quellverzeichnis</system:String>
+    <system:String x:Key="CaptureSettingsCaptureDirDescription">Das Quellverzeichnis des zu erfassenden Pfades.</system:String>
+
+    <!-- Capture Save To Page -->
+    <system:String x:Key="CaptureSaveToTitle">Wo soll das Abbild gespeichert werden?</system:String>
+    <system:String x:Key="CaptureSaveToDescription">Bitte wählen Sie das Ziel aus, um fortzufahren.</system:String>
+    <system:String x:Key="CaptureSaveToFileName">Dateinamen</system:String>
+    <system:String x:Key="CaptureSaveToFileNameDescription">Der Dateiname des Abbilds.</system:String>
+    <system:String x:Key="CaptureSaveToDisksCounter">Dive Laufwerke gefunden: {0}</system:String>
+
+    <!-- Capturing Page -->
+    <system:String x:Key="CapturingTitle">Windows wird erfasst</system:String>
+    <system:String x:Key="CapturingDescription">Dive wird nun die angegebene Quelle erfassen. Dies kann eine Weile dauern.</system:String>
+    <system:String x:Key="CapturingWaiting">Warten ...</system:String>
+
+
 </ResourceDictionary>

@@ -24,13 +24,9 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Where do you want to install Windows?
-                </TextBlock>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource DiskSelectTitle}"/>
 
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
-                    Please select from one of the available disks to continue.
-                </TextBlock>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource DiskSelectDescription}"/>
             </StackPanel>
 
             <ui:Button Grid.Column="1"
@@ -77,8 +73,8 @@
                     <ColumnDefinition Width="75"/>
                 </Grid.ColumnDefinitions>
 
-                <ToggleButton Grid.Column="1" x:Name="UseRecoveryBtn" Content="Add Recovery" IsEnabled="true" Margin="0,15,15,0"/>
-                <ToggleButton Grid.Column="2" x:Name="UseNTLDRBtn" Content="Use NTLDR (XP)" Margin="0,15,15,0"/>
+                <ToggleButton Grid.Column="1" x:Name="UseRecoveryBtn" Content="{DynamicResource AddRecovery}" IsEnabled="true" Margin="0,15,15,0"/>
+                <ToggleButton Grid.Column="2" x:Name="UseNTLDRBtn" Content="{DynamicResource UseNTLDR}" Margin="0,15,15,0"/>
                 <RadioButton Grid.Column="3" x:Name="BIOSRadio" VerticalAlignment="Center" GroupName="Firmware" Content="BIOS" Margin="0,15,0,0" MaxWidth="1" Checked="BIOSRadio_Checked" />
                 <RadioButton Grid.Column="4" x:Name="EFIRadio" VerticalAlignment="Center" GroupName="Firmware" Content="EFI" Margin="0,15,0,0" Checked="EFIRadio_Checked"/>
             </Grid>

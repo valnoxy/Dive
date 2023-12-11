@@ -16,13 +16,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
-                    Installing Windows
-            </TextBlock>
-
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
-                    Your computer will restart several times. This might take a while.
-            </TextBlock>
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource InstallPageTitle}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource InstallPageDescription}"/>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
@@ -30,28 +25,24 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0">
-                <ui:Card>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+            <ui:Card Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                        <Image Grid.Column="0" x:Name="ImageIcon" Height="40"/>
-                        <TextBlock Grid.Column="1" x:Name="ImageName" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
-                        <TextBlock Grid.Column="2" x:Name="ImageFile" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
-                    </Grid>
-                </ui:Card>
-            </Grid>
-            
+                    <Image Grid.Column="0" x:Name="ImageIcon" Height="40"/>
+                    <TextBlock Grid.Column="1" x:Name="ImageName" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
+                    <TextBlock Grid.Column="2" x:Name="ImageFile" VerticalAlignment="Center" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                </Grid>
+            </ui:Card>
+
             <Grid Grid.Row="1">
                 <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF">
-                        Waiting ...
-                    </TextBlock>
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF" Text="{DynamicResource InstallPageWaiting}"/>
                 </StackPanel>
             </Grid>
         </Grid>

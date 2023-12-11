@@ -2,12 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <!-- Dashboard -->
-    <system:String x:Key="FastDeployment">Fast Deployment</system:String>
-    <system:String x:Key="FastDeploymentDescription">Deploy Windows in minutes</system:String>
-    <system:String x:Key="Compatibility">Compatibility</system:String>
-    <system:String x:Key="CompatibilityDescription">Legacy &amp; Modern System</system:String>
-    <system:String x:Key="OpenSource">Open Source</system:String>
-    <system:String x:Key="OpenSourceDescription">Find me on GitHub!</system:String>
+    <system:String x:Key="OSImages">OS Images</system:String>
+    <system:String x:Key="DriverPacks">Driver Packs</system:String>
+    <system:String x:Key="Configs">Configs</system:String>
 
     <system:String x:Key="ApplyImage">Apply Image</system:String>
     <system:String x:Key="ApplyImageDescription">Install your Windows image on this device.</system:String>
@@ -68,7 +65,7 @@
 
     <system:String x:Key="InjectDriversTitle">Inject Drivers</system:String>
     <system:String x:Key="InjectDriversDescription">Load and inject multiple drivers (Vista and up).</system:String>
-    <system:String x:Key="InjectDriversNoSource">No source directory selected.</system:String>
+    <system:String x:Key="NoSourceSelected">No source directory selected.</system:String>
 
     <system:String x:Key="MoreSettingsTitle">More Settings</system:String>
     <system:String x:Key="MoreSettingsDescription">See a list of other settings for deployment.</system:String>
@@ -83,5 +80,40 @@
     <system:String x:Key="Deployment">Deployment</system:String>
     <system:String x:Key="OOBE">Out-Of-Box-Experience</system:String>
     <system:String x:Key="Application">Application</system:String>
+
+    <!-- Disk Selection Page -->
+    <system:String x:Key="DiskSelectTitle">Where do you want to install Windows?</system:String>
+    <system:String x:Key="DiskSelectDescription">Please select from one of the available disks to continue.</system:String>
+    <system:String x:Key="AddRecovery">Add Recovery</system:String>
+    <system:String x:Key="UseNTLDR">Use NTLDR (XP)</system:String>
+    
+    <!-- Installing Page -->
+    <system:String x:Key="InstallPageTitle">Installing Windows</system:String>
+    <system:String x:Key="InstallPageDescription">Your computer will restart several times. This might take a while.</system:String>
+    <system:String x:Key="InstallPageWaiting">Waiting ...</system:String>
+
+    <!-- Capture Settings Page -->
+    <system:String x:Key="CaptureSettingsTitle">How do you want to configure the capture?</system:String>
+    <system:String x:Key="CaptureSettingsDescription">Please configure the capture process to continue.</system:String>
+    <system:String x:Key="CaptureSettingsImageCardTitle">Image Information</system:String>
+    <system:String x:Key="CaptureSettingsImageCardDescription">Details about your Image.</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoName">Name</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoNamePlaceholder">My Image</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoDescription">Description</system:String>
+    <system:String x:Key="CaptureSettingsImageInfoDescriptionPlaceholder">Captured with Dive</system:String>
+    <system:String x:Key="CaptureSettingsCaptureDirTitle">Capture directory</system:String>
+    <system:String x:Key="CaptureSettingsCaptureDirDescription">The source directory of the path to be captured.</system:String>
+
+    <!-- Capture Save To Page -->
+    <system:String x:Key="CaptureSaveToTitle">Where should the image be saved?</system:String>
+    <system:String x:Key="CaptureSaveToDescription">Please select the destination to continue.</system:String>
+    <system:String x:Key="CaptureSaveToFileName">File name</system:String>
+    <system:String x:Key="CaptureSaveToFileNameDescription">The file name of the image.</system:String>
+    <system:String x:Key="CaptureSaveToDisksCounter">Dive Disks loaded: {0}</system:String>
+
+    <!-- Capturing Page -->
+    <system:String x:Key="CapturingTitle">Capturing Windows</system:String>
+    <system:String x:Key="CapturingDescription">Dive will now capture the specified source. This might take a while.</system:String>
+    <system:String x:Key="CapturingWaiting">Waiting ...</system:String>
 
 </ResourceDictionary>

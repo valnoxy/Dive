@@ -258,7 +258,7 @@
                                     <TextBlock
                                         FontSize="12"
                                         Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                        Text="Hide the online sign-in to Microsoft Account page." />
+                                        Text="Hide the network setup page." />
                                 </StackPanel>
                                 <ui:ToggleSwitch x:Name="HideWirelessSetupPageSwitch" Grid.Column="1" Margin="0,0,8,0" Click="HideWirelessSetupPageSwitch_OnClick"/>
                             </Grid>

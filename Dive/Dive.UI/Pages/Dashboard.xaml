@@ -18,23 +18,23 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <ui:Card Margin="12,0,12,0">
-                <StackPanel Width="130" Height="130">
+                <StackPanel Width="140" Height="140">
                     <ui:TextBlock x:Name="ImageCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
-                    <ui:TextBlock Text="OS Images" HorizontalAlignment="Center" FontTypography="Subtitle" />
+                    <ui:TextBlock Text="{DynamicResource OSImages}" HorizontalAlignment="Center" FontTypography="Subtitle" />
                 </StackPanel>
             </ui:Card>
             
             <ui:Card Margin="12,0,12,0">
-                <StackPanel Width="130" Height="130">
+                <StackPanel Width="140" Height="140">
                     <ui:TextBlock x:Name="DriverPackCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
-                    <ui:TextBlock Text="Driver Packs" HorizontalAlignment="Center" FontTypography="Subtitle" />
+                    <ui:TextBlock Text="{DynamicResource DriverPacks}" HorizontalAlignment="Center" FontTypography="Subtitle" />
                 </StackPanel>
             </ui:Card>
             
             <ui:Card Margin="12,0,12,0">
-                <StackPanel Width="130" Height="130">
+                <StackPanel Width="140" Height="140">
                     <ui:TextBlock x:Name="ConfigCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
-                    <ui:TextBlock Text="Configs" HorizontalAlignment="Center" FontTypography="Subtitle" />
+                    <ui:TextBlock Text="{DynamicResource Configs}" HorizontalAlignment="Center" FontTypography="Subtitle" />
                 </StackPanel>
             </ui:Card>
         </StackPanel>
