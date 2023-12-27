@@ -37,6 +37,8 @@ namespace Dive.UI.AutoDive
 
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
+        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         public AutoDiveUi_Old()
         {
@@ -504,7 +506,7 @@ namespace Dive.UI.AutoDive
             if (bootloader == Entities.Bootloader.BOOTMGR && ApplyDetailsInstance.UseRecovery)
             {
                 worker?.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, Common.DeploymentOption.AddDiveToWinRE, worker);
+                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, DeploymentOptionInstance.AddDiveToWinRE, worker);
 
                 if (IsCanceled)
                 {
@@ -514,14 +516,14 @@ namespace Dive.UI.AutoDive
             }
 
             // Install unattend file (only for Vista and higher)
-            if (DeploymentInfoInstance.UseUserInfo || Common.OemInfo.UseOemInfo)
+            if (DeploymentInfoInstance.UseUserInfo || OemInfoInstance.UseOemInfo)
             {
                 worker?.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
                 var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : Common.UnattendBuilder.Build();
                 Debug.WriteLine(config);
-                Actions.InstallUnattend($"{windowsDrive}Windows", config, Common.OemInfo.LogoPath, Common.DeploymentOption.UseSMode, worker);
+                Actions.InstallUnattend($"{windowsDrive}Windows", config, OemInfoInstance.LogoPath, DeploymentOptionInstance.UseSMode, worker);
 
                 if (IsCanceled)
                 {

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
 using System.Windows;
 using Dive.UI.Common;
-using Wpf.Ui.Controls;
 
 namespace Dive.UI.Pages.Extras
 {
@@ -13,6 +10,8 @@ namespace Dive.UI.Pages.Extras
     /// </summary>
     public partial class UnattendConfiguration
     {
+        private static readonly DeviceInfo DeviceInfoInstance = DeviceInfo.Instance;
+
         public UnattendConfiguration()
         {
             InitializeComponent();
@@ -26,18 +25,18 @@ namespace Dive.UI.Pages.Extras
         private void UnattendConfiguration_OnClosing(object? sender, CancelEventArgs e)
         {
             // Define state of DeviceInfo
-            if (!string.IsNullOrEmpty(DeviceInfo.RegisteredOwner) ||
-                !string.IsNullOrEmpty(DeviceInfo.RegisteredOrganization) ||
-                !string.IsNullOrEmpty(DeviceInfo.ProductKey) || 
-                !string.IsNullOrEmpty(DeviceInfo.DeviceName))
+            if (!string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOwner) ||
+                !string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOrganization) ||
+                !string.IsNullOrEmpty(DeviceInfoInstance.ProductKey) || 
+                !string.IsNullOrEmpty(DeviceInfoInstance.DeviceName))
             {
-                DeviceInfo.UseDeviceInfo = true;
+                DeviceInfoInstance.UseDeviceInfo = true;
                 Debug.Write("Use DeviceInfo in Unattend: ");
                 Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                DeviceInfo.UseDeviceInfo = false;
+                DeviceInfoInstance.UseDeviceInfo = false;
                 Debug.Write("Use DeviceInfo in Unattend: ");
                 Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }

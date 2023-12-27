@@ -15,11 +15,12 @@ namespace Dive.UI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für DiskSelectStep.xaml
     /// </summary>
-    public partial class DiskSelectStep : UserControl
+    public partial class DiskSelectStep
     {
         public const int ErrorInvalidFunction = 1;
         public static DiskSelectStep? ContentWindow;
-        private static ApplyDetails _applyDetailsInstance = ApplyDetails.Instance;
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
+        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
 
         [DllImport("kernel32.dll",
             EntryPoint = "GetFirmwareEnvironmentVariableW",
@@ -74,24 +75,24 @@ namespace Dive.UI.Pages.ApplyPages
             LoadDisks();
             CheckFirmware();
 
-            if (_applyDetailsInstance.Name.ToLower().Contains("windows xp") || _applyDetailsInstance.Name.ToLower().Contains("windows 2000"))
+            if (ApplyDetailsInstance.Name.ToLower().Contains("windows xp") || ApplyDetailsInstance.Name.ToLower().Contains("windows 2000"))
             {
                 UseNTLDRBtn.IsChecked = true;
                 BIOSRadio.IsChecked = true;
                 UseRecoveryBtn.IsChecked = false;
             }
-            else if (_applyDetailsInstance.Name.ToLower().Contains("windows vista"))
+            else if (ApplyDetailsInstance.Name.ToLower().Contains("windows vista"))
             {
                 UseRecoveryBtn.IsChecked = false;
                 UseNTLDRBtn.IsChecked = false;
             }
-            else if (_applyDetailsInstance.Name.ToLower().Contains("windows 7"))
+            else if (ApplyDetailsInstance.Name.ToLower().Contains("windows 7"))
             {
                 UseRecoveryBtn.IsChecked = true;
             }
-            else if (_applyDetailsInstance.Name.Contains("(") || _applyDetailsInstance.Name.Contains(")"))
+            else if (ApplyDetailsInstance.Name.Contains("(") || ApplyDetailsInstance.Name.Contains(")"))
             {
-                Common.DeploymentOption.UseCopyProfile = true;
+                DeploymentOptionInstance.UseCopyProfile = true;
             }
             else
             {
@@ -230,11 +231,11 @@ namespace Dive.UI.Pages.ApplyPages
             var ix = item.DiskId!.IndexOf(toBeSearched, StringComparison.Ordinal);
             if (ix == -1) return;
             var diskIndex = item.DiskId[(ix + toBeSearched.Length)..];
-            _applyDetailsInstance.DiskIndex = Convert.ToInt32(diskIndex);
-            _applyDetailsInstance.IsDriveRemovable = item.IsRemovableMedia;
+            ApplyDetailsInstance.DiskIndex = Convert.ToInt32(diskIndex);
+            ApplyDetailsInstance.IsDriveRemovable = item.IsRemovableMedia;
 
             Common.Debug.Write("The disk with ID ");
-            Common.Debug.Write(_applyDetailsInstance.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
+            Common.Debug.Write(ApplyDetailsInstance.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
             Common.Debug.Write(" will be used for deployment.\n", true);
             
             if (ApplyContent.ContentWindow != null)
@@ -254,14 +255,14 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void EFIRadio_Checked(object sender, RoutedEventArgs e)
         {
-            _applyDetailsInstance.UseEFI = true;
+            ApplyDetailsInstance.UseEFI = true;
             Common.Debug.Write("Firmware has been changed to: ");
             Common.Debug.Write("EFI\n", true, ConsoleColor.DarkYellow);
         }
 
         private void BIOSRadio_Checked(object sender, RoutedEventArgs e)
         {
-            _applyDetailsInstance.UseEFI = false;
+            ApplyDetailsInstance.UseEFI = false;
             Common.Debug.Write("Firmware has been changed to: ");
             Common.Debug.Write("BIOS\n", true, ConsoleColor.DarkYellow);
         }

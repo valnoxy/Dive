@@ -12,16 +12,20 @@ namespace Dive.UI.Pages.ApplyPages
     /// <summary>
     /// Interaktionslogik für DeploymentSettingsStep.xaml
     /// </summary>
-    public partial class DeploymentSettingsStep : UserControl
+    public partial class DeploymentSettingsStep
     {
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
-
+        private static readonly DeviceInfo DeviceInfoInstance = DeviceInfo.Instance;
+        private static readonly DomainInfo DomainInfoInstance = DomainInfo.Instance;
+        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
+        private static readonly OutOfBoxExperienceInfo OutOfBoxExperienceInfoInstance = OutOfBoxExperienceInfo.Instance;
+        
         public DeploymentSettingsStep()
         {
             InitializeComponent();
             DeploymentInfoInstance.UseUserInfo = false;
-            OemInfo.UseOemInfo = false;
+            OemInfoInstance.UseOemInfo = false;
 
             DataContext = DeploymentInfo.Instance;
         }
@@ -70,7 +74,7 @@ namespace Dive.UI.Pages.ApplyPages
                     {
                         if (File.Exists(oemLogoPath))
                         {
-                            OemInfo.LogoPath = oemLogoPath;
+                            OemInfoInstance.LogoPath = oemLogoPath;
                         }
                         else
                         {
@@ -78,21 +82,21 @@ namespace Dive.UI.Pages.ApplyPages
                         }
                     }
 
-                    OemInfo.Manufacturer = node.SelectSingleNode("Manufacturer")!.InnerText;
-                    OemInfo.Model = node.SelectSingleNode("Model")!.InnerText;
-                    OemInfo.SupportHours = node.SelectSingleNode("SupportHours")!.InnerText;
-                    OemInfo.SupportPhone = node.SelectSingleNode("SupportNo")!.InnerText;
-                    OemInfo.SupportURL = node.SelectSingleNode("Homepage")!.InnerText;
+                    OemInfoInstance.Manufacturer = node.SelectSingleNode("Manufacturer")!.InnerText;
+                    OemInfoInstance.Model = node.SelectSingleNode("Model")!.InnerText;
+                    OemInfoInstance.SupportHours = node.SelectSingleNode("SupportHours")!.InnerText;
+                    OemInfoInstance.SupportPhone = node.SelectSingleNode("SupportNo")!.InnerText;
+                    OemInfoInstance.SupportURL = node.SelectSingleNode("Homepage")!.InnerText;
                 }
 
-                OemInfo.UseOemInfo = !string.IsNullOrEmpty(OemInfo.LogoPath) ||
-                                     !string.IsNullOrEmpty(OemInfo.Manufacturer) ||
-                                     !string.IsNullOrEmpty(OemInfo.Model) ||
-                                     !string.IsNullOrEmpty(OemInfo.SupportHours) ||
-                                     !string.IsNullOrEmpty(OemInfo.SupportPhone) ||
-                                     !string.IsNullOrEmpty(OemInfo.SupportURL);
+                OemInfoInstance.UseOemInfo = !string.IsNullOrEmpty(OemInfoInstance.LogoPath) ||
+                                             !string.IsNullOrEmpty(OemInfoInstance.Manufacturer) ||
+                                             !string.IsNullOrEmpty(OemInfoInstance.Model) ||
+                                             !string.IsNullOrEmpty(OemInfoInstance.SupportHours) ||
+                                             !string.IsNullOrEmpty(OemInfoInstance.SupportPhone) ||
+                                             !string.IsNullOrEmpty(OemInfoInstance.SupportURL);
 
-                //ToggleOem.IsChecked = OemInfo.UseOemInfo;
+                //ToggleOem.IsChecked = OemInfoInstance.UseOemInfo;
                 Debug.WriteLine("Successfully imported settings from file.");
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.DarkRed); }
@@ -103,18 +107,18 @@ namespace Dive.UI.Pages.ApplyPages
 
                 foreach (XmlNode node in imageNames!)
                 {
-                    DeviceInfo.DeviceName = node.SelectSingleNode("DeviceName")!.InnerText;
-                    DeviceInfo.RegisteredOwner = node.SelectSingleNode("RegisteredOwner")!.InnerText;
-                    DeviceInfo.RegisteredOrganization = node.SelectSingleNode("RegisteredOrganization")!.InnerText;
-                    DeviceInfo.ProductKey = node.SelectSingleNode("ProductKey")!.InnerText;
-                    DeviceInfo.TimeZone = node.SelectSingleNode("Timezone")!.InnerText;
+                    DeviceInfoInstance.DeviceName = node.SelectSingleNode("DeviceName")!.InnerText;
+                    DeviceInfoInstance.RegisteredOwner = node.SelectSingleNode("RegisteredOwner")!.InnerText;
+                    DeviceInfoInstance.RegisteredOrganization = node.SelectSingleNode("RegisteredOrganization")!.InnerText;
+                    DeviceInfoInstance.ProductKey = node.SelectSingleNode("ProductKey")!.InnerText;
+                    DeviceInfoInstance.TimeZone = node.SelectSingleNode("Timezone")!.InnerText;
                 }
 
-                DeviceInfo.UseDeviceInfo = !string.IsNullOrEmpty(DeviceInfo.DeviceName) ||
-                                           !string.IsNullOrEmpty(DeviceInfo.RegisteredOwner) ||
-                                           !string.IsNullOrEmpty(DeviceInfo.RegisteredOrganization) ||
-                                           !string.IsNullOrEmpty(DeviceInfo.ProductKey) ||
-                                           !string.IsNullOrEmpty(DeviceInfo.TimeZone);
+                DeviceInfoInstance.UseDeviceInfo = !string.IsNullOrEmpty(DeviceInfoInstance.DeviceName) ||
+                                                   !string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOwner) ||
+                                                   !string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOrganization) ||
+                                                   !string.IsNullOrEmpty(DeviceInfoInstance.ProductKey) ||
+                                                   !string.IsNullOrEmpty(DeviceInfoInstance.TimeZone);
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
 
@@ -124,14 +128,14 @@ namespace Dive.UI.Pages.ApplyPages
 
                 foreach (XmlNode node in imageNames!)
                 {
-                    DomainInfo.UserName = node.SelectSingleNode("UserName")!.InnerText;
-                    DomainInfo.Password = node.SelectSingleNode("Password")!.InnerText;
-                    DomainInfo.Domain = node.SelectSingleNode("Domain")!.InnerText;
+                    DomainInfoInstance.UserName = node.SelectSingleNode("UserName")!.InnerText;
+                    DomainInfoInstance.Password = node.SelectSingleNode("Password")!.InnerText;
+                    DomainInfoInstance.Domain = node.SelectSingleNode("Domain")!.InnerText;
                 }
 
-                DomainInfo.UseDomainInfo = !string.IsNullOrEmpty(DomainInfo.UserName) ||
-                                           !string.IsNullOrEmpty(DomainInfo.Password) ||
-                                           !string.IsNullOrEmpty(DomainInfo.Domain);
+                DomainInfoInstance.UseDomainInfo = !string.IsNullOrEmpty(DomainInfoInstance.UserName) ||
+                                                   !string.IsNullOrEmpty(DomainInfoInstance.Password) ||
+                                                   !string.IsNullOrEmpty(DomainInfoInstance.Domain);
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
 
@@ -141,24 +145,24 @@ namespace Dive.UI.Pages.ApplyPages
 
                 foreach (XmlNode node in imageNames!)
                 {
-                    OutOfBoxExperienceInfo.HideEULAPage = node.SelectSingleNode("HideEULAPage")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.HideOEMRegistrationScreen = node.SelectSingleNode("HideOEMRegistrationScreen")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.HideOnlineAccountScreens = node.SelectSingleNode("HideOnlineAccountScreens")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.HideWirelessSetupInOOBE = node.SelectSingleNode("HideWirelessSetupInOOBE")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.HideLocalAccountScreen = node.SelectSingleNode("HideLocalAccountScreen")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.SkipMachineOOBE = node.SelectSingleNode("SkipMachineOOBE")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.SkipUserOOBE = node.SelectSingleNode("SkipUserOOBE")!.InnerText == "true";
-                    OutOfBoxExperienceInfo.NetworkLocation = node.SelectSingleNode("NetworkLocation")!.InnerText;
+                    OutOfBoxExperienceInfoInstance.HideEULAPage = node.SelectSingleNode("HideEULAPage")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen = node.SelectSingleNode("HideOEMRegistrationScreen")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens = node.SelectSingleNode("HideOnlineAccountScreens")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE = node.SelectSingleNode("HideWirelessSetupInOOBE")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.HideLocalAccountScreen = node.SelectSingleNode("HideLocalAccountScreen")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.SkipMachineOOBE = node.SelectSingleNode("SkipMachineOOBE")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.SkipUserOOBE = node.SelectSingleNode("SkipUserOOBE")!.InnerText == "true";
+                    OutOfBoxExperienceInfoInstance.NetworkLocation = node.SelectSingleNode("NetworkLocation")!.InnerText;
                 }
 
-                OutOfBoxExperienceInfo.UseOOBEInfo = !OutOfBoxExperienceInfo.HideEULAPage ||
-                                                     !OutOfBoxExperienceInfo.HideOEMRegistrationScreen ||
-                                                     !OutOfBoxExperienceInfo.HideOnlineAccountScreens ||
-                                                     !OutOfBoxExperienceInfo.HideWirelessSetupInOOBE ||
-                                                     !OutOfBoxExperienceInfo.HideLocalAccountScreen ||
-                                                     !OutOfBoxExperienceInfo.SkipMachineOOBE ||
-                                                     !OutOfBoxExperienceInfo.SkipUserOOBE ||
-                                                     !string.IsNullOrEmpty(OutOfBoxExperienceInfo.NetworkLocation);
+                OutOfBoxExperienceInfoInstance.UseOOBEInfo = !OutOfBoxExperienceInfoInstance.HideEULAPage ||
+                                                             !OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen ||
+                                                             !OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens ||
+                                                             !OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE ||
+                                                             !OutOfBoxExperienceInfoInstance.HideLocalAccountScreen ||
+                                                             !OutOfBoxExperienceInfoInstance.SkipMachineOOBE ||
+                                                             !OutOfBoxExperienceInfoInstance.SkipUserOOBE ||
+                                                             !string.IsNullOrEmpty(OutOfBoxExperienceInfoInstance.NetworkLocation);
             }
             catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
         }
@@ -196,36 +200,36 @@ namespace Dive.UI.Pages.ApplyPages
                 OEMSupport = new ApplyConfig.settingsOEMSupport
                 {
                     OEMLogo = fileNameOfOemLogo,
-                    Manufacturer = OemInfo.Manufacturer,
-                    Model = OemInfo.Model,
-                    SupportHours = OemInfo.SupportHours,
-                    SupportNo = OemInfo.SupportPhone,
-                    Homepage = OemInfo.SupportURL
+                    Manufacturer = OemInfoInstance.Manufacturer,
+                    Model = OemInfoInstance.Model,
+                    SupportHours = OemInfoInstance.SupportHours,
+                    SupportNo = OemInfoInstance.SupportPhone,
+                    Homepage = OemInfoInstance.SupportURL
                 },
                 DeviceInfo = new ApplyConfig.settingsDeviceInfo
                 {
-                    DeviceName = DeviceInfo.DeviceName,
-                    ProductKey = DeviceInfo.ProductKey,
-                    RegisteredOwner = DeviceInfo.RegisteredOwner,
-                    RegisteredOrganization = DeviceInfo.RegisteredOrganization,
-                    Timezone = DeviceInfo.TimeZone
+                    DeviceName = DeviceInfoInstance.DeviceName,
+                    ProductKey = DeviceInfoInstance.ProductKey,
+                    RegisteredOwner = DeviceInfoInstance.RegisteredOwner,
+                    RegisteredOrganization = DeviceInfoInstance.RegisteredOrganization,
+                    Timezone = DeviceInfoInstance.TimeZone
                 },
                 DomainInfo = new ApplyConfig.settingsDomainInfo
                 {
-                    UserName = DomainInfo.UserName,
-                    Password = DomainInfo.Password,
-                    Domain = DomainInfo.Domain
+                    UserName = DomainInfoInstance.UserName,
+                    Password = DomainInfoInstance.Password,
+                    Domain = DomainInfoInstance.Domain
                 },
                 OutOfBoxExperience = new ApplyConfig.settingsOutOfBoxExperience
                 {
-                    HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
-                    HideOEMRegistrationScreen = OutOfBoxExperienceInfo.HideOEMRegistrationScreen,
-                    HideOnlineAccountScreens = OutOfBoxExperienceInfo.HideOnlineAccountScreens,
-                    HideWirelessSetupInOOBE = OutOfBoxExperienceInfo.HideWirelessSetupInOOBE,
-                    HideLocalAccountScreen = OutOfBoxExperienceInfo.HideLocalAccountScreen,
-                    NetworkLocation = OutOfBoxExperienceInfo.NetworkLocation,
-                    SkipUserOOBE = OutOfBoxExperienceInfo.SkipUserOOBE,
-                    SkipMachineOOBE = OutOfBoxExperienceInfo.SkipMachineOOBE
+                    HideEULAPage = OutOfBoxExperienceInfoInstance.HideEULAPage,
+                    HideOEMRegistrationScreen = OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen,
+                    HideOnlineAccountScreens = OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens,
+                    HideWirelessSetupInOOBE = OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE,
+                    HideLocalAccountScreen = OutOfBoxExperienceInfoInstance.HideLocalAccountScreen,
+                    NetworkLocation = OutOfBoxExperienceInfoInstance.NetworkLocation,
+                    SkipUserOOBE = OutOfBoxExperienceInfoInstance.SkipUserOOBE,
+                    SkipMachineOOBE = OutOfBoxExperienceInfoInstance.SkipMachineOOBE
                 }
             };
 

@@ -17,6 +17,7 @@ namespace Dive.UI.Pages.ApplyPages
         private readonly BackgroundWorker _applyBackgroundWorker = new();
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         public ApplySelectStep()
         {
@@ -39,16 +40,16 @@ namespace Dive.UI.Pages.ApplyPages
             ApplyDetailsInstance.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
 
             // Validate deployment settings
-            if (OemInfo.UseOemInfo)
+            if (OemInfoInstance.UseOemInfo)
             {
-                if (string.IsNullOrEmpty(OemInfo.SupportPhone)
-                    && string.IsNullOrEmpty(OemInfo.LogoPath)
-                    && string.IsNullOrEmpty(OemInfo.Manufacturer)
-                    && string.IsNullOrEmpty(OemInfo.Model)
-                    && string.IsNullOrEmpty(OemInfo.SupportHours)
-                    && string.IsNullOrEmpty(OemInfo.SupportURL))
+                if (string.IsNullOrEmpty(OemInfoInstance.SupportPhone)
+                    && string.IsNullOrEmpty(OemInfoInstance.LogoPath)
+                    && string.IsNullOrEmpty(OemInfoInstance.Manufacturer)
+                    && string.IsNullOrEmpty(OemInfoInstance.Model)
+                    && string.IsNullOrEmpty(OemInfoInstance.SupportHours)
+                    && string.IsNullOrEmpty(OemInfoInstance.SupportURL))
                 {
-                    OemInfo.UseOemInfo = false;
+                    OemInfoInstance.UseOemInfo = false;
                 }
             }
 

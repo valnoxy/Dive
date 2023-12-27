@@ -21,7 +21,7 @@ namespace Dive.UI.Pages.ApplyPages
         {
             InitializeComponent();
             //DeploymentInfo.UseUserInfo = false;
-            OemInfo.UseOemInfo = false;
+            //OemInfo.UseOemInfo = false;
         }
 
         private void MoreSettings_OnClicked(object sender, RoutedEventArgs e)

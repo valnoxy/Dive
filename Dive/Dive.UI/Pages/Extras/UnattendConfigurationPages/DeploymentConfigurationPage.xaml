@@ -8,11 +8,6 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <common:ApplyDetails x:Key="ApplyDetails"/>
-        <common:DeploymentInfo x:Key="DeploymentInfo"/>
-    </UserControl.Resources>
-
     <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
         <StackPanel Margin="10,15,10,15">
             <ui:CardExpander Icon="{ui:SymbolIcon Person24}" IsExpanded="False">
@@ -60,7 +55,6 @@
                                 Grid.Row="0"
                                 Icon="{ui:SymbolIcon Person24}" 
                                 PlaceholderText="{DynamicResource UsernamePlaceholder}"
-                                Text="{Binding Source={StaticResource DeploymentInfo}, Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 IsEnabled="true"
                                 Margin="0,0,0,5"
                                 TextChanged="TbUser_OnTextChanged"/>

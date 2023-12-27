@@ -1104,6 +1104,11 @@ namespace Dive.UI.Common
     {
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
+        private static readonly DeviceInfo DeviceInfoInstance = DeviceInfo.Instance;
+        private static readonly DomainInfo DomainInfoInstance = DomainInfo.Instance;
+        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
+        private static readonly OutOfBoxExperienceInfo OutOfBoxExperienceInfoInstance = OutOfBoxExperienceInfo.Instance;
 
         public static string Build()
         {
@@ -1112,11 +1117,11 @@ namespace Dive.UI.Common
 
             // Calculate Settings Array Size
             var settingsArraySize = 0;
-            if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo || DeploymentOption.UseCopyProfile)
+            if (DeviceInfoInstance.UseDeviceInfo || DomainInfoInstance.UseDomainInfo || DeploymentOptionInstance.UseCopyProfile)
                 settingsArraySize++; // pass="specialize"
-            if (DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo || DeploymentInfoInstance.UseUserInfo)
+            if (DeviceInfoInstance.UseDeviceInfo || OemInfoInstance.UseOemInfo || DeploymentInfoInstance.UseUserInfo)
                 settingsArraySize++; // pass="oobeSystem"
-            if (DeploymentOption.UseSMode)
+            if (DeploymentOptionInstance.UseSMode)
                 settingsArraySize++; // pass="offlineServicing"
 
             var uc = new UnattendXmlClass.unattend
@@ -1125,8 +1130,8 @@ namespace Dive.UI.Common
             };
 
             #region oobeSystem (single component)
-            if (DeploymentInfoInstance.UseUserInfo || DeviceInfo.UseDeviceInfo || OemInfo.UseOemInfo ||
-                OutOfBoxExperienceInfo.UseOOBEInfo)
+            if (DeploymentInfoInstance.UseUserInfo || DeviceInfoInstance.UseDeviceInfo || OemInfoInstance.UseOemInfo ||
+                OutOfBoxExperienceInfoInstance.UseOOBEInfo)
             {
                 Debug.WriteLine("Entered region: oobeSystem (single component)");
                 uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
@@ -1143,47 +1148,47 @@ namespace Dive.UI.Common
                     versionScope = "nonSxS"
                 };
 
-                if (!string.IsNullOrEmpty(DeviceInfo.RegisteredOwner))
-                    uc.settings[currentSettings].component[0].RegisteredOwner = DeviceInfo.RegisteredOwner;
-                if (!string.IsNullOrEmpty(DeviceInfo.RegisteredOrganization))
-                    uc.settings[currentSettings].component[0].RegisteredOrganization = DeviceInfo.RegisteredOrganization;
+                if (!string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOwner))
+                    uc.settings[currentSettings].component[0].RegisteredOwner = DeviceInfoInstance.RegisteredOwner;
+                if (!string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOrganization))
+                    uc.settings[currentSettings].component[0].RegisteredOrganization = DeviceInfoInstance.RegisteredOrganization;
 
                 // OOBE Information
-                if (OutOfBoxExperienceInfo.UseOOBEInfo)
+                if (OutOfBoxExperienceInfoInstance.UseOOBEInfo)
                 {
                     // Windows Vista / 7
                     if (ApplyDetailsInstance.NTVersion == "6.0" || ApplyDetailsInstance.NTVersion == "6.1")
                         uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
                         {
-                            HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
-                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfo.HideWirelessSetupInOOBE,
-                            NetworkLocation = OutOfBoxExperienceInfo.NetworkLocation,
-                            SkipMachineOOBE = OutOfBoxExperienceInfo.SkipMachineOOBE,
-                            SkipUserOOBE = OutOfBoxExperienceInfo.SkipUserOOBE,
+                            HideEULAPage = OutOfBoxExperienceInfoInstance.HideEULAPage,
+                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE,
+                            NetworkLocation = OutOfBoxExperienceInfoInstance.NetworkLocation,
+                            SkipMachineOOBE = OutOfBoxExperienceInfoInstance.SkipMachineOOBE,
+                            SkipUserOOBE = OutOfBoxExperienceInfoInstance.SkipUserOOBE,
                         };
 
                     // Windows 10 / 11 
                     if (ApplyDetailsInstance.NTVersion == "6.2" || ApplyDetailsInstance.NTVersion == "6.3" || ApplyDetailsInstance.NTVersion.Contains("10."))
                         uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
                         {
-                            HideEULAPage = OutOfBoxExperienceInfo.HideEULAPage,
-                            HideOEMRegistrationScreen = OutOfBoxExperienceInfo.HideOEMRegistrationScreen,
-                            HideOnlineAccountScreens = OutOfBoxExperienceInfo.HideOnlineAccountScreens,
-                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfo.HideWirelessSetupInOOBE,
-                            NetworkLocation = OutOfBoxExperienceInfo.NetworkLocation,
-                            SkipMachineOOBE = OutOfBoxExperienceInfo.SkipMachineOOBE,
-                            SkipUserOOBE = OutOfBoxExperienceInfo.SkipUserOOBE,
-                            HideLocalAccountScreen = OutOfBoxExperienceInfo.HideLocalAccountScreen
+                            HideEULAPage = OutOfBoxExperienceInfoInstance.HideEULAPage,
+                            HideOEMRegistrationScreen = OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen,
+                            HideOnlineAccountScreens = OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens,
+                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE,
+                            NetworkLocation = OutOfBoxExperienceInfoInstance.NetworkLocation,
+                            SkipMachineOOBE = OutOfBoxExperienceInfoInstance.SkipMachineOOBE,
+                            SkipUserOOBE = OutOfBoxExperienceInfoInstance.SkipUserOOBE,
+                            HideLocalAccountScreen = OutOfBoxExperienceInfoInstance.HideLocalAccountScreen
                         };
                 }
 
                 // OEM Information
-                if (OemInfo.UseOemInfo)
+                if (OemInfoInstance.UseOemInfo)
                 {
                     var oemLogo = "";
-                    if (!string.IsNullOrEmpty(OemInfo.LogoPath))
+                    if (!string.IsNullOrEmpty(OemInfoInstance.LogoPath))
                     {
-                        Debug.WriteLine("[UnattendBuilder v2] OEM Logo found: " + OemInfo.LogoPath);
+                        Debug.WriteLine("[UnattendBuilder v2] OEM Logo found: " + OemInfoInstance.LogoPath);
                         oemLogo = "%WINDIR%\\System32\\logo.bmp";
                     }
 
@@ -1191,11 +1196,11 @@ namespace Dive.UI.Common
                         new UnattendXmlClass.unattendSettingsComponentOEMInformation
                         {
                             Logo = oemLogo,
-                            Manufacturer = OemInfo.Manufacturer,
-                            Model = OemInfo.Model,
-                            SupportHours = OemInfo.SupportHours,
-                            SupportPhone = OemInfo.SupportPhone,
-                            SupportURL = OemInfo.SupportURL
+                            Manufacturer = OemInfoInstance.Manufacturer,
+                            Model = OemInfoInstance.Model,
+                            SupportHours = OemInfoInstance.SupportHours,
+                            SupportPhone = OemInfoInstance.SupportPhone,
+                            SupportURL = OemInfoInstance.SupportURL
                         };
                 }
 
@@ -1272,16 +1277,16 @@ namespace Dive.UI.Common
             #endregion
 
             #region specialize (2 components)
-            if (DeviceInfo.UseDeviceInfo || DomainInfo.UseDomainInfo || DeploymentOption.UseCopyProfile)
+            if (DeviceInfoInstance.UseDeviceInfo || DomainInfoInstance.UseDomainInfo || DeploymentOptionInstance.UseCopyProfile)
             {
                 Debug.WriteLine("Entered region: specialize (2 component)");
                 var currentComponent = 0;
 
                 // Calculate component Array size
                 var componentArraySize = 0;
-                if (DeviceInfo.UseDeviceInfo || DeploymentOption.UseCopyProfile)
+                if (DeviceInfoInstance.UseDeviceInfo || DeploymentOptionInstance.UseCopyProfile)
                     componentArraySize++;
-                if (DomainInfo.UseDomainInfo)
+                if (DomainInfoInstance.UseDomainInfo)
                     componentArraySize++;
 
                 uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
@@ -1290,7 +1295,7 @@ namespace Dive.UI.Common
                     component = new UnattendXmlClass.unattendSettingsComponent[componentArraySize]
                 };
 
-                if (DeviceInfo.UseDeviceInfo || DeploymentOption.UseCopyProfile)
+                if (DeviceInfoInstance.UseDeviceInfo || DeploymentOptionInstance.UseCopyProfile)
                 {
                     uc.settings[currentSettings].component[currentComponent] = new UnattendXmlClass.unattendSettingsComponent
                     {
@@ -1301,16 +1306,16 @@ namespace Dive.UI.Common
                         versionScope = "nonSxS"
                     };
 
-                    if (DeviceInfo.UseDeviceInfo)
+                    if (DeviceInfoInstance.UseDeviceInfo)
                     {
-                        uc.settings[currentSettings].component[currentComponent].ComputerName = DeviceInfo.DeviceName;
-                        uc.settings[currentSettings].component[currentComponent].ProductKey = DeviceInfo.ProductKey;
-                        uc.settings[currentSettings].component[currentComponent].RegisteredOwner = DeviceInfo.RegisteredOwner;
-                        uc.settings[currentSettings].component[currentComponent].RegisteredOrganization= DeviceInfo.RegisteredOrganization;
-                        uc.settings[currentSettings].component[currentComponent].TimeZone = DeviceInfo.TimeZone;
+                        uc.settings[currentSettings].component[currentComponent].ComputerName = DeviceInfoInstance.DeviceName;
+                        uc.settings[currentSettings].component[currentComponent].ProductKey = DeviceInfoInstance.ProductKey;
+                        uc.settings[currentSettings].component[currentComponent].RegisteredOwner = DeviceInfoInstance.RegisteredOwner;
+                        uc.settings[currentSettings].component[currentComponent].RegisteredOrganization= DeviceInfoInstance.RegisteredOrganization;
+                        uc.settings[currentSettings].component[currentComponent].TimeZone = DeviceInfoInstance.TimeZone;
                     }
 
-                    if (DeploymentOption.UseCopyProfile)
+                    if (DeploymentOptionInstance.UseCopyProfile)
                     {
                         uc.settings[currentSettings].component[currentComponent].CopyProfile = true;
                         uc.settings[currentSettings].component[currentComponent].CopyProfileSpecified = true;
@@ -1319,7 +1324,7 @@ namespace Dive.UI.Common
                     currentComponent++;
                 }
 
-                if (DomainInfo.UseDomainInfo)
+                if (DomainInfoInstance.UseDomainInfo)
                 {
                     uc.settings[currentSettings].component[currentComponent] = new UnattendXmlClass.unattendSettingsComponent
                     {
@@ -1334,11 +1339,11 @@ namespace Dive.UI.Common
                         {
                             Credentials = new UnattendXmlClass.unattendSettingsComponentIdentificationCredentials
                             {
-                                Domain = DomainInfo.Domain,
-                                Username = DomainInfo.UserName,
-                                Password = DomainInfo.Password
+                                Domain = DomainInfoInstance.Domain,
+                                Username = DomainInfoInstance.UserName,
+                                Password = DomainInfoInstance.Password
                             },
-                            JoinDomain = DomainInfo.Domain
+                            JoinDomain = DomainInfoInstance.Domain
                         };
                     //currentComponent++;
                 }
@@ -1349,7 +1354,7 @@ namespace Dive.UI.Common
             #endregion
 
             #region offlineServicing (single component)
-            if (DeploymentOption.UseSMode)
+            if (DeploymentOptionInstance.UseSMode)
             {
                 Debug.WriteLine("Entered region: offlineServicing (single component)");
 

@@ -1,9 +1,6 @@
-﻿using Dive.Core;
-using Dive.Core.Common;
-using Dive.UI.Common;
+﻿using Dive.UI.Common;
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Windows.Media;
 using System.Diagnostics;
 using System.Management;
@@ -13,10 +10,11 @@ namespace Dive.UI.Pages.TweaksPages
     /// <summary>
     /// Interaktionslogik für TweaksActionScreen.xaml
     /// </summary>
-    public partial class TweaksActionScreen : System.Windows.Controls.UserControl
+    public partial class TweaksActionScreen
     {
         private BackgroundWorker applyBackgroundWorker = new();
-        bool IsCanceled = false;
+        public bool IsCanceled = false;
+        private static readonly Tweaks TweaksInstance = Tweaks.Instance;
 
         public TweaksActionScreen()
         {
@@ -30,13 +28,13 @@ namespace Dive.UI.Pages.TweaksPages
             }
 
             // Set active Image to card
-            ImageName.Text = $"Disk {Common.Tweaks.DiskIndex}";
+            ImageName.Text = $"Disk {TweaksInstance.DiskIndex}";
             
             // ImageFile.Text = Common.ApplyDetails.FileName;
             var img = new ImageSourceConverter();
             try
             {
-                ImageIcon.Source = (ImageSource)img.ConvertFromString("null");
+                ImageIcon.Source = (ImageSource)img.ConvertFromString("null")!;
             }
             catch
             {
@@ -240,9 +238,9 @@ namespace Dive.UI.Pages.TweaksPages
             #endregion
 
             // Validate Windows Disk
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskPartition WHERE DiskIndex = " + Common.Tweaks.DiskIndex);
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskPartition WHERE DiskIndex = " + TweaksInstance.DiskIndex);
 
-            foreach (ManagementObject partition in searcher.Get())
+            foreach (var partition in searcher.Get())
             {
                 Console.WriteLine("Type: " + partition["Type"]);
                 Console.WriteLine("Size: " + partition["Size"] + " bytes");

@@ -17,6 +17,7 @@ namespace Dive.UI.Pages
         readonly TweaksDashboard _td = new();
         readonly PlayBookLoad _pb = new();
         //DeploymentSettingsStep deploymentSettingsStep = new DeploymentSettingsStep();
+        private static readonly Tweaks TweaksInstance = Tweaks.Instance;
 
         public TweaksContent()
         {
@@ -30,7 +31,7 @@ namespace Dive.UI.Pages
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            switch (Common.Tweaks.CurrentMode)
+            switch (TweaksInstance.CurrentMode)
             {
                 case TweakMode.AutoInit:
                     switch (FrameWindow.Content)
@@ -78,7 +79,7 @@ namespace Dive.UI.Pages
 
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            switch (Common.Tweaks.CurrentMode)
+            switch (TweaksInstance.CurrentMode)
             {
                 case TweakMode.AutoInit:
                     switch (FrameWindow.Content)
@@ -120,7 +121,6 @@ namespace Dive.UI.Pages
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)

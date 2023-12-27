@@ -12,6 +12,8 @@ namespace Dive.UI.Common.Deployment
     {
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
+        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         internal class Configuration
         {
@@ -109,7 +111,7 @@ namespace Dive.UI.Common.Deployment
                 Actions.InstallRecovery(
                     $"{Configuration.WindowsDrive}Windows",
                     Configuration.RecoveryDrive,
-                    DeploymentOption.AddDiveToWinRE,
+                    DeploymentOptionInstance.AddDiveToWinRE,
                     worker);
 
                 if (Configuration.IsCanceled)
@@ -121,15 +123,15 @@ namespace Dive.UI.Common.Deployment
             }
 
             // Install unattended file (only for Vista and higher)
-            if (DeploymentInfoInstance.UseUserInfo || OemInfo.UseOemInfo)
+            if (DeploymentInfoInstance.UseUserInfo || OemInfoInstance.UseOemInfo)
             {
                 Debug.WriteLine("Building config...");
-                var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : Common.UnattendBuilder.Build();
+                var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : UnattendBuilder.Build();
 
                 if (string.IsNullOrEmpty(config))
                     throw new Exception("Could not build or read unattended configuration file.");
 
-                Actions.InstallUnattend($"{Configuration.WindowsDrive}Windows", config, OemInfo.LogoPath, DeploymentOption.UseSMode, worker);
+                Actions.InstallUnattend($"{Configuration.WindowsDrive}Windows", config, OemInfoInstance.LogoPath, DeploymentOptionInstance.UseSMode, worker);
                 Debug.Write("Configuration file written to ");
                 Debug.Write($"{Configuration.WindowsDrive}Windows\\Panther\\unattend.xml\n", true, ConsoleColor.DarkYellow);
 

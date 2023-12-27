@@ -3,14 +3,17 @@ using System.Linq;
 using System.Management;
 using System.Text.RegularExpressions;
 using System.Windows;
+using Dive.UI.Common;
 
 namespace Dive.UI.Pages.TweaksPages
 {
     /// <summary>
     /// Interaktionslogik für MigrateSettings.xaml
     /// </summary>
-    public partial class MigrateSettings : System.Windows.Controls.UserControl
+    public partial class MigrateSettings
     {
+        private static readonly Tweaks TweaksInstance = Tweaks.Instance;
+
         public MigrateSettings()
         {
             InitializeComponent();
@@ -114,10 +117,10 @@ namespace Dive.UI.Pages.TweaksPages
 
                 if (ix == -1) return;
                 var diskIndex = itemData[(ix + toBeSearched.Length)..];
-                Common.Tweaks.DiskIndex = Convert.ToInt32(diskIndex);
+                TweaksInstance.DiskIndex = Convert.ToInt32(diskIndex);
             }
 
-            Common.Debug.WriteLine($"Using disk {Common.Tweaks.DiskIndex} for migration", ConsoleColor.White);
+            Debug.WriteLine($"Using disk {TweaksInstance.DiskIndex} for migration", ConsoleColor.White);
 
             if (TweaksContent.ContentWindow != null)
             {

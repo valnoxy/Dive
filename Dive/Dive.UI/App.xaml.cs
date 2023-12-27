@@ -196,31 +196,33 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
                 var deploymentInfoInstance = DeploymentInfo.Instance;
+                var deploymentOptionInstance = DeploymentOption.Instance;
+                var oemInfoInstance = OemInfo.Instance;
 
                 var config = "";
                 deploymentInfoInstance.UseUserInfo = true;
                 deploymentInfoInstance.Username = "User";
                 deploymentInfoInstance.Password = "Pa$$w0rd";
-                Common.DeploymentOption.UseCopyProfile = true;
-                Common.DeploymentOption.UseSMode = true;
-                Common.OemInfo.UseOemInfo = true;
-                Common.OemInfo.Model = "Toaster";
-                Common.OemInfo.Manufacturer = "Fabrikam";
-                Common.OemInfo.SupportHours = "24/7";
-                Common.OemInfo.SupportURL = "https://fabrikam.com";
-                Common.OemInfo.SupportPhone = "+1 111 11111111";
-
+                deploymentOptionInstance.UseCopyProfile = true;
+                deploymentOptionInstance.UseSMode = true;
+                oemInfoInstance.UseOemInfo = true;
+                oemInfoInstance.Model = "Toaster";
+                oemInfoInstance.Manufacturer = "Fabrikam";
+                oemInfoInstance.SupportHours = "24/7";
+                oemInfoInstance.SupportURL = "https://fabrikam.com";
+                oemInfoInstance.SupportPhone = "+1 111 11111111";
+                
                 Common.Debug.WriteLine("Use User: " + deploymentInfoInstance.UseUserInfo);
                 Common.Debug.WriteLine("Username: " + deploymentInfoInstance.Username);
                 Common.Debug.WriteLine("Password: " + deploymentInfoInstance.Password);
-                Common.Debug.WriteLine("Use S Mode: " + Common.DeploymentOption.UseSMode);
-                Common.Debug.WriteLine("Use Copy Path: " + Common.DeploymentOption.UseCopyProfile);
-                Common.Debug.WriteLine("Use OEM: " + Common.OemInfo.UseOemInfo);
-                Common.Debug.WriteLine("Manufacturer: " + Common.OemInfo.Manufacturer);
-                Common.Debug.WriteLine("Model: " + Common.OemInfo.Model);
-                Common.Debug.WriteLine("Support Tel.: " + Common.OemInfo.SupportPhone);
-                Common.Debug.WriteLine("Support Hours: " + Common.OemInfo.SupportHours);
-                Common.Debug.WriteLine("Support URL: " + Common.OemInfo.SupportURL);
+                Common.Debug.WriteLine("Use S Mode: " + deploymentOptionInstance.UseSMode);
+                Common.Debug.WriteLine("Use Copy Path: " + deploymentOptionInstance.UseCopyProfile);
+                Common.Debug.WriteLine("Use OEM: " + oemInfoInstance.UseOemInfo);
+                Common.Debug.WriteLine("Manufacturer: " + oemInfoInstance.Manufacturer);
+                Common.Debug.WriteLine("Model: " + oemInfoInstance.Model);
+                Common.Debug.WriteLine("Support Tel.: " + oemInfoInstance.SupportPhone);
+                Common.Debug.WriteLine("Support Hours: " + oemInfoInstance.SupportHours);
+                Common.Debug.WriteLine("Support URL: " + oemInfoInstance.SupportURL);
 
                 Common.Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
                 config = Common.UnattendBuilder.Build();
@@ -255,7 +257,7 @@ namespace Dive.UI
 
             if (args.Contains("--fuck"))
             {
-                Dive.Core.Action.CaptureTest.TestBuildInfo();
+                Core.Action.CaptureTest.TestBuildInfo();
                 Environment.Exit(0);
             }
 

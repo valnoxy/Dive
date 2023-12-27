@@ -10,6 +10,8 @@ namespace Dive.UI.Pages.TweaksPages
     /// </summary>
     public partial class TweaksDashboard : UserControl
     {
+        private static readonly Tweaks TweaksInstance = Tweaks.Instance;
+
         public TweaksDashboard()
         {
             InitializeComponent();
@@ -17,19 +19,19 @@ namespace Dive.UI.Pages.TweaksPages
 
         private void SwitchToAutoInit(object sender, RoutedEventArgs e)
         {
-            Common.Tweaks.CurrentMode = TweakMode.AutoInit;
+            TweaksInstance.CurrentMode = TweakMode.AutoInit;
             TweaksContent.ContentWindow.FrameWindow.Content = new PlayBookLoad();
         }
 
         private void SwitchToMigratePage(object sender, RoutedEventArgs e)
         {
-            Common.Tweaks.CurrentMode = TweakMode.Migrate;
+            TweaksInstance.CurrentMode = TweakMode.Migrate;
             TweaksContent.ContentWindow.FrameWindow.Content = new MigrateSettings();
         }
 
         private void SwitchToRepairPage(object sender, RoutedEventArgs e)
         {
-            Common.Tweaks.CurrentMode = TweakMode.RepairBootloader;
+            TweaksInstance.CurrentMode = TweakMode.RepairBootloader;
         }
     }
 }

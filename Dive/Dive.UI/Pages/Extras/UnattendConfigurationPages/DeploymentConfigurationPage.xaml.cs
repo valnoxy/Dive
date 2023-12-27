@@ -11,25 +11,44 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
     /// <summary>
     /// Interaktionslogik für DeploymentConfigurationPage.xaml
     /// </summary>
-    public partial class DeploymentConfigurationPage : UserControl
+    public partial class DeploymentConfigurationPage
     {
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
+        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
+        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         public DeploymentConfigurationPage()
         {
             InitializeComponent();
 
-            if (ApplyDetailsInstance.NTVersion == "10.0" && ApplyDetailsInstance.Build >= 17134)
-                SModeSwitch.IsEnabled = true;
-            else
-                SModeSwitch.IsEnabled = false;
+            DeploymentInfo.Instance.SettingChanged += SettingChanged;
+            OemInfo.Instance.SettingChanged += SettingChanged;
 
+            SModeSwitch.IsEnabled = ApplyDetailsInstance is { NTVersion: "10.0", Build: >= 17134 };
             DiveToRecovery.IsEnabled = ApplyDetailsInstance.NTVersion is "10.0" or "6.3" or "6.2";
+            UpdateUiSettings();
+        }
 
-            SModeSwitch.IsChecked = DeploymentOption.UseSMode;
-            CopyProfileToggle.IsChecked = DeploymentOption.UseCopyProfile;
-            DiveToRecovery.IsChecked = DeploymentOption.AddDiveToWinRE;
+        private void SettingChanged(object sender, SettingChangedEventArgs e) => UpdateUiSettings();
+        private void UpdateUiSettings()
+        {
+            SModeSwitch.IsChecked = DeploymentOptionInstance.UseSMode;
+            CopyProfileToggle.IsChecked = DeploymentOptionInstance.UseCopyProfile;
+            DiveToRecovery.IsChecked = DeploymentOptionInstance.AddDiveToWinRE;
+
+            TbUser.Text = DeploymentInfoInstance.Username;
+            TbPassword.Text = DeploymentInfoInstance.Password;
+
+            TbLogo.Text = OemInfoInstance.LogoPath;
+            TbManufacturer.Text = OemInfoInstance.Manufacturer;
+            TbModel.Text = OemInfoInstance.Model;
+            TbSupportHours.Text = OemInfoInstance.SupportHours;
+            TbPhone.Text = OemInfoInstance.SupportPhone;
+            TbUrl.Text = OemInfoInstance.SupportURL;
+
+            ToggleUser.IsChecked = DeploymentInfoInstance.UseUserInfo;
+            ToggleOem.IsChecked = OemInfoInstance.UseOemInfo;
         }
 
         private void TbUser_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -66,32 +85,32 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
 
         private void TbLogo_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            OemInfo.LogoPath = TbLogo.Text;
+            OemInfoInstance.LogoPath = TbLogo.Text;
         }
 
         private void TbManufacturer_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            OemInfo.Manufacturer = TbManufacturer.Text;
+            OemInfoInstance.Manufacturer = TbManufacturer.Text;
         }
 
         private void TbModel_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            OemInfo.Model = TbModel.Text;
+            OemInfoInstance.Model = TbModel.Text;
         }
 
         private void TbSupportHours_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            OemInfo.SupportHours = TbSupportHours.Text;
+            OemInfoInstance.SupportHours = TbSupportHours.Text;
         }
 
         private void TbPhone_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            OemInfo.SupportPhone = TbPhone.Text;
+            OemInfoInstance.SupportPhone = TbPhone.Text;
         }
 
         private void TbUrl_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            OemInfo.SupportURL = TbUrl.Text;
+            OemInfoInstance.SupportURL = TbUrl.Text;
         }
 
         private void User_Switch(object sender, RoutedEventArgs e)
@@ -111,7 +130,7 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
 
         private void Oem_Switch(object sender, RoutedEventArgs e)
         {
-            OemInfo.UseOemInfo = ToggleOem.IsChecked.Value;
+            OemInfoInstance.UseOemInfo = ToggleOem.IsChecked.Value;
             if (ToggleOem.IsChecked.Value)
             {
                 Debug.Write("Use OEM Information in Unattend: ");
@@ -167,13 +186,13 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         {
             if (SModeSwitch.IsChecked == true)
             {
-                DeploymentOption.UseSMode = true;
+                DeploymentOptionInstance.UseSMode = true;
                 Debug.Write("Using S Mode in Unattend: ");
                 Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                DeploymentOption.UseSMode = false;
+                DeploymentOptionInstance.UseSMode = false;
                 Debug.Write("Using S Mode in Unattend: ");
                 Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
@@ -183,13 +202,13 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         {
             if (CopyProfileToggle.IsChecked == true)
             {
-                DeploymentOption.UseCopyProfile = true;
+                DeploymentOptionInstance.UseCopyProfile = true;
                 Debug.Write("Using CopyProfile in Unattend: ");
                 Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                DeploymentOption.UseCopyProfile = false;
+                DeploymentOptionInstance.UseCopyProfile = false;
                 Debug.Write("Using CopyProfile in Unattend: ");
                 Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }
@@ -199,13 +218,13 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
         {
             if (DiveToRecovery.IsChecked == true)
             {
-                DeploymentOption.AddDiveToWinRE = true;
+                DeploymentOptionInstance.AddDiveToWinRE = true;
                 Debug.Write("Implement Dive into Windows RE image: ");
                 Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
-                DeploymentOption.AddDiveToWinRE = false;
+                DeploymentOptionInstance.AddDiveToWinRE = false;
                 Debug.Write("Implement Dive into Windows RE image: ");
                 Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
             }

@@ -33,7 +33,7 @@
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="1" Height="365">
+        <Grid Grid.Row="1" Height="365" Margin="0,-10,0,0">
             <ui:NavigationView x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed">
                 <ui:NavigationView.MenuItems>
                     <ui:NavigationViewItem Content="{DynamicResource Deployment}" NavigationCacheMode="Enabled" TargetPageType="{x:Type unattendConfigurationPages:DeploymentConfigurationPage}">
