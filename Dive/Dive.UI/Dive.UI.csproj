@@ -26,6 +26,7 @@
 		<None Remove="Assets\banner.jpg" />
 		<None Remove="Assets\Fadi_Loop_f.gif" />
 		<None Remove="Assets\icon-hdd-40.png" />
+		<None Remove="Assets\icon-person-40.png" />
 		<None Remove="Assets\icon-windows-10-40.png" />
 		<None Remove="Assets\icon-windows-11-40.png" />
 		<None Remove="Assets\icon-windows-2000-40.png" />
@@ -48,6 +49,7 @@
 		<Resource Include="Assets\banner.jpg" />
 		<Resource Include="Assets\Fadi_Loop_f.gif" />
 		<Resource Include="Assets\icon-hdd-40.png" />
+		<Resource Include="Assets\icon-person-40.png" />
 	</ItemGroup>
 	<ItemGroup>
 		<Resource Include="Assets\icon-windows-10-40.png" />
@@ -68,7 +70,7 @@
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
-		<PackageReference Include="WPF-UI" Version="3.0.0-preview.12" />
+		<PackageReference Include="WPF-UI" Version="3.0.0-preview.13" />
 		<PackageReference Include="XamlAnimatedGif" Version="2.2.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Management" Version="8.0.0" />

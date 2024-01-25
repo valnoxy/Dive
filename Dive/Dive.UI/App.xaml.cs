@@ -26,6 +26,7 @@ using Dive.UI.Common;
 using Dive.UI.Initialization;
 using Action = System.Action;
 using Application = System.Windows.Application;
+using Dive.Core.Action.Capturing;
 
 namespace Dive.UI
 {
@@ -257,7 +258,7 @@ namespace Dive.UI
 
             if (args.Contains("--fuck"))
             {
-                Core.Action.CaptureTest.TestBuildInfo();
+                CaptureTest.TestBuildInfo();
                 Environment.Exit(0);
             }
 

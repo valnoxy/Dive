@@ -43,6 +43,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="Assets\USMT.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>USMT.resx</DependentUpon>
+		</Compile>
 		<Compile Update="Assets\UefiSevenResources.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
@@ -56,6 +61,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Update="Assets\USMT.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+		  <LastGenOutput>USMT.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 		<EmbeddedResource Update="Assets\UefiSevenResources.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>UefiSevenResources.Designer.cs</LastGenOutput>

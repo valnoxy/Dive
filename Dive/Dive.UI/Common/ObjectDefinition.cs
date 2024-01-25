@@ -835,6 +835,7 @@ namespace Dive.UI.Common
     {
         AutoInit,
         Migrate,
+        MigrateUser,
         RepairBootloader
     }
 }

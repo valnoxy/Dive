@@ -51,13 +51,13 @@
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
                     
-                    <!-- Not implemented
-                    <ui:NavigationViewItem Content="{DynamicResource Tweaks}" TargetPageType="{x:Type pages:TweaksContent}">
+                    <!-- Currently for Debug purpose only -->
+                    <ui:NavigationViewItem Content="{DynamicResource Tweaks}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:TweaksContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Toolbox24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    -->
+                    
                 </ui:NavigationView.MenuItems>
                 
                 <ui:NavigationView.FooterMenuItems>

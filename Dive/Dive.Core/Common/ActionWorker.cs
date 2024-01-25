@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dive.Core.Common
+﻿namespace Dive.Core.Common
 {
     public class ActionWorker
     {
@@ -25,6 +19,9 @@ namespace Dive.Core.Common
         InstallUnattend,
         InstallDrivers,
         InstallUefiSeven,
-        CaptureDisk
+        CaptureDisk,
+        PrepareUSMT,
+        MigrateUserState,
+        RestoreUserState
     }
 }

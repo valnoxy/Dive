@@ -10,7 +10,6 @@
  * Source code: https://github.com/valnoxy/dive
  */
 
-using Dive.Core.Action;
 using Dive.Core.Common;
 using Microsoft.Wim;
 using System;
@@ -21,6 +20,8 @@ using System.IO;
 using Dive.Core.Assets;
 using Microsoft.Dism;
 using Newtonsoft.Json;
+using Dive.Core.Action.Deployment;
+using Dive.Core.Action.Capturing;
 
 namespace Dive.Core
 {

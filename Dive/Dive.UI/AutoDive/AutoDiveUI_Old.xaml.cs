@@ -9,6 +9,7 @@ using System.ComponentModel;
 using Dive.UI.Pages;
 using Dive.Core.Common;
 using Dive.UI.Common.Configuration;
+using Dive.Core.Action.Deployment;
 
 namespace Dive.UI.AutoDive
 {
@@ -551,7 +552,7 @@ namespace Dive.UI.AutoDive
             if (Common.WindowsModification.InstallUefiSeven)
             {
                 worker?.ReportProgress(206, "");     // Installing UefiSeven
-                Dive.Core.Action.UefiSeven.InstallUefiSeven(bootDrive,
+                UefiSeven.InstallUefiSeven(bootDrive,
                     Common.WindowsModification.UsToggleSkipErros,
                     Common.WindowsModification.UsToggleFakeVesa,
                     Common.WindowsModification.UsToggleVerbose,

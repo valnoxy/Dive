@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using Dive.Core;
+using Dive.Core.Action.Deployment;
 using Dive.Core.Common;
 using Newtonsoft.Json;
 using static Dive.Core.Common.Entities;
@@ -167,7 +168,7 @@ namespace Dive.UI.Common.Deployment
             // Install UefiSeven (only for Vista and 7 with EFI)
             if (WindowsModification.InstallUefiSeven)
             {
-                Core.Action.UefiSeven.InstallUefiSeven(
+                UefiSeven.InstallUefiSeven(
                     Configuration.BootDrive,
                     WindowsModification.UsToggleSkipErros,
                     WindowsModification.UsToggleFakeVesa,

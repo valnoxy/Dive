@@ -20,11 +20,28 @@
                     FontWeight="Medium"
                     Text="Clean-up Windows" />
                 <TextBlock
-                    FontSize="11"
+                    FontSize="12"
                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                     Text="Clean-up your Windows Instance with AutoInit." />
             </StackPanel>
         </ui:CardAction>
+
+        <ui:CardAction
+            Margin="0,0,0,8"
+            Click="SwitchToUserMigratePage"
+            Icon="{ui:SymbolIcon PersonArrowRight24}">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontWeight="Medium"
+                    Text="Migrate User Profile" />
+                <TextBlock
+                    FontSize="12"
+                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                    Text="Migrate Windows User Profile to a new instance or account using USMT (User State Migration Tool)." />
+            </StackPanel>
+        </ui:CardAction>
+        
         <ui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToMigratePage"
@@ -36,11 +53,12 @@
                     FontWeight="Medium"
                     Text="Migrate Legacy Windows" />
                 <TextBlock
-                    FontSize="11"
+                    FontSize="12"
                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                     Text="Migrate your legacy (CSM) Windows installation to EFI based systems." />
             </StackPanel>
         </ui:CardAction>
+
         <ui:CardAction
             Margin="0,0,0,8"
             Click="SwitchToRepairPage"
@@ -52,7 +70,7 @@
                     FontWeight="Medium"
                     Text="Repair Bootloader" />
                 <TextBlock
-                    FontSize="11"
+                    FontSize="12"
                     Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                     Text="Repair the Bootloader of your current Windows installation." />
             </StackPanel>
