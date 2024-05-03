@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="Dive.UI.Common.UserInterface.Skeleton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d" 
+             d:DesignHeight="140" d:DesignWidth="140">
+    <UserControl.Resources>
+        <Storyboard x:Key="SkeletonAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetName="SkeletonRect" Storyboard.TargetProperty="Opacity"
+                             From="0.2" To="0.8" AutoReverse="True" Duration="0:0:0.5"/>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <StackPanel Width="140" Height="140">
+        <Grid x:Name="SkeletonGrid" Visibility="Visible">
+            <Rectangle x:Name="SkeletonRect" Fill="LightGray" Width="100" Height="82" Margin="5" Opacity="0.2" RadiusX="5" RadiusY="5"/>
+        </Grid>
+        <Grid x:Name="ContentGrid" Visibility="Collapsed">
+            <ui:TextBlock Text="{Binding Value}" x:Name="ValueBox" HorizontalAlignment="Center" FontTypography="Display" />
+        </Grid>
+        <ui:TextBlock Text="{Binding Title}" HorizontalAlignment="Center" FontTypography="Subtitle" />
+    </StackPanel>
+
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource SkeletonAnimation}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+</UserControl>

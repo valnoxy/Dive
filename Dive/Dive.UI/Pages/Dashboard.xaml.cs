@@ -1,11 +1,11 @@
 ﻿using Dive.Core;
-using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Xml;
 using Dive.UI.Common;
+using System.Threading.Tasks;
 
 namespace Dive.UI.Pages
 {
@@ -14,31 +14,10 @@ namespace Dive.UI.Pages
     /// </summary>
     public partial class Dashboard
     {
+        private bool _firstLoad;
         public Dashboard()
         {
             InitializeComponent();
-
-            try
-            {
-                var availableImages = CountAvailableImages();
-                ImageCounter.Text = Convert.ToString(availableImages);
-
-                var availableConfigs = 0;
-                var allDrives = DriveInfo.GetDrives();
-                foreach (var d in allDrives)
-                {
-                    string[] dirs = { };
-                    if (Directory.Exists(Path.Combine(d.Name, "Configs")))
-                        dirs = Directory.GetFiles(Path.Combine(d.Name, "Configs"), "*.xml").ToArray();
-                    if (dirs.Length > 0)
-                        availableConfigs = dirs.Length;
-                }
-                ConfigCounter.Text = Convert.ToString(availableConfigs);
-            }
-            catch
-            {
-                // ignored
-            }
         }
 
         private static int CountAvailableImages()
@@ -49,7 +28,7 @@ namespace Dive.UI.Pages
             var allDrives = DriveInfo.GetDrives();
             foreach (var d in allDrives)
             {
-                string[] dirs = { };
+                string[] dirs = [];
                 if (Directory.Exists(Path.Combine(d.Name, "WIMs")))
                     dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim")
                         .Concat(Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.esd"))
@@ -105,5 +84,43 @@ namespace Dive.UI.Pages
         {
             (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate(typeof(TweaksContent));
         }
+
+        private async void Dashboard_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var availableImages = await Task.Run(CountAvailableImages);
+                ImagesSkeleton.Value = Convert.ToString(availableImages);
+
+                var availableConfigs = 0;
+                await Task.Run(() =>
+                {
+                    var allDrives = DriveInfo.GetDrives();
+                    foreach (var d in allDrives)
+                    {
+                        string[] dirs = [];
+                        if (Directory.Exists(Path.Combine(d.Name, "Configs")))
+                            dirs = Directory.GetFiles(Path.Combine(d.Name, "Configs"), "*.xml");
+                        if (dirs.Length > 0)
+                            availableConfigs = dirs.Length;
+                    }
+                });
+
+                ConfigSkeleton.Value = Convert.ToString(availableConfigs);
+
+                if (!_firstLoad)
+                {
+                    ImagesSkeleton.Switch();
+                    DriverSkeleton.Switch();
+                    ConfigSkeleton.Switch();
+                }
+                _firstLoad = true;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
     }
 }

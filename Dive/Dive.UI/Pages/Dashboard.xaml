@@ -5,8 +5,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Dive.UI.Pages"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:userInterface="clr-namespace:Dive.UI.Common.UserInterface"
       mc:Ignorable="d" 
       d:DesignHeight="549" d:DesignWidth="728"
+      Loaded="Dashboard_OnLoaded"
       Title="Dashboard">
 
     <Grid Margin="19,40,19,0">
@@ -18,24 +20,15 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <ui:Card Margin="12,0,12,0">
-                <StackPanel Width="140" Height="140">
-                    <ui:TextBlock x:Name="ImageCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
-                    <ui:TextBlock Text="{DynamicResource OSImages}" HorizontalAlignment="Center" FontTypography="Subtitle" />
-                </StackPanel>
+                <userInterface:Skeleton x:Name="ImagesSkeleton" Title="{DynamicResource OSImages}" Value="0"/>
             </ui:Card>
             
             <ui:Card Margin="12,0,12,0">
-                <StackPanel Width="140" Height="140">
-                    <ui:TextBlock x:Name="DriverPackCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
-                    <ui:TextBlock Text="{DynamicResource DriverPacks}" HorizontalAlignment="Center" FontTypography="Subtitle" />
-                </StackPanel>
+                <userInterface:Skeleton x:Name="DriverSkeleton" Title="{DynamicResource DriverPacks}" Value="n/a"/>
             </ui:Card>
             
             <ui:Card Margin="12,0,12,0">
-                <StackPanel Width="140" Height="140">
-                    <ui:TextBlock x:Name="ConfigCounter" Text="n/a" HorizontalAlignment="Center" FontTypography="Display" />
-                    <ui:TextBlock Text="{DynamicResource Configs}" HorizontalAlignment="Center" FontTypography="Subtitle" />
-                </StackPanel>
+                <userInterface:Skeleton x:Name="ConfigSkeleton" Title="{DynamicResource Configs}" Value="0"/>
             </ui:Card>
         </StackPanel>
         
