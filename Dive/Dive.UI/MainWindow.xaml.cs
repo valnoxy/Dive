@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Security.Principal;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
+using Dive.UI.Pages.Extras.FunPages;
 using Wpf.Ui.Controls;
 
 namespace Dive.UI
@@ -90,6 +91,20 @@ namespace Dive.UI
         private void ThemeSwitch_Click(object sender, RoutedEventArgs e)
         {
             WindowBackdropType = WindowBackdropType == WindowBackdropType.Mica ? WindowBackdropType.Tabbed : WindowBackdropType.Mica;
+        }
+
+        private void FunIcon_OnClick(object sender, RoutedEventArgs e)
+        {
+            var w = new FunSettings();
+            w.ShowDialog();
+        }
+
+        private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F && Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                FunIcon.Visibility = Visibility.Visible;
+            }
         }
     }
 }

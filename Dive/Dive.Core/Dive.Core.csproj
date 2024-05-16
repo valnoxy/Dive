@@ -22,10 +22,11 @@
 		<Company>Exploitox</Company>
 		<Product>Dive</Product>
 		<Title>Dive Core</Title>
-		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
+		<Copyright>Copyright © 2018 - 2024 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<PackageReleaseNotes>Dive Core</PackageReleaseNotes>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

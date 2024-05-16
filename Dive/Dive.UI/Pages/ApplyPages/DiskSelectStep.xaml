@@ -38,12 +38,12 @@
         </Grid>
 
         <ui:Card Grid.Row="1">
-            <ListView Name="DiskListView" 
-                      Margin="-10"
-                      VerticalAlignment="Center"
-                      SelectionChanged="DiskListView_Selected"
-                      ItemsSource="{Binding DiskList}" 
-                      Height="300">
+            <ui:ListView Name="DiskListView" 
+                         Margin="-10"
+                         VerticalAlignment="Center"
+                         SelectionChanged="DiskListView_Selected"
+                         ItemsSource="{Binding DiskList}" 
+                         Height="300">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="5,3,0,3" >
@@ -60,7 +60,7 @@
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </ui:ListView>
         </ui:Card>
 
         <StackPanel Grid.Row="2">

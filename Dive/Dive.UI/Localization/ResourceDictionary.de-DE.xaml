@@ -4,7 +4,7 @@
     <!-- Dashboard -->
     <system:String x:Key="OSImages">OS Abbilder</system:String>
     <system:String x:Key="DriverPacks">Treiber Pakete</system:String>
-    <system:String x:Key="Configs">Konfigs</system:String>
+    <system:String x:Key="Configs">Configs</system:String>
 
 
     <system:String x:Key="ApplyImage">Abbild installieren</system:String>
@@ -27,6 +27,7 @@
     <system:String x:Key="Tweaks">Tweaks</system:String>
     <system:String x:Key="Console">Konsole</system:String>
     <system:String x:Key="About">Über</system:String>
+    <system:String x:Key="FunSettingsToolTip">Spaßige Einstellungen</system:String>
 
     <system:String x:Key="Cancel">Abbrechen</system:String>
     <system:String x:Key="Back">Zurück</system:String>

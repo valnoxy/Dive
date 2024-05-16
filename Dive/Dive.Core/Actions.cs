@@ -1,12 +1,12 @@
-﻿/* 
- * Dive - Deployment is very easy.
- * Copyright (c) 2018 - 2023 Exploitox.
- * 
- * Dive (formally deploya) is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE). 
- * So you are allowed to use freely and modify the application. 
- * I will not be responsible for any outcome. 
+﻿/*
+ * Dive (formally deploya) - Deployment is very easy.
+ * Copyright (c) 2018 - 2024 Exploitox.
+ *
+ * Dive is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE).
+ * So you are allowed to use freely and modify the application.
+ * I will not be responsible for any outcome.
  * Proceed with any action at your own risk.
- * 
+ *
  * Source code: https://github.com/valnoxy/dive
  */
 

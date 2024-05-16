@@ -30,12 +30,12 @@
 
         <Grid Grid.Row="1">
             <ui:Card>
-                <ListView Name="UserListView" 
-                          Margin="-10"
-                          VerticalAlignment="Center"
-                          SelectionChanged="UserListView_Selected"
-                          ItemsSource="{Binding UsersList}" 
-                          Height="310">
+                <ui:ListView Name="UserListView" 
+                             Margin="-10"
+                             VerticalAlignment="Center"
+                             SelectionChanged="UserListView_Selected"
+                             ItemsSource="{Binding UsersList}" 
+                             Height="310">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="5,3,0,3" >
@@ -52,7 +52,7 @@
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
-                </ListView>
+                </ui:ListView>
             </ui:Card>
         </Grid>
 

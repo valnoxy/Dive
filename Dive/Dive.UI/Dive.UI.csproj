@@ -15,11 +15,15 @@
 		<AssemblyName>Dive</AssemblyName>
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
-		<Version>1.0.0.529</Version>
-		<Copyright>Copyright © 2018 - 2023 Exploitox. All rights reserved.</Copyright>
+		<Version>1.0.0.532</Version>
+		<Copyright>Copyright © 2018 - 2024 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<AppendTargetFrameworkToOutputIdentifier>false</AppendTargetFrameworkToOutputIdentifier>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<OutputPath>..\Output\$(Configuration)\</OutputPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\autodive_background.jpg" />
@@ -69,9 +73,9 @@
 	<ItemGroup>
 		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
-		<PackageReference Include="ModernWpfUI" Version="0.9.6" />
-		<PackageReference Include="WPF-UI" Version="3.0.0-preview.13" />
-		<PackageReference Include="XamlAnimatedGif" Version="2.2.0" />
+		<PackageReference Include="WLED" Version="2.0.48" />
+		<PackageReference Include="WPF-UI" Version="3.0.4" />
+		<PackageReference Include="XamlAnimatedGif" Version="2.3.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Management" Version="8.0.0" />
 	</ItemGroup>

@@ -35,7 +35,7 @@
         </Grid>
 
         <ui:Card Grid.Row="1">
-            <ListView Name="SkuListView" 
+            <ui:ListView Name="SkuListView" 
                      Margin="-10"
                      VerticalAlignment="Center"
                      SelectionChanged="SKUListView_Selected"
@@ -57,7 +57,7 @@
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+            </ui:ListView>
         </ui:Card>
 
         <TextBlock Grid.Row="2" VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="#FFFFFF"/>
