@@ -1,20 +1,18 @@
-﻿/* 
- * Dive (formally deploya) - Fast and Easy way to deploy Windows
- * Copyright (c) 2018 - 2022 Exploitox.
- * 
- * Dive is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE). 
- * So you are allowed to use freely and modify the application. 
- * I will not be responsible for any outcome. 
+﻿/*
+ * Dive (formally deploya) - Deployment is very easy.
+ * Copyright (c) 2018 - 2024 Exploitox.
+ *
+ * Dive is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE).
+ * So you are allowed to use freely and modify the application.
+ * I will not be responsible for any outcome.
  * Proceed with any action at your own risk.
- * 
+ *
  * Source code: https://github.com/valnoxy/dive
  */
 
-using CommandLine;
-using CommandLine.Text;
 using Dive.UI.AutoDive;
+using Dive.UI.Common;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Diagnostics;
@@ -22,11 +20,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
 using System.Windows.Threading;
-using Dive.UI.Common;
-using Dive.UI.Initialization;
 using Action = System.Action;
-using Application = System.Windows.Application;
-using Dive.Core.Action.Capturing;
 
 namespace Dive.UI
 {
@@ -38,67 +32,6 @@ namespace Dive.UI
         public static readonly FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
         public static readonly string Ver = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 
-        #region Parser options
-        [Verb("Apply", HelpText = "Add file contents to the index.")]
-        class ApplyOptions
-        {
-            [Option('w', "wim", Required = true, HelpText = "Input WIM-file to be processed.")]
-            public string wimfile { get; set; }
-
-            [Option('i', "index", Required = true, HelpText = "Index ID of the selected Windows-Installation.")]
-            public int index { get; set; }
-
-            [Option('d', "driveid", Required = true, HelpText = "Hard Drive ID of the destination hard drive.")]
-            public int driveid { get; set; }
-
-            [Option('e', "efi", Default = false, HelpText = "Use EFI for installation.")]
-            public bool efi { get; set; }
-
-            [Option('n', "ntldr", Default = false, HelpText = "Use NTLDR bootloader for XP and below.")]
-            public bool ntldr { get; set; }
-
-
-            [Usage(ApplicationAlias = "Dive")]
-            public static IEnumerable<Example> Examples
-            {
-                get
-                {
-                    return new List<Example>() {
-                         new Example("\nApply WIM file on a EFI system", new ApplyOptions { driveid = 0, wimfile = "file.wim", index = 1, efi = true, ntldr = false }),
-                         new Example("\nApply WIM file on a Legacy system", new ApplyOptions { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = false }),
-                         new Example("\nApply XP-based image on a Legacy system", new ApplyOptions { driveid = 0, wimfile = "file.wim", index = 1, efi = false, ntldr = true }),
-                    };
-                }
-            }
-
-        }
-
-        [Verb("Capture", HelpText = "Captures a image")]
-        private class CaptureOptions
-        {
-            [Option('c', "cap", Required = true, HelpText = "Input WIM-file to be processed.")]
-            public string capturedir { get; set; }
-
-            [Option(Default = false, Hidden = true, HelpText = "Used for deploya GUI Installation")]
-            public bool uimode { get; set; }
-
-            [Option('i', "index", Required = true, HelpText = "Index ID of the selected Windows-Installation.")]
-            public int index { get; set; }
-
-        }
-
-        private static void DisplayHelp<T>(ParserResult<T> result, IEnumerable<Error> errs)
-        {
-            var helpText = HelpText.AutoBuild(result, h =>
-            {
-                h.AdditionalNewLineAfterOption = false; // Remove the extra newline between options
-                h.Heading = $"{VersionInfo.ProductName} [Version: {Ver}]"; // Header
-                h.Copyright = VersionInfo.LegalCopyright; // Copyright text
-                return HelpText.DefaultParsingErrorsHandler(result, h);
-            }, e => e);
-            Console.WriteLine(helpText);
-        }
-
         private static void ShowGui()
         {
             var wnd = new MainWindow();
@@ -106,11 +39,11 @@ namespace Dive.UI
             splash.Show();
             while (splash.IsVisible)
             {
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() => { }));
+                Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() => { }));
             }
 
             // Update language
-            Common.LocalizationManager.LoadLanguage(Common.LocalizationManager.CurrentLanguage.Code);
+            LocalizationManager.LoadLanguage(LocalizationManager.CurrentLanguage.Code);
 
             wnd.ShowDialog();
             Environment.Exit(0);
@@ -122,15 +55,6 @@ namespace Dive.UI
             //wnd.ShowDialog();
             Environment.Exit(0);
         }
-
-        private static void ShowAutoInitBoot(Configuration? config)
-        {
-            var wnd = new Initialization.BootWindow(config);
-            wnd.ShowDialog();
-            Environment.Exit(0);
-        }
-
-        #endregion
 
         #region Console Window State
 
@@ -149,6 +73,7 @@ namespace Dive.UI
         {
             var args = Environment.GetCommandLineArgs();
             var handle = GetConsoleWindow();
+            var loadedPlugins = 0;
 
             if (args.Length == 1)
             {
@@ -158,8 +83,14 @@ namespace Dive.UI
                 ShowWindow(handle, SwHide);
 #endif
                 // Initialize Console
-                Common.Debug.InitializeConsole();                
-                //Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
+                Common.Debug.InitializeConsole();
+
+                // Load plugins
+                Common.Debug.WriteLine("Loading plugins ...");
+                loadedPlugins = Plugin.PluginManager.LoadPlugins(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
+                Common.Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
+                Plugin.PluginManager.InitPlugins();
+                Common.Debug.WriteLine("Initialized all plugins.");
 
                 var allDrives = DriveInfo.GetDrives();
                 foreach (var d in allDrives)
@@ -188,12 +119,13 @@ namespace Dive.UI
             }
 
 #if DEBUG
+            // Debug switches
             if (args.Contains("--unattend-test"))
             {
                 Console.Title = $"{VersionInfo.ProductName} - Debug Console";
                 Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
                 Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
-                Common.Debug.WriteLine("Debug console initialized.", ConsoleColor.White);
+                Common.Debug.WriteLine("Debug console initialized.");
                 Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
                 var deploymentInfoInstance = DeploymentInfo.Instance;
@@ -226,12 +158,19 @@ namespace Dive.UI
                 Common.Debug.WriteLine("Support URL: " + oemInfoInstance.SupportURL);
 
                 Common.Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
-                config = Common.UnattendBuilder.Build();
+                config = UnattendBuilder.Build();
                 Console.WriteLine(config);
 
                 Environment.Exit(0);
             }
 #endif
+
+            // Load plugins
+            Common.Debug.WriteLine("Loading plugins ...");
+            loadedPlugins = Plugin.PluginManager.LoadPlugins(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
+            Common.Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
+            Plugin.PluginManager.InitPlugins();
+            Common.Debug.WriteLine("Initialized all plugins.");
 
             if (args.Contains("--autoinit-boot"))
             {
@@ -244,7 +183,7 @@ namespace Dive.UI
                 var testConfigJson = Initialization.ConfigurationLoader.CreateConfiguration();
                 var config = Initialization.ConfigurationLoader.LoadConfiguration(testConfigJson);
 
-                ShowAutoInitBoot(config);
+                //ShowAutoInitBoot(config);
             }
 
             if (args.Contains("--autodive"))
@@ -256,23 +195,7 @@ namespace Dive.UI
                 Environment.Exit(0);
             }
 
-            if (args.Contains("--fuck"))
-            {
-                CaptureTest.TestBuildInfo();
-                Environment.Exit(0);
-            }
-
-            var parser = new Parser(with => with.HelpWriter = null);
-            var parserResult = parser.ParseArguments<ApplyOptions, CaptureOptions>(args);
-            parserResult
-                .WithParsed(options => RunA())
-                .WithNotParsed(errs => DisplayHelp(parserResult, errs));
             Environment.Exit(0);
-        }
-
-        private static void RunA()
-        {
-            throw new NotImplementedException("The CLI version is obsolete and will be replaced in future versions. Please use the GUI version of Dive for deployment.");
         }
     }
 }

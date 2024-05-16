@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Dive.UI.Common;
 
 namespace Dive.UI.Pages
 {
@@ -36,21 +37,33 @@ namespace Dive.UI.Pages
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
             ValueVersionCore.Content = $"{versionInfo.ProductName} Core v{coreVersion}";
 
-            // Define AutoInit Module Version
-            var autoInitVersion = typeof(AutoInit.AppxManagement).Assembly
+            // Define Plugins Version
+            var pluginList = Plugin.PluginManager.GetPlugins();
+            foreach (var plugin in pluginList)
+            {
+                ValueVersionPlugins.Content += $"{plugin.GetPluginInfo().Name} v{plugin.GetPluginInfo().Version}\n";
+            }
+            ValueVersionPlugins.Content = ValueVersionPlugins.Content.ToString()!.TrimEnd('\n');
+
+            /*var autoInitVersion = typeof(AutoInit.AppxManagement).Assembly
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
-            ValueVersionAutoInit.Content = $"{versionInfo.ProductName} AutoInit Module v{autoInitVersion}";
+            ValueVersionAutoInit.Content = $"{versionInfo.ProductName} AutoInit Module v{autoInitVersion}";*/
         }
 
         private void Homepage_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                Process.Start(new ProcessStartInfo() { FileName = "https://exploitox.de", UseShellExecute = true });
+                Process.Start(new ProcessStartInfo { FileName = "https://exploitox.de", UseShellExecute = true });
             }
-            catch
+            catch (System.ComponentModel.Win32Exception noBrowser)
             {
-                // ignored
+                if (noBrowser.ErrorCode == -2147467259)
+                    MessageBox.Show(noBrowser.Message);
+            }
+            catch (Exception other)
+            {
+                MessageBox.Show(other.Message);
             }
         }
 
@@ -58,11 +71,16 @@ namespace Dive.UI.Pages
         {
             try
             {
-                Process.Start(new ProcessStartInfo() { FileName = "https://paypal.me/valnoxy", UseShellExecute = true });
+                Process.Start(new ProcessStartInfo { FileName = "https://paypal.me/valnoxy", UseShellExecute = true });
             }
-            catch
+            catch (System.ComponentModel.Win32Exception noBrowser)
             {
-                // ignored
+                if (noBrowser.ErrorCode == -2147467259)
+                    MessageBox.Show(noBrowser.Message);
+            }
+            catch (Exception other)
+            {
+                MessageBox.Show(other.Message);
             }
         }
 
@@ -70,14 +88,14 @@ namespace Dive.UI.Pages
         {
             try
             {
-                Process.Start(new ProcessStartInfo() { FileName = "https://github.com/valnoxy/dive", UseShellExecute = true });
+                Process.Start(new ProcessStartInfo { FileName = "https://github.com/valnoxy/dive", UseShellExecute = true });
             }
             catch (System.ComponentModel.Win32Exception noBrowser)
             {
                 if (noBrowser.ErrorCode == -2147467259)
                     MessageBox.Show(noBrowser.Message);
             }
-            catch (System.Exception other)
+            catch (Exception other)
             {
                 MessageBox.Show(other.Message);
             }

@@ -71,7 +71,6 @@
 		<Resource Include="Localization\ResourceDictionary.xaml" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="CommandLineParser" Version="2.9.1" />
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="WLED" Version="2.0.48" />
 		<PackageReference Include="WPF-UI" Version="3.0.4" />
@@ -80,8 +79,8 @@
 		<PackageReference Include="System.Management" Version="8.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Dive.AutoInit\Dive.AutoInit.csproj" />
 		<ProjectReference Include="..\Dive.Core\Dive.Core.csproj" />
+		<ProjectReference Include="..\Dive.PluginContext\Dive.PluginContext.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Page Update="Pages\ApplyPages\CloudSelectStep.xaml">

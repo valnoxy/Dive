@@ -1,5 +1,6 @@
 ﻿namespace Dive.UI.Initialization
 {
+    /*
     public class Action
     {
         public static void Tweaks(Configuration config)
@@ -109,4 +110,5 @@
         }
 
     }
+    */
 }

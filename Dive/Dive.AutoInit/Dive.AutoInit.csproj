@@ -18,15 +18,24 @@
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PackageId>Dive.AutoInit</PackageId>
-		<Version>2.0.0</Version>
+		<Version>2.0</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>
 		<Product>Dive</Product>
-		<Title>Dive AutoInit Module</Title>
-		<Copyright>Copyright (c) 2018 - 2023 Exploitox.</Copyright>
+		<Title>Dive AutoInit Plugin</Title>
+		<Copyright>Copyright © 2018 - 2024 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<PackageReleaseNotes>Dive AutoInit Module</PackageReleaseNotes>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<AppendTargetFrameworkToOutputIdentifier>false</AppendTargetFrameworkToOutputIdentifier>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+		<OutputPath>..\Output\$(Configuration)\Plugins\</OutputPath>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Dive.PluginContext\Dive.PluginContext.csproj" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Update="Resources\StartMenu.Designer.cs">

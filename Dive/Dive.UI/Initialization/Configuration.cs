@@ -44,7 +44,7 @@ namespace Dive.UI.Initialization
     {
         public bool CleanupStartPins { get; set; }
         public bool DisableAutoRebootOnBsod { get; set; }
-        public AutoInit.Tweaks.MemoryDumpOption SetMaxMemoryDumpSize { get; set; }
+        //public AutoInit.Tweaks.MemoryDumpOption SetMaxMemoryDumpSize { get; set; }
         public int ShadowStorage { get; set; } // Ex. 20% of Volume Size
         public bool SetMaxPerformance { get; set; }
         public bool DisableFastBoot { get; set; }
@@ -91,34 +91,36 @@ namespace Dive.UI.Initialization
                 {
                     CleanupStartPins = true,
                     DisableAutoRebootOnBsod = true,
-                    SetMaxMemoryDumpSize = AutoInit.Tweaks.MemoryDumpOption.Small,
+                    //SetMaxMemoryDumpSize = AutoInit.Tweaks.MemoryDumpOption.Small,
                     ShadowStorage = 20,
                     SetMaxPerformance = true,
                     DisableFastBoot = true
                 },
-                Applications = new List<Application>
-                {
+                Applications =
+                [
                     new Application
                     {
                         Name = "Mozilla Firefox",
                         Scope = "machine",
                         PackageId = "Mozilla.Firefox"
                     },
+
                     new Application
                     {
                         Name = "Mozilla Firefox",
                         Scope = "machine",
                         PackageId = "Adobe.Acrobat.Reader.64-bit"
                     },
+
                     new Application
                     {
                         Name = "Fernwartung",
                         PackageId = "https://www.wolkenhof.com/download/Fernwartung_Wolkenhof.exe",
                         PathToExe = "C:\\Users\\Public\\Desktop\\Fernwartung Wolkenhof.exe"
                     }
-                },
-                Removal = new List<Removal>
-                {
+                ],
+                Removal =
+                [
                     new Removal { Name = "3D Builder", PackageId = "Microsoft.3DBuilder" },
                     new Removal { Name = "3D Viewer", PackageId = "Microsoft.Microsoft3DViewer" },
                     new Removal { Name = "App Connector", PackageId = "Microsoft.Appconnector" },
@@ -171,7 +173,7 @@ namespace Dive.UI.Initialization
                     new Removal { Name = "Your Phone Companion #1", PackageId = "Microsoft.WindowsPhone" },
                     new Removal { Name = "Your Phone Companion #2", PackageId = "Microsoft.Windows.Phon" },
                     new Removal { Name = "Your Phone", PackageId = "Microsoft.YourPhone" }
-                }
+                ]
             };
             var json = JsonConvert.SerializeObject(config);
             Console.WriteLine(json);

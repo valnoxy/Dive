@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dive.UI.Common.Plugins;
 
 namespace Dive.UI.Common
 {
+    public class Plugin
+    {
+        public static PluginManager PluginManager { get; } = new();
+    }
+
     public class SettingChangedEventArgs : EventArgs
     {
         public string PropertyName { get; }

@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<RootNamespace>Dive.PluginContext</RootNamespace>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>Link</TrimMode>
+		<AssemblyName>Dive.PluginContext</AssemblyName>
+		<Platforms>x64</Platforms>
+		<Prefer32Bit>false</Prefer32Bit>
+		<PackageId>Dive.PluginContext</PackageId>
+		<Version>1.0</Version>
+		<Authors>valnoxy</Authors>
+		<Company>Exploitox</Company>
+		<Product>Dive</Product>
+		<Title>Dive PluginContext</Title>
+		<Copyright>Copyright © 2018 - 2024 Exploitox. All rights reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
+		<PackageReleaseNotes>Dive PluginContext</PackageReleaseNotes>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+	</PropertyGroup>
+		
+</Project>
