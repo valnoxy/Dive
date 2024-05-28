@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Security.Principal;
 using System.Windows;
@@ -27,13 +28,13 @@ namespace Dive.UI
 
 #if DEBUG
             DebugString.Visibility = Visibility.Visible;
-            DebugString.Text = "Debug build - This is not a production ready build.";
             _displayDebugConsole = true;
             Branch.Text = "Development";
+            TweaksPage.Visibility = Visibility.Visible;
 #else
-            DebugString.Visibility = Visibility.Hidden;
-            //DebugString.Text = "Pre-Release 2";
+            DebugString.Visibility = Visibility.Collapsed;
             Branch.Text = "Pre-Release 2";
+            TweaksPage.Visibility = Visibility.Collapsed;
 #endif
             // Get version
             var assembly = Assembly.GetExecutingAssembly();
@@ -49,6 +50,36 @@ namespace Dive.UI
             // Time & Date
             _timer.Tick += UpdateTimeAndDate_Tick!;
             _timer.Start();
+
+            // Check for valid license
+            if (File.Exists("Dive.lic"))
+            {
+                var licenseData = File.ReadAllText("Dive.lic");
+                Common.Licensing.Validation.Validate(licenseData);
+            }
+            else
+            {
+                var allDrives = DriveInfo.GetDrives();
+                foreach (var d in allDrives)
+                {
+                    if (File.Exists($"{d.Name}Dive.lic"))
+                    {
+                        var licenseData = File.ReadAllText($"{d.Name}Dive.lic");
+                        Common.Licensing.Validation.Validate(licenseData);
+                        break;
+                    }
+                    if (File.Exists($"{d.Name}Dive\\Dive.lic"))
+                    {
+                        var licenseData = File.ReadAllText($"{d.Name}Dive\\Dive.txt");
+                        Common.Licensing.Validation.Validate(licenseData);
+                        break;
+                    }
+                }
+            }
+            if (Common.Licensing.Validation.Info.Valid)
+            {
+                FoundersBanner.Visibility = Visibility.Visible;
+            }
         }
 
         private void UpdateTimeAndDate_Tick(object sender, EventArgs e)
@@ -75,6 +106,9 @@ namespace Dive.UI
 
         private void MainWindow_OnLoaded(object? sender, EventArgs eventArgs)
         {
+            // run plugin startup
+            Common.Plugin.PluginManager.RunStartup();
+
             RootNavigation.Navigate(typeof(Pages.Dashboard));
         }
 

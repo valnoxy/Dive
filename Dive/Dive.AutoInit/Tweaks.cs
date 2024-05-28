@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dive.AutoInit.Resources;
+﻿using Dive.AutoInit.Resources;
+using Dive.PluginContext;
 
 namespace Dive.AutoInit
 {
@@ -23,12 +19,28 @@ namespace Dive.AutoInit
             return System.Registry.SetKey("SYSTEM\\CurrentControlSet\\Control\\CrashControl", "AutoReboot", "0");
         }
 
-        public static bool SetMaxMemDump(MemoryDumpOption memoryDumpOption)
+        public static bool SetMaxMemDump(MemoryDumpOption? memoryDumpOption)
         {
             var status = true;
-            var a = System.Processes.RunProcess("wmic.exe", $"recoveros set DebugInfoType = {(int)memoryDumpOption}");
-            if (a != 0) status = false;
+            if (memoryDumpOption != null)
+            {
+                var a = System.Processes.RunProcess("wmic.exe", $"recoveros set DebugInfoType = {(int)memoryDumpOption}");
+                if (a != 0) status = false;
+            }
+            else
+            {
+                var a = System.Processes.RunProcess("wmic.exe", $"recoveros set DebugInfoType = 0");
+                if (a != 0) status = false;
+            }
 
+            return status;
+        }
+
+        public static bool EnableSystemProtection()
+        {
+            var status = true;
+            var a = System.Processes.RunProcess("wmic.exe", "WMIC /Namespace:\\\\root\\default Path SystemRestore Call Enable \"C:\\\"");
+            if (a != 0) status = false;
             return status;
         }
 
@@ -37,7 +49,6 @@ namespace Dive.AutoInit
             var status = true;
             var a = System.Processes.RunProcess("vssadmin.exe", $"resize shadowstorage /for=C: /on=C: /maxsize={size}%");
             if (a != 0) status = false;
-            
             return status;
         }
 
@@ -57,28 +68,29 @@ namespace Dive.AutoInit
             return status;
         }
 
-        public static void CleanupStartPins()
+        public static bool CleanupStartPins()
         {
             var build = Environment.OSVersion.Version.Build;
-            if (build >= 22000) // Windows 11+
+            if (build < 22000) return true; // Windows 11+
+            
+            var root = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory)!, "Users");
+            var subdirectoriesEntries = Directory.GetDirectories(root);
+            foreach (var subdirectory in subdirectoriesEntries)
             {
-                var root = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory), "Users");
-                var subdirectoriesEntries = Directory.GetDirectories(root);
-                foreach (var subdirectory in subdirectoriesEntries)
+                var startMenu = Path.Combine(subdirectory,
+                    "AppData", "Local", "Packages", "Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy", "LocalState");
+                if (!Directory.Exists(startMenu)) continue;
+                try
                 {
-                    var startmenu = Path.Combine(subdirectory,
-                        "AppData", "Local", "Packages", "Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy", "LocalState");
-                    if (!Directory.Exists(startmenu)) continue;
-                    try
-                    {
-                        File.WriteAllBytes(Path.Combine(startmenu, "start2.bin"), StartMenu.start2_W11);
-                    }
-                    catch (Exception ex)
-                    {
-                        // log error
-                    }
+                    File.WriteAllBytes(Path.Combine(startMenu, "start2.bin"), StartMenu.start2_W11);
+                }
+                catch (Exception ex)
+                {
+                    DebugConsole.WriteLine("Error while replacing start menu pins: " + ex.Message, ConsoleColor.Red);
+                    return false;
                 }
             }
+            return true;
         }
     }
 }

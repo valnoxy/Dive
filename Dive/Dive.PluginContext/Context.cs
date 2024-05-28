@@ -3,6 +3,7 @@
     public interface IPlugin
     {
         void Initialize();
+        void OnStartup();
         PluginInfo GetPluginInfo();
     }
 

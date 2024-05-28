@@ -29,7 +29,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <ui:NavigationView x:Name="RootNavigation" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" Margin="6,0" Grid.Row="0">
+            <ui:NavigationView x:Name="RootNavigation" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" Margin="6,-5" Grid.Row="0">
                 <ui:NavigationView.MenuItems>
                     <ui:NavigationViewItem Content="{DynamicResource Home}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:Dashboard}">
                         <ui:NavigationViewItem.Icon>
@@ -53,7 +53,7 @@
                     </ui:NavigationViewItem>
                     
                     <!-- Currently for Debug purpose only -->
-                    <ui:NavigationViewItem Content="{DynamicResource Tweaks}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:TweaksContent}">
+                    <ui:NavigationViewItem x:Name="TweaksPage" Content="{DynamicResource Tweaks}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:TweaksContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Toolbox24" />
                         </ui:NavigationViewItem.Icon>
@@ -76,6 +76,12 @@
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="QuestionCircle24" />
                         </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+
+                    <ui:NavigationViewItem Visibility="Collapsed" x:Name="FoundersBanner">
+                        <ui:Card Padding="6" Margin="-7">
+                            <TextBlock Text="Founders Edition" />
+                        </ui:Card>
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>
             </ui:NavigationView>
@@ -157,13 +163,8 @@
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="1" x:Name="DebugString" Text="Debug" Margin="0,17,50,0" Foreground="Red" TextAlignment="Right" HorizontalAlignment="Right"/>
-        </Grid>
+        <ui:Card x:Name="DebugString" Grid.Row="0" Padding="5" Margin="-315,4,0,0" Width="55">
+            <TextBlock Text="Debug" />
+        </ui:Card>
     </Grid>
 </ui:FluentWindow>

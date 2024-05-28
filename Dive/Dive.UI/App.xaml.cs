@@ -118,13 +118,14 @@ namespace Dive.UI
                 ShowGui();
             }
 
+            Console.Title = $"{VersionInfo.ProductName} - Debug Console";
+            Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
+            Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+
 #if DEBUG
             // Debug switches
             if (args.Contains("--unattend-test"))
             {
-                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
-                Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-                Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
                 Common.Debug.WriteLine("Debug console initialized.");
                 Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
@@ -171,14 +172,10 @@ namespace Dive.UI
             Common.Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
             Plugin.PluginManager.InitPlugins();
             Common.Debug.WriteLine("Initialized all plugins.");
+            Plugin.PluginManager.RunStartup();
 
             if (args.Contains("--autoinit-boot"))
             {
-                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
-                Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-                Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
-                Console.WriteLine("Please wait ...");
-
                 // Load test config
                 var testConfigJson = Initialization.ConfigurationLoader.CreateConfiguration();
                 var config = Initialization.ConfigurationLoader.LoadConfiguration(testConfigJson);

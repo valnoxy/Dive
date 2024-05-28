@@ -1,20 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Dive.UI.Common;
 
 namespace Dive.UI.Pages
@@ -45,9 +35,9 @@ namespace Dive.UI.Pages
             }
             ValueVersionPlugins.Content = ValueVersionPlugins.Content.ToString()!.TrimEnd('\n');
 
-            /*var autoInitVersion = typeof(AutoInit.AppxManagement).Assembly
-                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion;
-            ValueVersionAutoInit.Content = $"{versionInfo.ProductName} AutoInit Module v{autoInitVersion}";*/
+            LicenseStatus.Text = Common.Licensing.Validation.Info.Valid 
+                ? $"Licensed to {Common.Licensing.Validation.Info.LicenseName} ({Common.Licensing.Validation.Info.LicenseEmail})" 
+                : "You are currently using the Free Edition.";
         }
 
         private void Homepage_OnClick(object sender, RoutedEventArgs e)

@@ -48,10 +48,18 @@ namespace Dive.UI.Common.Plugins
                 plugin.Initialize();
             }
         }
+        public void RunStartup()
+        {
+            foreach (var plugin in _plugins)
+            {
+                plugin.OnStartup();
+            }
+        }
 
         public List<IPlugin> GetPlugins()
         {
             return _plugins;
         }
+
     }
 }

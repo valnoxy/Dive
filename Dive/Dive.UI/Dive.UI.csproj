@@ -72,6 +72,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
+		<PackageReference Include="Standard.Licensing" Version="1.1.8" />
 		<PackageReference Include="WLED" Version="2.0.48" />
 		<PackageReference Include="WPF-UI" Version="3.0.4" />
 		<PackageReference Include="XamlAnimatedGif" Version="2.3.0" />

@@ -9,8 +9,6 @@
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>Link</TrimMode>
 		<AssemblyName>Dive.PluginContext</AssemblyName>
-		<Platforms>x64</Platforms>
-		<Prefer32Bit>false</Prefer32Bit>
 		<PackageId>Dive.PluginContext</PackageId>
 		<Version>1.0</Version>
 		<Authors>valnoxy</Authors>

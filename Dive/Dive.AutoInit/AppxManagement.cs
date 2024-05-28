@@ -5,29 +5,21 @@ namespace Dive.AutoInit
 {
     public class AppxManagement
     {
-        // public list of apps to remove
-        public class App
-        {
-            public string Name { get; set; }
-            public string ID { get; set; }
-        }
-        public static List<App> apps;
-
         /// <summary>
         /// Removes the App from the system.
         /// </summary>
         /// <remarks>
         /// Return code: 0 = success, 1 = failure
         /// </remarks>
-        /// <param name="appID">Application ID</param>
+        /// <param name="appId">Application ID</param>
         /// <returns>Status code</returns>
-        public static int RemoveAppx(string appID)
+        public static int RemoveAppx(string appId)
         {
             var psi = new ProcessStartInfo
             {
                 UseShellExecute = true,
                 CreateNoWindow = false,
-                Arguments = $"Get-AppxPackage '{appID}' | Remove-AppxPackage",
+                Arguments = $"Get-AppxPackage '{appId}' | Remove-AppxPackage",
                 WindowStyle = ProcessWindowStyle.Hidden,
                 FileName = "powershell.exe"
             };
@@ -81,13 +73,18 @@ namespace Dive.AutoInit
         /// <summary>
         /// Installs the app to the system via WinGet.
         /// </summary>
-        /// <param name="PackageName"></param>
+        /// <param name="packageName"></param>
+        /// <param name="scope"></param>
         /// <returns>Status code</returns>
-        public static int InstallApp(string PackageName)
+        public static int InstallApp(string packageName, string? scope = null)
         {
+            var scopeArg = string.Empty;
+            if (!string.IsNullOrEmpty(scope))
+                scopeArg = $"--scope {scope}";
+
             var p = new Process();
             p.StartInfo.FileName = "cmd.exe";
-            p.StartInfo.Arguments = $"/c winget install --id {PackageName} --accept-source-agreements --accept-package-agreements";
+            p.StartInfo.Arguments = $"/c winget install --id {packageName} {scopeArg} --accept-source-agreements --accept-package-agreements";
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
             p.Start();
@@ -102,7 +99,7 @@ namespace Dive.AutoInit
         /// <param name="downloadUrl"></param>
         /// <param name="saveTo"></param>
         /// <returns>Status code</returns>
-        public static int InstallRemoteManagement(string downloadUrl, string saveTo)
+        public static int DownloadFile(string downloadUrl, string saveTo)
         {
             try
             {
