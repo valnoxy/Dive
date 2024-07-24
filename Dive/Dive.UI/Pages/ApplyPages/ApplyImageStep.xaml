@@ -67,7 +67,13 @@
                     <ui:ProgressRing Grid.Column="1" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden"/>
                 </Grid>
             </ui:Card>
-
+            
+            <Grid>
+                <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
+                    <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF" Text="{DynamicResource InstallPageWaiting}"/>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </Grid>
 </UserControl>

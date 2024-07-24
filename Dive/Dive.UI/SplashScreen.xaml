@@ -16,16 +16,49 @@
 
     <Grid>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="210"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
                 <!-- Title with button text -->
-                <RowDefinition Height="*"/>
+                <ColumnDefinition Width="*"/>
                 <!-- Content -->
-            </Grid.RowDefinitions>
+            </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="0">
+            <Grid Grid.Column="1" Margin="20,30,20,20">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="28"
+                            FontWeight="Bold"
+                            Foreground="#FFFFFF"
+                            Text="Welcome to Dive 👋" />
+                        <TextBlock
+                            Foreground="#FFFFFF"
+                            Text="Enter your preferences and click 'Next' to continue." />
+                        <ui:CardControl Icon="{ui:SymbolIcon LocalLanguage24}" Margin="0,15,0,0">
+                            <ui:CardControl.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Text="Language" />
+                                    </StackPanel>
+                                    <ComboBox Grid.Column="1" Width="200" x:Name="LanguageDropDown" 
+                                              SelectionChanged="LanguageDropDown_OnSelectionChanged"/>
+                                </Grid>
+                            </ui:CardControl.Header>
+                        </ui:CardControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <StackPanel Grid.Column="0">
                 <Border
-                    Height="200"
+                    Height="360"
                     CornerRadius="0">
                     <Border.Background>
                         <ImageBrush
@@ -47,15 +80,16 @@
                                 VerticalAlignment="Center"
                                 Background="Transparent">
                                 <TextBlock
+                                    FontSize="28"
+                                    FontWeight="Bold"
+                                    Foreground="#FFFFFF"
+                                    Text="Dive" />
+                                <TextBlock
                                     FontSize="18"
                                     Foreground="#B7FFFFFF"
                                     x:Name="VersionLabel"
                                     Text="Version" />
-                                <TextBlock
-                                    FontSize="28"
-                                    FontWeight="Bold"
-                                    Foreground="#FFFFFF"
-                                    Text="Dive - Deployment is very easy." />
+
                             </StackPanel>
                             <TextBlock
                                 Margin="12"
@@ -68,35 +102,6 @@
                     </Border>
                 </Border>
             </StackPanel>
-
-            <Grid Grid.Row="1" Height="350"  Margin="20,0,20,20">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
-                    <StackPanel>
-                        <ui:CardControl Icon="{ui:SymbolIcon LocalLanguage24}" Margin="0,5,0,0">
-                            <ui:CardControl.Header>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="13"
-                                            FontWeight="Medium"
-                                            Text="Language" />
-                                        <TextBlock
-                                            FontSize="12"
-                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                            Text="Please select your language." />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" Margin="0,0,16,0" Width="200" x:Name="LanguageDropDown" 
-                                              SelectionChanged="LanguageDropDown_OnSelectionChanged"/>
-                                </Grid>
-                            </ui:CardControl.Header>
-                        </ui:CardControl>
-                    </StackPanel>
-                </ScrollViewer>
-            </Grid>
         </Grid>
         <ui:TitleBar ShowMinimize="False" ShowMaximize="False" CanMaximize="False"/>
         <ui:Button Content="Next" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="20" Click="ExitButton_Click"/>

@@ -36,7 +36,7 @@ namespace Dive.UI
             var version = fvi.FileVersion;
             VersionLabel.Text = $"Version {version}";
 #if DEBUG
-            VersionLabel.Text = $"Version {version} - Debug build";
+            VersionLabel.Text = $"Version {version}\nDebug build";
 #endif
 
             foreach (var language in _languages)

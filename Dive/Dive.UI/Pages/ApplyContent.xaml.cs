@@ -12,7 +12,7 @@ namespace Dive.UI.Pages
     public partial class ApplyContent : UserControl
     {
         public static ApplyContent? ContentWindow;
-        private static ApplyDetails _applyDetailsInstance = ApplyDetails.Instance;
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
 
         SKUSelectStep SKUSS = new();
         DeploymentSettingsStep deploymentSettingsStep = new();
@@ -40,7 +40,7 @@ namespace Dive.UI.Pages
                     FrameWindow.Content = DiskSS;
                     break;
                 case DiskSelectStep:
-                    if ((_applyDetailsInstance.Name.ToLower().Contains("windows 7") || _applyDetailsInstance.Name.ToLower().Contains("vista")) && _applyDetailsInstance.UseEFI)
+                    if ((ApplyDetailsInstance.Name.ToLower().Contains("windows 7") || ApplyDetailsInstance.Name.ToLower().Contains("vista")) && ApplyDetailsInstance.UseEFI)
                     {
                         Common.Debug.WriteLine("Detected Windows Vista / 7 with EFI - Showing UefiSeven Installation prompt ...");
 
@@ -62,10 +62,10 @@ namespace Dive.UI.Pages
                             }
                         }
                     }
-                    var ApplySS = new ApplySelectStep();
+                    var ApplySS = new ApplyImageStep();
                     FrameWindow.Content = ApplySS;
                     break;
-                case ApplySelectStep:
+                case ApplyImageStep:
                     if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
                         System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
                     else
