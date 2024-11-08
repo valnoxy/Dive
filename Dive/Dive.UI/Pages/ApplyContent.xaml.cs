@@ -62,9 +62,12 @@ namespace Dive.UI.Pages
                             }
                         }
                     }
-                    var ApplySS = new ApplyImageStep();
-                    FrameWindow.Content = ApplySS;
+
+                    var applyPage = new ApplySelectStep();
+                    //var applyPage = new ApplyImageStep();
+                    FrameWindow.Content = applyPage;
                     break;
+                case ApplySelectStep:
                 case ApplyImageStep:
                     if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
                         System.Diagnostics.Process.Start("wpeutil.exe", "reboot");

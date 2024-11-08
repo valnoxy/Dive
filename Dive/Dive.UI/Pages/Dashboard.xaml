@@ -24,10 +24,6 @@
             </ui:Card>
             
             <ui:Card Margin="12,0,12,0">
-                <userInterface:Skeleton x:Name="DriverSkeleton" Title="{DynamicResource DriverPacks}" Value="n/a"/>
-            </ui:Card>
-            
-            <ui:Card Margin="12,0,12,0">
                 <userInterface:Skeleton x:Name="ConfigSkeleton" Title="{DynamicResource Configs}" Value="0"/>
             </ui:Card>
         </StackPanel>

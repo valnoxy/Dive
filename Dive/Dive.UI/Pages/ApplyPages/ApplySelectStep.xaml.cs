@@ -160,7 +160,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                     case Progress.ApplyImage:
@@ -176,7 +176,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                     case Progress.InstallBootloader:
@@ -192,7 +192,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                     case Progress.InstallRecovery:
@@ -208,7 +208,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.InstallRecovery, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                     case Progress.InstallUnattend:
@@ -224,7 +224,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.InstallUnattend, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                     case Progress.InstallDrivers:
@@ -240,7 +240,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.InstallDrivers, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                     case Progress.InstallUefiSeven:
@@ -256,7 +256,7 @@ namespace Dive.UI.Pages.ApplyPages
 
                         Debug.RefreshProgressBar(Progress.InstallUefiSeven, e.ProgressPercentage, response.Message);
                         if (Common.Configuration.FunConfig.WledCommunication)
-                            Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
                         break;
                     }
                 }

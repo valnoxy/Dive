@@ -4,28 +4,28 @@ namespace Dive.AutoInit.Common
 {
     public class Configuration
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public double Version { get; set; }
-        public string Description { get; set; }
-        public string Author { get; set; }
-        public List<Application> Applications { get; set; }
-        public List<Removal> Removal { get; set; }
-        public Telemetry Telemetry { get; set; }
-        public Tweaks Tweaks { get; set; }
+        public string? Description { get; set; }
+        public string? Author { get; set; }
+        public List<Application>? Applications { get; set; }
+        public List<Removal>? Removal { get; set; }
+        public Telemetry? Telemetry { get; set; }
+        public Tweaks? Tweaks { get; set; }
     }
 
     public class Application
     {
-        public string Name { get; set; }
-        public string PackageId { get; set; }
-        public string Scope { get; set; }
-        public string PathToExe { get; set; }
+        public string? Name { get; set; }
+        public string? PackageId { get; set; }
+        public string? Scope { get; set; }
+        public string? PathToExe { get; set; }
     }
 
     public class Removal
     {
-        public string Name { get; set; }
-        public string PackageId { get; set; }
+        public string? Name { get; set; }
+        public string? PackageId { get; set; }
     }
 
     public class Telemetry

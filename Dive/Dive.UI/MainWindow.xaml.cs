@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Dive.UI.Pages.Extras.FunPages;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace Dive.UI
@@ -17,6 +18,7 @@ namespace Dive.UI
     public partial class MainWindow
     {
         private bool _displayDebugConsole;
+        private string CurrentTheme = "Mica";
         private readonly DispatcherTimer _timer = new()
         {
             Interval = TimeSpan.FromSeconds(1)
@@ -79,6 +81,12 @@ namespace Dive.UI
             if (Common.Licensing.Validation.Info.Valid)
             {
                 FoundersBanner.Visibility = Visibility.Visible;
+                Common.Debug.WriteLine("Founders License found!", ConsoleColor.Green);
+            }
+
+            if (Common.Licensing.Validation.Info.ValidationFailed)
+            {
+                Common.Debug.WriteLine("License validation failed! Invalid license detected.", ConsoleColor.Red);
             }
         }
 
@@ -124,7 +132,29 @@ namespace Dive.UI
 
         private void ThemeSwitch_Click(object sender, RoutedEventArgs e)
         {
-            WindowBackdropType = WindowBackdropType == WindowBackdropType.Mica ? WindowBackdropType.Tabbed : WindowBackdropType.Mica;
+            //WindowBackdropType = WindowBackdropType == WindowBackdropType.Mica ? WindowBackdropType.Tabbed : WindowBackdropType.Mica;
+            switch (CurrentTheme)
+            {
+                case "Mica":
+                    ApplicationThemeManager.Apply(
+                        ApplicationTheme.Dark,
+                        WindowBackdropType.Tabbed);
+                    CurrentTheme = "Tabbed";
+                    break;
+                case "Tabbed":
+                    //WindowBackdropType = WindowBackdropType.Mica;
+                    CurrentTheme = "Light";
+                    ApplicationThemeManager.Apply(
+                        ApplicationTheme.Light,
+                        WindowBackdropType.Mica);
+                    break;
+                case "Light":
+                    CurrentTheme = "Mica";
+                    ApplicationThemeManager.Apply(
+                        ApplicationTheme.Dark,
+                        WindowBackdropType.Mica);
+                    break;
+            }
         }
 
         private void FunIcon_OnClick(object sender, RoutedEventArgs e)

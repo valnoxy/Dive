@@ -128,9 +128,10 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                 <TextBlock
+                                    x:Name="LicenseTitle"
                                     FontSize="13"
                                     FontWeight="Medium"
-                                    Text="Founders license" />
+                                    Text="License Status" />
                                 <TextBlock
                                     x:Name="LicenseStatus"
                                     FontSize="12"

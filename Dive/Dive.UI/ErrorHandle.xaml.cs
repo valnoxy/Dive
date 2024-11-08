@@ -6,17 +6,16 @@ using System.Windows.Threading;
 namespace Dive.UI
 {
     /// <summary>
-    /// Interaktionslogik für MessageUI.xaml
+    /// Interaktionslogik für ErrorHandle.xaml
     /// </summary>
-    public partial class MessageUI
+    public partial class ErrorHandle
     {
         public virtual string? Summary => _buttonPressed;
 
         private static string? _buttonPressed;
         private static bool _mainThread;
-        private readonly DispatcherTimer _timer;
 
-        public MessageUI(string title, string message, string btn1 = null, string btn2 = null, bool isMainThread = false, int timer = 0)
+        public ErrorHandle(string title, string message, string btn1 = null, string btn2 = null, bool isMainThread = false, int timer = 0)
         {
             InitializeComponent();
 
@@ -29,27 +28,6 @@ namespace Dive.UI
                 this.Btn1.Visibility = Visibility.Hidden;
             if (btn2 is null or "")
                 this.Btn2.Visibility = Visibility.Hidden;
-
-            if (timer != 0)
-            {
-                var time = TimeSpan.FromSeconds(timer);
-
-                _timer = new DispatcherTimer(new TimeSpan(0, 0, 1), DispatcherPriority.Normal, delegate
-                {
-                    LbTimer.Text = $"{time:%s}s before auto-selecting '{this.Btn2.Content}'.";
-                    if (time == TimeSpan.Zero)
-                    {
-                        _timer?.Stop();
-                        _buttonPressed = "Btn2";
-                        if (_mainThread) this.Hide();
-                        else this.Close();
-                    }
-                    time = time.Add(TimeSpan.FromSeconds(-1));
-                }, Application.Current.Dispatcher);
-
-                _timer.Start();
-            }
-            else LbTimer.Visibility = Visibility.Hidden;
 
             _mainThread = isMainThread;
         }

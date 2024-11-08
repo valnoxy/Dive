@@ -2,9 +2,9 @@
 using Dive.UI.Common;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Xml;
 using System.Xml.Serialization;
+using Dive.UI.Common.Configuration;
 using Microsoft.Win32;
 
 namespace Dive.UI.Pages.ApplyPages

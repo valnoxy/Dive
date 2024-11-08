@@ -33,6 +33,9 @@ namespace Dive.UI.Pages
             }
             ValueVersionPlugins.Content = ValueVersionPlugins.Content.ToString()!.TrimEnd('\n');
 
+            LicenseTitle.Text = Common.Licensing.Validation.Info.Valid
+                ? $"Founders Edition"
+                : "License Status";
             LicenseStatus.Text = Common.Licensing.Validation.Info.Valid 
                 ? $"Licensed to {Common.Licensing.Validation.Info.LicenseName} ({Common.Licensing.Validation.Info.LicenseEmail})" 
                 : "You are currently using the Free Edition.";

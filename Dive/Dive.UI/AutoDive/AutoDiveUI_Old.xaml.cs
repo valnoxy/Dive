@@ -19,10 +19,10 @@ namespace Dive.UI.AutoDive
     public partial class AutoDiveUi_Old
     {
         // AutoDive config
-        private static string? _version = null;
+        private static string? _version;
         private static string? _diskId = null;
         private static string? _diskName = null;
-        private static string _bootloader = null;
+        private static string? _bootloader = null;
         private static string _firmware = null;
         private static bool _useRecovery = false;
         private static string _imageFile = null;

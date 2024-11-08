@@ -1,4 +1,4 @@
-﻿namespace Dive.UI.Common
+﻿namespace Dive.UI.Common.Configuration
 {
     public class ApplyConfig
     {

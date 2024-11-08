@@ -80,11 +80,6 @@ namespace Dive.UI.Pages
             (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate(typeof(CloudContent));
         }
 
-        private void SwitchToRepairPage(object sender, RoutedEventArgs e)
-        {
-            (Application.Current.MainWindow as MainWindow)?.RootNavigation.Navigate(typeof(TweaksContent));
-        }
-
         private async void Dashboard_OnLoaded(object sender, RoutedEventArgs e)
         {
             try
@@ -111,7 +106,6 @@ namespace Dive.UI.Pages
                 if (!_firstLoad)
                 {
                     ImagesSkeleton.Switch();
-                    DriverSkeleton.Switch();
                     ConfigSkeleton.Switch();
                 }
                 _firstLoad = true;

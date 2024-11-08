@@ -7,7 +7,7 @@ namespace Dive.AutoInit
     {
         public static void PerformTelemetry(Configuration config)
         {
-            if (config.Telemetry.DisableCei)
+            if (config.Telemetry!.DisableCei)
                 if (!Telemetry.DisableCEI())
                     CurrentAction.ErrorCounter++;
 
@@ -34,7 +34,7 @@ namespace Dive.AutoInit
 
         public static void PerformTweaks(Configuration config)
         {
-            if (config.Tweaks.CleanupStartPins)
+            if (config.Tweaks!.CleanupStartPins)
                 if (!Tweaks.CleanupStartPins())
                     CurrentAction.ErrorCounter++;
 
@@ -65,16 +65,16 @@ namespace Dive.AutoInit
 
         public static void PerformRemoval(Configuration config)
         {
-            foreach (var app in config.Removal)
+            foreach (var app in config.Removal!)
             {
-                var statusAppx = AppxManagement.RemoveAppx(app.PackageId);
+                var statusAppx = AppxManagement.RemoveAppx(app.PackageId!);
                 if (statusAppx != 0)
                 {
                     DebugConsole.WriteLine($"Failed to remove appx package \"{app.PackageId}\": Exited with code {statusAppx}");
                     CurrentAction.ErrorCounter++;
                 }
 
-                var statusProvisioning = AppxManagement.RemoveAppXProvisionedPackage(app.PackageId);
+                var statusProvisioning = AppxManagement.RemoveAppXProvisionedPackage(app.PackageId!);
                 if (statusProvisioning != 0)
                 {
                     DebugConsole.WriteLine($"Failed to remove provisioned appx package \"{app.PackageId}\": Exited with code {statusProvisioning}");
@@ -85,12 +85,12 @@ namespace Dive.AutoInit
 
         public static void PerformInstallation(Configuration config)
         {
-            foreach (var app in config.Applications)
+            foreach (var app in config.Applications!)
             {
                 if (string.IsNullOrEmpty(app.PathToExe))
                 {
                     // Winget app
-                    var status = AppxManagement.InstallApp(app.PackageId, app.Scope);
+                    var status = AppxManagement.InstallApp(app.PackageId!, app.Scope);
                     if (status != 0)
                     {
                         DebugConsole.WriteLine($"Failed to install appx package \"{app.Name}\": Exited with code {status}");
@@ -100,7 +100,7 @@ namespace Dive.AutoInit
                 else
                 {
                     // App from the internet
-                    var status = AppxManagement.DownloadFile(app.PackageId, app.PathToExe);
+                    var status = AppxManagement.DownloadFile(app.PackageId!, app.PathToExe);
                     if (status != 0)
                     {
                         DebugConsole.WriteLine($"Failed to install appx package \"{app.Name}\": Exited with code {status}");
