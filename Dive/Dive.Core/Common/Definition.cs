@@ -20,5 +20,10 @@
             SeparateBoot,
             Full
         }
+
+        public class CanarySettings
+        {
+            public static readonly bool UseNewDiskOperation = true;
+        }
     }
 }

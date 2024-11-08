@@ -56,6 +56,49 @@ namespace Dive.Core
             if (bootloader == Entities.Bootloader.BOOTMGR && firmware == Entities.Firmware.EFI && (windowsDrive == "\0" || bootDrive == "\0"))
                 throw new ArgumentException("Invalid arguments");
 
+            if (Entities.CanarySettings.UseNewDiskOperation)
+            {
+                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    IsDebug = true,
+                    Message = "Using new disk operation!"
+                }));
+                switch (partitionStyle)
+                {
+                    case Entities.PartitionStyle.Full:
+                        switch (firmware)
+                        {
+                            case Entities.Firmware.EFI:
+                                Action.DiskPreparation.PrepareDisk.EFI.PrepareFull(disk, bootDrive, windowsDrive, recoveryDrive, worker);
+                                break;
+                            case Entities.Firmware.BIOS:
+                                // Not implemented - use diskpart
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(firmware), firmware, null);
+                        }
+
+                        break;
+                    case Entities.PartitionStyle.Single:
+                        // Not implemented - use diskpart
+                        break;
+                    case Entities.PartitionStyle.SeparateBoot:
+                        // Not implemented - use diskpart
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(partitionStyle), partitionStyle, null);
+                }
+
+                worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+                {
+                    Action = Progress.PrepareDisk,
+                    IsError = false,
+                    IsIndeterminate = false,
+                    Message = "Done."
+                }));
+                return;
+            }
+
             // Start Diskpart tool
             var partDest = new Process();
             partDest.StartInfo.FileName = "diskpart.exe";
@@ -111,7 +154,7 @@ namespace Dive.Core
                             break;
                     }
                     break;
-                
+
                 case Entities.PartitionStyle.SeparateBoot:
                     switch (firmware)
                     {
@@ -144,7 +187,7 @@ namespace Dive.Core
                             break;
                     }
                     break;
-                
+
                 case Entities.PartitionStyle.Single:
                     switch (firmware)
                     {

@@ -34,9 +34,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Dism" Version="2.5.2" />
+		<PackageReference Include="Microsoft.Dism" Version="3.1.0" />
 		<PackageReference Include="Microsoft.Wim" Version="1.2.11" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Management" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
