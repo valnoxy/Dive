@@ -9,16 +9,10 @@ namespace Dive.UI.Common
         public static PluginManager PluginManager { get; } = new();
     }
 
-    public class SettingChangedEventArgs : EventArgs
+    public class SettingChangedEventArgs(string propertyName, object newValue) : EventArgs
     {
-        public string PropertyName { get; }
-        public object NewValue { get; }
-
-        public SettingChangedEventArgs(string propertyName, object newValue)
-        {
-            PropertyName = propertyName;
-            NewValue = newValue;
-        }
+        public string PropertyName { get; } = propertyName;
+        public object NewValue { get; } = newValue;
     }
 
     public class ApplyDetails

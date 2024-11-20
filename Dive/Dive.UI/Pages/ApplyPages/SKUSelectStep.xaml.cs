@@ -48,6 +48,9 @@ namespace Dive.UI.Pages.ApplyPages
             images = [];
             var counter = 0;
 
+            LoadingScreen.Visibility = Visibility.Visible;
+            SkuListView.Visibility = Visibility.Hidden;
+
             await Task.Run(() =>
             {
                 // Find WIM USB device
@@ -205,6 +208,8 @@ namespace Dive.UI.Pages.ApplyPages
 
                 ImageCounter.Text = string.Format(localizedImageCounter, counter);
                 SkuListView.ItemsSource = images;
+                LoadingScreen.Visibility = Visibility.Hidden;
+                SkuListView.Visibility = Visibility.Visible;
             });
         }
 

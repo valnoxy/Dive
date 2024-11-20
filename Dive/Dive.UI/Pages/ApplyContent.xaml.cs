@@ -63,8 +63,8 @@ namespace Dive.UI.Pages
                         }
                     }
 
-                    var applyPage = new ApplySelectStep();
-                    //var applyPage = new ApplyImageStep();
+                    //var applyPage = new ApplySelectStep(); // Old
+                    var applyPage = new ApplyImageStep(); // New
                     FrameWindow.Content = applyPage;
                     break;
                 case ApplySelectStep:

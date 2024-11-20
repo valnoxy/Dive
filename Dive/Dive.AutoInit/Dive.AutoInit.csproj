@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<TargetFramework>net9.0-windows</TargetFramework>
 		<RootNamespace>Dive.AutoInit</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>

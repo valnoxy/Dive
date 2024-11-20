@@ -35,29 +35,35 @@
         </Grid>
 
         <ui:Card Grid.Row="1">
-            <ui:ListView Name="SkuListView" 
-                     Margin="-10"
-                     VerticalAlignment="Center"
-                     SelectionChanged="SKUListView_Selected"
-                     ItemsSource="{Binding ImageList}" 
-                     Height="332">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="5,3,0,3" >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="45" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+            <Grid>
+                <ui:ListView Name="SkuListView" 
+                             Margin="-10"
+                             VerticalAlignment="Center"
+                             SelectionChanged="SKUListView_Selected"
+                             ItemsSource="{Binding ImageList}" 
+                             Height="332">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5,3,0,3" >
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="45" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
-                            <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
-                            <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
-                            <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ui:ListView>
+                                <Image Grid.Column="0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
+                                <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
+                                <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ui:ListView>
+                <StackPanel VerticalAlignment="Center" x:Name="LoadingScreen">
+                    <ui:ProgressRing Visibility="Visible" IsIndeterminate="True" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                    <ui:TextBlock Text="Loading files ..." FontTypography="Subtitle" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </ui:Card>
 
         <TextBlock Grid.Row="2" VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="#FFFFFF"/>

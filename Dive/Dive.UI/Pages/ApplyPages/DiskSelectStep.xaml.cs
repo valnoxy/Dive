@@ -73,7 +73,6 @@ namespace Dive.UI.Pages.ApplyPages
 
             ContentWindow = this;
             LoadDisks();
-            CheckFirmware();
 
             if (ApplyDetailsInstance.Name.ToLower().Contains("windows xp") || ApplyDetailsInstance.Name.ToLower().Contains("windows 2000"))
             {
@@ -85,19 +84,23 @@ namespace Dive.UI.Pages.ApplyPages
             {
                 UseRecoveryBtn.IsChecked = false;
                 UseNTLDRBtn.IsChecked = false;
+                CheckFirmware();
             }
             else if (ApplyDetailsInstance.Name.ToLower().Contains("windows 7"))
             {
                 UseRecoveryBtn.IsChecked = true;
+                CheckFirmware();
             }
             else if (ApplyDetailsInstance.Name.Contains("(") || ApplyDetailsInstance.Name.Contains(")"))
             {
                 DeploymentOptionInstance.UseCopyProfile = true;
+                CheckFirmware();
             }
             else
             {
                 UseNTLDRBtn.IsChecked = false;
                 UseRecoveryBtn.IsChecked = true;
+                CheckFirmware();
             }
         }
 

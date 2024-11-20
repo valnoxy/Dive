@@ -17,59 +17,85 @@
             <Image x:Name="ImageIcon" Height="60"/>
             <ui:TextBlock x:Name="ImageName"
                           FontTypography="Title"
-                          Text="Installing Windows 11 Pro"
+                          Text="Installing OS"
                           Margin="0,5,0,0"
                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                           VerticalAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1">
-            <ui:Card Width="400" Margin="0,10,0,0" Background="#393d1b">
+            <ui:Card Width="400" Margin="0,10,0,0" x:Name="CopyWindowsCard">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
 
                     <ui:TextBlock Grid.Column="0"
-                                  Text="Applying image ..."
+                                  Text="Copying Windows files ..."
                                   VerticalAlignment="Center"
                                   FontTypography="Body"/>
-                    <ui:ProgressRing Grid.Column="1" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden"/>
-                    <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="1" FontSize="26" Visibility="Visible"/>
+                    <ui:TextBlock Grid.Column="1"
+                                  Text="0%"
+                                  VerticalAlignment="Center"
+                                  FontTypography="Body"
+                                  x:Name="CopyWindowsPercentage"
+                                  Visibility="Hidden"
+                                  TextAlignment="Right"/>
+                    <ui:ProgressRing Grid.Column="2" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden" x:Name="CopyWindowsProgRing"/>
+                    <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" x:Name="CopyWindowsCheck"/>
                 </Grid>
             </ui:Card>
-            <ui:Card Width="400" Margin="0,10,0,0">
+            <ui:Card Width="400" Margin="0,10,0,0" x:Name="FinalizeDiskCard">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
 
                     <ui:TextBlock Grid.Column="0"
-                                  Text="Installing bootloader ..."
+                                  Text="Finalizing disk ..."
                                   VerticalAlignment="Center"
                                   FontTypography="Body"/>
-                    <ui:ProgressRing Grid.Column="1" Height="30" Width="30" IsIndeterminate="True" Visibility="Visible"/>
+                    <ui:TextBlock Grid.Column="1"
+                                  Text="0%"
+                                  VerticalAlignment="Center"
+                                  FontTypography="Body"
+                                  x:Name="FinalizeDiskPercentage"
+                                  Visibility="Hidden"
+                                  TextAlignment="Right"/>
+                    <ui:ProgressRing Grid.Column="2" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden" x:Name="FinalizeDiskProgRing"/>
+                    <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" x:Name="FinalizeDiskCheck"/>
                 </Grid>
             </ui:Card>
-            <ui:Card Width="400" Margin="0,10,0,0">
+            <ui:Card Width="400" Margin="0,10,0,0" x:Name="FeaturesAndDriversCard">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
 
                     <ui:TextBlock Grid.Column="0"
-                                  Text="Installing drivers ..."
+                                  Text="Installing features &amp; drivers ..."
                                   VerticalAlignment="Center"
                                   FontTypography="Body"/>
-                    <ui:ProgressRing Grid.Column="1" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden"/>
+                    <ui:TextBlock Grid.Column="1"
+                                  Text="0%"
+                                  VerticalAlignment="Center"
+                                  FontTypography="Body"
+                                  x:Name="FeaturesAndDriversPercentage"
+                                  Visibility="Hidden"
+                                  TextAlignment="Right"/>
+                    <ui:ProgressRing Grid.Column="2" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden" x:Name="FeaturesAndDriversProgRing"/>
+                    <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" x:Name="FeaturesAndDriversCheck"/>
                 </Grid>
             </ui:Card>
             
             <Grid>
-                <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
+                <StackPanel VerticalAlignment="Center" Margin="0,25,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
                     <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF" Text="{DynamicResource InstallPageWaiting}"/>
                 </StackPanel>
