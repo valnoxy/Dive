@@ -23,8 +23,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource ApplySKUTitle}"/>
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource ApplySKUTitleDescription}"/>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource ApplySKUTitle}"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource ApplySKUTitleDescription}"/>
             </StackPanel>
             <ui:Button Grid.Column="1"
                           Click="ReloadBtn_Clicked" 
@@ -66,7 +66,7 @@
             </Grid>
         </ui:Card>
 
-        <TextBlock Grid.Row="2" VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="#FFFFFF"/>
+        <TextBlock Grid.Row="2" VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
 
     </Grid>
 

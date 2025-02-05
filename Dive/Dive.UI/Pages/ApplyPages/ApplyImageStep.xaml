@@ -97,7 +97,7 @@
             <Grid>
                 <StackPanel VerticalAlignment="Center" Margin="0,25,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF" Text="{DynamicResource InstallPageWaiting}"/>
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource InstallPageWaiting}"/>
                 </StackPanel>
             </Grid>
         </StackPanel>

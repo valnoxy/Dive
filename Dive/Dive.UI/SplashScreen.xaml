@@ -29,10 +29,10 @@
                         <TextBlock
                             FontSize="28"
                             FontWeight="Bold"
-                            Foreground="#FFFFFF"
+                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                             Text="Welcome to Dive 👋" />
                         <TextBlock
-                            Foreground="#FFFFFF"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                             Text="Enter your preferences and click 'Next' to continue." />
                         <ui:CardControl Icon="{ui:SymbolIcon LocalLanguage24}" Margin="0,15,0,0">
                             <ui:CardControl.Header>

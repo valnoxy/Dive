@@ -24,8 +24,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource ConfigureTitle}"/>
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource ConfigureTitleDescription}"/>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource ConfigureTitle}"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource ConfigureTitleDescription}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
                 <ui:Button Margin="0,0,8,0" Content="{DynamicResource ImportBtn}" Click="Import_OnClicked" />

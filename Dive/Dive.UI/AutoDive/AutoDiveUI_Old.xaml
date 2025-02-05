@@ -21,11 +21,11 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="1">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
                     Installing Windows
                 </TextBlock>
 
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
                     Dive will now prepare your computer with Windows automatically. This can take a while.
                 </TextBlock>
             </StackPanel>
@@ -90,7 +90,7 @@
 
         <StackPanel VerticalAlignment="Center" Margin="0,50,0,0">
             <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-            <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF">
+            <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
                 Waiting ...
             </TextBlock>
         </StackPanel>

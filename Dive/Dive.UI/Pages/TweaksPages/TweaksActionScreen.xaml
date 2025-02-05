@@ -16,11 +16,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
                     Migrating Windows
             </TextBlock>
 
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
                     Dive will now migrate your legacy Windows installation to EFI.
             </TextBlock>
         </StackPanel>
@@ -50,7 +50,7 @@
             <Grid Grid.Row="1">
                 <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF">
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
                         Waiting ...
                     </TextBlock>
                 </StackPanel>

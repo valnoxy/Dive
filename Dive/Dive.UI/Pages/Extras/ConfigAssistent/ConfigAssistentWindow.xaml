@@ -22,8 +22,6 @@
             <ui:Card>
                 <StackPanel>
                     <TextBlock> </TextBlock>
-                    <TextBlock> </TextBlock>
-                    <TextBlock> </TextBlock>
                 </StackPanel>
             </ui:Card>
         </Grid>

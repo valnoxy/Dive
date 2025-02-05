@@ -24,9 +24,9 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource DiskSelectTitle}"/>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource DiskSelectTitle}"/>
 
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource DiskSelectDescription}"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource DiskSelectDescription}"/>
             </StackPanel>
 
             <ui:Button Grid.Column="1"

@@ -23,8 +23,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="Which profile do you want to migrate?"/>
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="Select all the profiles you want to migrate to continue."/>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Which profile do you want to migrate?"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="Select all the profiles you want to migrate to continue."/>
             </StackPanel>
         </Grid>
 

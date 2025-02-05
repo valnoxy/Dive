@@ -73,12 +73,12 @@
 	<ItemGroup>
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="Standard.Licensing" Version="1.2.1" />
-		<PackageReference Include="System.Text.Json" Version="9.0.0" />
-		<PackageReference Include="WLED" Version="2.0.50" />
-		<PackageReference Include="WPF-UI" Version="3.0.5" />
+		<PackageReference Include="System.Text.Json" Version="9.0.1" />
+		<PackageReference Include="WLED" Version="2.0.52" />
+		<PackageReference Include="WPF-UI" Version="4.0.0" />
 		<PackageReference Include="XamlAnimatedGif" Version="2.3.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="9.0.0" />
+		<PackageReference Include="System.Management" Version="9.0.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Dive.Core\Dive.Core.csproj" />

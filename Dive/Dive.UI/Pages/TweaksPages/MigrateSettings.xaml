@@ -18,11 +18,11 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
                 How do you want to configure the migration?
             </TextBlock>
 
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF">
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
                 Please configure the migration process to continue.
             </TextBlock>
         </StackPanel>

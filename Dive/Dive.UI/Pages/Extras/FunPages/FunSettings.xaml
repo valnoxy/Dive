@@ -23,7 +23,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
                         How do you want to configure the Fun?
                 </TextBlock>
             </StackPanel>

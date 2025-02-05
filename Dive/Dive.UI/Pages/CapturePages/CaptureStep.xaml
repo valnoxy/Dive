@@ -16,8 +16,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource CapturingTitle}"/>
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource CapturingDescription}"/>
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource CapturingTitle}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource CapturingDescription}"/>
         </StackPanel>
 
         <Grid Grid.Row="1">
@@ -45,7 +45,7 @@
             <Grid Grid.Row="1">
                 <StackPanel VerticalAlignment="Center" Margin="0,15,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="#FFFFFF" Text="{DynamicResource CapturingWaiting}"/>
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource CapturingWaiting}"/>
                 </StackPanel>
             </Grid>
         </Grid>

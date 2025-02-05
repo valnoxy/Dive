@@ -23,9 +23,9 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource CaptureSaveToTitle}"/>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource CaptureSaveToTitle}"/>
 
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource CaptureSaveToDescription}"/>
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource CaptureSaveToDescription}"/>
             </StackPanel>
             <ui:Button Grid.Column="1" Visibility="Hidden" HorizontalAlignment="Right" Content="Reload" Icon="{ui:SymbolIcon ArrowReset24}" Margin="0,0,0,0"/>
         </Grid>
@@ -82,7 +82,7 @@
                     </Grid>
                 </ui:CardControl.Header>
             </ui:CardControl>
-            <TextBlock VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="#FFFFFF"/>
+            <TextBlock VerticalAlignment="Bottom" x:Name="ImageCounter" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
         </StackPanel>
     </Grid>
 </UserControl>

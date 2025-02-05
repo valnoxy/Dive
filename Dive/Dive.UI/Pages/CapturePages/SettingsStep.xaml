@@ -16,9 +16,9 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" Text="{DynamicResource CaptureSettingsTitle}"/>
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource CaptureSettingsTitle}"/>
 
-            <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" Text="{DynamicResource CaptureSettingsDescription}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource CaptureSettingsDescription}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Height="350">

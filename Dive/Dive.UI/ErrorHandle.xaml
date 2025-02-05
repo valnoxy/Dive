@@ -27,11 +27,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" x:Name="MessageTitle" Margin="0,0,0,5"> 
+                <TextBlock Grid.Row="0" FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" x:Name="MessageTitle" Margin="0,0,0,5"> 
                     Message.Title
                 </TextBlock>
 
-                <TextBlock Grid.Row="1" FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="MessageText" TextWrapping="Wrap"> 
+                <TextBlock Grid.Row="1" FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" x:Name="MessageText" TextWrapping="Wrap"> 
                     Message.Text
                 </TextBlock>
             </Grid>

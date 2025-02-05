@@ -23,11 +23,11 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FFFFFF" x:Name="MessageTitle" Margin="0,0,0,5">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" x:Name="MessageTitle" Margin="0,0,0,5">
                     Message.Title
                 </TextBlock>
 
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="MessageText" TextWrapping="Wrap">
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" x:Name="MessageText" TextWrapping="Wrap">
                     Message.Text
                 </TextBlock>
             </StackPanel>
@@ -40,7 +40,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0" HorizontalAlignment="Left">
-                    <TextBlock FontWeight="Normal" FontSize="14" Foreground="#FFFFFF" x:Name="LbTimer" VerticalAlignment="Center" TextAlignment="Right"/>
+                    <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorPrimaryBrush}" x:Name="LbTimer" VerticalAlignment="Center" TextAlignment="Right"/>
                 </Grid>
 
                 <Grid Grid.Column="1" Margin="15,0,0,0" HorizontalAlignment="Right">
