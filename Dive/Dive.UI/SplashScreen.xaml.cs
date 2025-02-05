@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Dive.Core.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using Debug = Dive.UI.Common.UserInterface.Debug;
 
 namespace Dive.UI
 {
@@ -61,12 +63,13 @@ namespace Dive.UI
                 if (string.IsNullOrEmpty(language)) return;
 
                 var languageCode = _languages.Find(x => x.Name == language)?.Code;
-                Common.Debug.WriteLine($"Trying to load language '{language}' with code '{languageCode}' ...");
+                Debug.WriteLine($"Trying to load language '{language}' with code '{languageCode}' ...");
+                Logging.Log($"Trying to load language '{language}' with code '{languageCode}' ...");
                 Common.LocalizationManager.LoadLanguage(languageCode!);
             }
             catch (Exception ex) 
             {
-                Common.Debug.WriteLine(ex.ToString(), ConsoleColor.Red);
+                Debug.WriteLine(ex.ToString(), ConsoleColor.Red);
             }
         }
 

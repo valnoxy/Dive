@@ -11,9 +11,9 @@ using Microsoft.Win32;
 namespace Dive.UI.Pages.ApplyPages
 {
     /// <summary>
-    /// Interaktionslogik für DeploymentSettingsStep.xaml
+    /// Interaktionslogik für DeploymentSettingsStepOld.xaml
     /// </summary>
-    public partial class DeploymentSettingsStep
+    public partial class DeploymentSettingsStepOld
     {
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
         private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
@@ -22,7 +22,7 @@ namespace Dive.UI.Pages.ApplyPages
         private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
         private static readonly OutOfBoxExperienceInfo OutOfBoxExperienceInfoInstance = OutOfBoxExperienceInfo.Instance;
         
-        public DeploymentSettingsStep()
+        public DeploymentSettingsStepOld()
         {
             InitializeComponent();
             DeploymentInfoInstance.UseUserInfo = false;
@@ -33,10 +33,6 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void Import_OnClicked(object sender, RoutedEventArgs e)
         {
-            var w = new Extras.ConfigAssistent.ConfigAssistentWindow();
-            w.ShowDialog();
-
-            return;
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "Dive Configuration (*.xml)|*.xml"

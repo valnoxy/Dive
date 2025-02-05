@@ -6,6 +6,7 @@ using System.Windows;
 using System.Xml;
 using Dive.UI.Common;
 using System.Threading.Tasks;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages
 {

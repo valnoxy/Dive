@@ -6,6 +6,7 @@ using System.Windows.Media;
 using Dive.Core.Common;
 using Dive.UI.Common;
 using Dive.UI.Common.Deployment;
+using Dive.UI.Common.UserInterface;
 using Newtonsoft.Json;
 
 namespace Dive.UI.Pages.ApplyPages

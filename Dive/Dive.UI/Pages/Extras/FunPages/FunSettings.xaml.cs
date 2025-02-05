@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.Extras.FunPages
 {

@@ -7,6 +7,8 @@ using System.Windows;
 using System.Xml;
 using Dive.UI.Common;
 using System.Threading.Tasks;
+using Dive.Core.Common;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -110,21 +112,23 @@ namespace Dive.UI.Pages.ApplyPages
                                 // Skip if image is Windows PE
                                 if (productName != null && productName.ToLower().Contains("pe"))
                                 {
-                                    Common.Debug.Write("Image ");
-                                    Common.Debug.Write(productName, true, ConsoleColor.DarkYellow);
-                                    Common.Debug.Write(" in file ", true);
-                                    Common.Debug.Write(binary, true, ConsoleColor.DarkYellow);
-                                    Common.Debug.Write(" is a Windows PE image and will be skipped\n", true);
+                                    Debug.Write("Image ");
+                                    Debug.Write(productName, true, ConsoleColor.DarkYellow);
+                                    Debug.Write(" in file ", true);
+                                    Debug.Write(binary, true, ConsoleColor.DarkYellow);
+                                    Debug.Write(" is a Windows PE image and will be skipped\n", true);
+                                    Logging.Log($"Image {productName} in file {binary} is a Windows PE image and will be skipped.", Logging.LogLevel.WARNING);
                                     break;
                                 }
 
-                                Common.Debug.Write("Found ");
-                                Common.Debug.Write(productName + " (" + productArch + ")", true,
+                                Debug.Write("Found ");
+                                Debug.Write(productName + " (" + productArch + ")", true,
                                     ConsoleColor.DarkYellow);
-                                Common.Debug.Write(" with Index ", true);
-                                Common.Debug.Write(productId, true, ConsoleColor.DarkYellow);
-                                Common.Debug.Write(" in Image ", true);
-                                Common.Debug.Write(binary + "\n", true, ConsoleColor.DarkYellow);
+                                Debug.Write(" with Index ", true);
+                                Debug.Write(productId, true, ConsoleColor.DarkYellow);
+                                Debug.Write(" in Image ", true);
+                                Debug.Write(binary + "\n", true, ConsoleColor.DarkYellow);
+                                Logging.Log($"Found {productName} ({productArch}) with Index {productId} in Image {binary}");
 
                                 // Determine Windows Version
                                 var imageVersion = "windows";
@@ -196,6 +200,7 @@ namespace Dive.UI.Pages.ApplyPages
                         catch (Exception ex)
                         {
                             Debug.WriteLine(ex.Message, ConsoleColor.Red);
+                            Logging.Log(ex.Message, Logging.LogLevel.ERROR);
                         }
                     }
                 }
@@ -223,13 +228,14 @@ namespace Dive.UI.Pages.ApplyPages
             _applyDetailsInstance.Build = item.Build;
             _applyDetailsInstance.NTVersion = item.NTVersion;
 
-            Common.Debug.Write("Selected ");
-            Common.Debug.Write(_applyDetailsInstance.Name, true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" with Index ", true);
-            Common.Debug.Write(_applyDetailsInstance.Index.ToString(), true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" in Image ", true);
-            Common.Debug.Write(_applyDetailsInstance.FileName, true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" for deployment.\n", true);
+            Debug.Write("Selected ");
+            Debug.Write(_applyDetailsInstance.Name, true, ConsoleColor.DarkYellow);
+            Debug.Write(" with Index ", true);
+            Debug.Write(_applyDetailsInstance.Index.ToString(), true, ConsoleColor.DarkYellow);
+            Debug.Write(" in Image ", true);
+            Debug.Write(_applyDetailsInstance.FileName, true, ConsoleColor.DarkYellow);
+            Debug.Write(" for deployment.\n", true);
+            Logging.Log($"Selected {_applyDetailsInstance.Name} with Index {_applyDetailsInstance.Index} in Image {_applyDetailsInstance.FileName} for deployment.");
 
             ApplyContent.ContentWindow!.NextBtn.IsEnabled = true;
         }

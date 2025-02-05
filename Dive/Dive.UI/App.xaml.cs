@@ -21,6 +21,7 @@ using System.Reflection;
 using System.IO;
 using System.Windows.Threading;
 using Action = System.Action;
+using Debug = Dive.UI.Common.UserInterface.Debug;
 
 namespace Dive.UI
 {
@@ -73,7 +74,7 @@ namespace Dive.UI
         {
             var args = Environment.GetCommandLineArgs();
             var handle = GetConsoleWindow();
-            var loadedPlugins = 0;
+            int loadedPlugins;
 
             if (args.Length == 1)
             {
@@ -83,14 +84,15 @@ namespace Dive.UI
                 ShowWindow(handle, SwHide);
 #endif
                 // Initialize Console
-                Common.Debug.InitializeConsole();
+                Core.Common.Logging.Initialize();
+                Debug.InitializeConsole();
 
                 // Load plugins
-                Common.Debug.WriteLine("Loading plugins ...");
+                Debug.WriteLine("Loading plugins ...");
                 loadedPlugins = Plugin.PluginManager.LoadPlugins(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
-                Common.Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
+                Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
                 Plugin.PluginManager.InitPlugins();
-                Common.Debug.WriteLine("Initialized all plugins.");
+                Debug.WriteLine("Initialized all plugins.");
 
                 var allDrives = DriveInfo.GetDrives();
                 foreach (var d in allDrives)
@@ -126,8 +128,8 @@ namespace Dive.UI
             // Debug switches
             if (args.Contains("--unattend-test"))
             {
-                Common.Debug.WriteLine("Debug console initialized.");
-                Common.Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
+                Debug.WriteLine("Debug console initialized.");
+                Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
                 var deploymentInfoInstance = DeploymentInfo.Instance;
                 var deploymentOptionInstance = DeploymentOption.Instance;
@@ -146,19 +148,19 @@ namespace Dive.UI
                 oemInfoInstance.SupportURL = "https://fabrikam.com";
                 oemInfoInstance.SupportPhone = "+1 111 11111111";
                 
-                Common.Debug.WriteLine("Use User: " + deploymentInfoInstance.UseUserInfo);
-                Common.Debug.WriteLine("Username: " + deploymentInfoInstance.Username);
-                Common.Debug.WriteLine("Password: " + deploymentInfoInstance.Password);
-                Common.Debug.WriteLine("Use S Mode: " + deploymentOptionInstance.UseSMode);
-                Common.Debug.WriteLine("Use Copy Path: " + deploymentOptionInstance.UseCopyProfile);
-                Common.Debug.WriteLine("Use OEM: " + oemInfoInstance.UseOemInfo);
-                Common.Debug.WriteLine("Manufacturer: " + oemInfoInstance.Manufacturer);
-                Common.Debug.WriteLine("Model: " + oemInfoInstance.Model);
-                Common.Debug.WriteLine("Support Tel.: " + oemInfoInstance.SupportPhone);
-                Common.Debug.WriteLine("Support Hours: " + oemInfoInstance.SupportHours);
-                Common.Debug.WriteLine("Support URL: " + oemInfoInstance.SupportURL);
+                Debug.WriteLine("Use User: " + deploymentInfoInstance.UseUserInfo);
+                Debug.WriteLine("Username: " + deploymentInfoInstance.Username);
+                Debug.WriteLine("Password: " + deploymentInfoInstance.Password);
+                Debug.WriteLine("Use S Mode: " + deploymentOptionInstance.UseSMode);
+                Debug.WriteLine("Use Copy Path: " + deploymentOptionInstance.UseCopyProfile);
+                Debug.WriteLine("Use OEM: " + oemInfoInstance.UseOemInfo);
+                Debug.WriteLine("Manufacturer: " + oemInfoInstance.Manufacturer);
+                Debug.WriteLine("Model: " + oemInfoInstance.Model);
+                Debug.WriteLine("Support Tel.: " + oemInfoInstance.SupportPhone);
+                Debug.WriteLine("Support Hours: " + oemInfoInstance.SupportHours);
+                Debug.WriteLine("Support URL: " + oemInfoInstance.SupportURL);
 
-                Common.Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
+                Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
                 config = UnattendBuilder.Build();
                 Console.WriteLine(config);
 
@@ -167,11 +169,11 @@ namespace Dive.UI
 #endif
 
             // Load plugins
-            Common.Debug.WriteLine("Loading plugins ...");
+            Debug.WriteLine("Loading plugins ...");
             loadedPlugins = Plugin.PluginManager.LoadPlugins(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
-            Common.Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
+            Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
             Plugin.PluginManager.InitPlugins();
-            Common.Debug.WriteLine("Initialized all plugins.");
+            Debug.WriteLine("Initialized all plugins.");
             Plugin.PluginManager.RunStartup();
 
             if (args.Contains("--autoinit-boot"))
@@ -185,8 +187,8 @@ namespace Dive.UI
 
             if (args.Contains("--autodive"))
             {
-                Common.Debug.InitializeConsole();
-                Common.Debug.WriteLine("Loading AutoDive UI ...");
+                Debug.InitializeConsole();
+                Debug.WriteLine("Loading AutoDive UI ...");
                 var adUi = new AutoDiveUI();
                 adUi.ShowDialog();
                 Environment.Exit(0);

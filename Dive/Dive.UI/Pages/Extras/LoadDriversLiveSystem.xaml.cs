@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading;
 using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Threading;
 
 namespace Dive.UI.Pages.Extras
 {

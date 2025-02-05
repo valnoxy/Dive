@@ -10,6 +10,7 @@ using Dive.UI.Pages;
 using Dive.Core.Common;
 using Dive.UI.Common.Configuration;
 using Dive.Core.Action.Deployment;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.AutoDive
 {
@@ -165,11 +166,11 @@ namespace Dive.UI.AutoDive
                     product_size = node.SelectSingleNode("TOTALBYTES").InnerText;
                     var sizeInGB = Modules.convertSize(Convert.ToDouble(product_size));
 
-                    Common.Debug.WriteLine("--- Image ---", ConsoleColor.White);
-                    Common.Debug.WriteLine($"ID : {product_id}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Name : {product_name}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Size : {sizeInGB}", ConsoleColor.White);
-                    Common.Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
+                    Debug.WriteLine("--- Image ---", ConsoleColor.White);
+                    Debug.WriteLine($"ID : {product_id}", ConsoleColor.White);
+                    Debug.WriteLine($"Name : {product_name}", ConsoleColor.White);
+                    Debug.WriteLine($"Size : {sizeInGB}", ConsoleColor.White);
+                    Debug.WriteLine("--- Image ---\n", ConsoleColor.White);
 
                     var imageVersion = "";
 
@@ -232,7 +233,7 @@ namespace Dive.UI.AutoDive
             }
             catch (Exception ex)
             {
-                Common.Debug.WriteLine(ex.Message, ConsoleColor.Red);
+                Debug.WriteLine(ex.Message, ConsoleColor.Red);
                 return false;
             }
         }
@@ -258,19 +259,19 @@ namespace Dive.UI.AutoDive
                     if (info["Size"] != null) size = info["Size"].ToString();
                     if (info["Size"] != null) sizeInGb = Modules.convertSize(Convert.ToDouble(info["Size"]));
 
-                    Common.Debug.WriteLine($"DeviceID: {deviceId}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Model: {model}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Interface: {interfaceType}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Serial: {serial}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Size: {size}", ConsoleColor.White);
-                    Common.Debug.WriteLine($"Size in GB: {sizeInGb}", ConsoleColor.White);
+                    Debug.WriteLine($"DeviceID: {deviceId}", ConsoleColor.White);
+                    Debug.WriteLine($"Model: {model}", ConsoleColor.White);
+                    Debug.WriteLine($"Interface: {interfaceType}", ConsoleColor.White);
+                    Debug.WriteLine($"Serial: {serial}", ConsoleColor.White);
+                    Debug.WriteLine($"Size: {size}", ConsoleColor.White);
+                    Debug.WriteLine($"Size in GB: {sizeInGb}", ConsoleColor.White);
 
                     if (deviceId == $"\\\\.\\PHYSICALDRIVE{diskId}")
                     {
                         _diskName = model;
                         return true;
                     }
-                    Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
+                    Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }
             catch
@@ -448,17 +449,17 @@ namespace Dive.UI.AutoDive
                     throw new ArgumentOutOfRangeException();
             }
 
-            Common.Debug.Write("New Windows drive: ");
-            Common.Debug.Write($"{windowsDrive}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("New Windows drive: ");
+            Debug.Write($"{windowsDrive}\n", true, ConsoleColor.DarkYellow);
 
-            Common.Debug.Write("New Boot drive: ");
-            Common.Debug.Write($"{bootDrive}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("New Boot drive: ");
+            Debug.Write($"{bootDrive}\n", true, ConsoleColor.DarkYellow);
 
-            Common.Debug.Write("New Recovery drive: ");
-            Common.Debug.Write($"{recoveryDrive}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("New Recovery drive: ");
+            Debug.Write($"{recoveryDrive}\n", true, ConsoleColor.DarkYellow);
 
-            Common.Debug.Write("Using partition style: ");
-            Common.Debug.Write($"{partStyle}\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("Using partition style: ");
+            Debug.Write($"{partStyle}\n", true, ConsoleColor.DarkYellow);
 
             #endregion
 

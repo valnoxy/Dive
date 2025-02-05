@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
 using Dive.UI.Common.Deployment;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.ApplyPages
 {

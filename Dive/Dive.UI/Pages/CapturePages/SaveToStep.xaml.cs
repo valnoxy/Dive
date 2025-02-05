@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.CapturePages
 {
@@ -66,7 +67,7 @@ namespace Dive.UI.Pages.CapturePages
             {
                 Common.CaptureInfo.PathToImage = item.Path;
 
-                Common.Debug.WriteLine($"Selected Path: {Common.CaptureInfo.PathToImage}", ConsoleColor.White);
+                Debug.WriteLine($"Selected Path: {Common.CaptureInfo.PathToImage}", ConsoleColor.White);
                 Validate();
             }
         }

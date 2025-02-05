@@ -251,6 +251,47 @@ namespace Dive.Core
                 IsIndeterminate = false,
                 Message = "Applying image ..."
             }));
+
+            // Checking if WIM File is an HTTP/S URL -> Download file to WINDOWS-DISK:\Dive\image.wim
+            var isUrl = Uri.TryCreate(wimFile, UriKind.Absolute, out var uriResult)
+                   && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            if (isUrl)
+            {
+                // Download async
+                var downloader = new FileDownloaderSync();
+                var outputPath = Path.Combine(path, "Dive", uriResult.Segments[^1]); // Should be something like: C:\Dive\pro.wim
+                Directory.CreateDirectory(Path.Combine(path, "Dive"));
+
+                var progress = new Progress<int>(percentage =>
+                {
+                    worker?.ReportProgress(percentage, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.ApplyImage,
+                        IsError = false,
+                        IsIndeterminate = false,
+                        Message = $"Downloading Windows Image file ({percentage}%) ..."
+                    }));
+                });
+
+                try
+                {
+                    downloader.DownloadFile(wimFile, outputPath, progress);
+                }
+                catch (Exception ex)
+                {
+                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    {
+                        Action = Progress.ApplyImage,
+                        IsError = true,
+                        IsIndeterminate = false,
+                        Message = $"Failed to download Windows Image: {ex.Message}"
+                    }));
+                    return;
+                }
+
+                wimFile = outputPath;
+            }
+
             Apply.WriteToDisk(wimFile, index, path, worker);
             worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
             {

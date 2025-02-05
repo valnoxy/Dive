@@ -39,7 +39,9 @@
                        Click="ReloadBtn_Clicked" 
                        HorizontalAlignment="Right"
                        Icon="{ui:SymbolIcon Settings24}" 
-                       Margin="10,0,0,0"/>
+                       Margin="10,0,0,0"
+                       Height="32"
+                       IsEnabled="False"/>
         </Grid>
 
         <ui:Card Grid.Row="1">
@@ -61,7 +63,7 @@
 
                                 <Image Grid.Column="0" Margin="5,2,2,0" x:Name="ImageIcon" Source="{Binding Picture}" Height="40"/>
                                 <TextBlock Grid.Column="1" x:Name="ImageName" Text="{Binding Name}" VerticalAlignment="Center" Margin="10,0,0,0" FontSize="15"/>
-                                <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding ImageFile}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
+                                <TextBlock Grid.Column="2" x:Name="ImageFile" Text="{Binding Language}" VerticalAlignment="Top" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                                 <TextBlock Grid.Column="2" x:Name="ImageArch" Text="{Binding Arch}" VerticalAlignment="Bottom" HorizontalAlignment="Right" TextAlignment="Right" FontSize="13"/>
                             </Grid>
                         </DataTemplate>

@@ -1,9 +1,11 @@
 ﻿using Dive.UI.Common;
 using Dive.UI.Pages.ApplyPages;
 using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages
 {
@@ -14,8 +16,9 @@ namespace Dive.UI.Pages
     {
         public static CloudContent? ContentWindow;
 
-        CloudSelectStep CSS = new CloudSelectStep();
-        DeploymentSettingsStep deploymentSettingsStep = new DeploymentSettingsStep();
+        private readonly CloudSelectStep _css = new();
+        private readonly DeploymentSettingsStep _deploymentSettingsStep = new();
+        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
 
         public CloudContent()
         {
@@ -23,7 +26,7 @@ namespace Dive.UI.Pages
 
             NextBtn.IsEnabled = false;
             BackBtn.IsEnabled = false;
-            FrameWindow.Content = CSS;
+            FrameWindow.Content = _css;
             ContentWindow = this;
         }
 
@@ -32,24 +35,47 @@ namespace Dive.UI.Pages
             switch (FrameWindow.Content)
             {
                 case CloudSelectStep:
-                    FrameWindow.Content = deploymentSettingsStep;
+                    FrameWindow.Content = _deploymentSettingsStep;
                     BackBtn.IsEnabled = true;
                     break;
                 case DeploymentSettingsStep:
-                    DiskSelectStep DiskSS = new DiskSelectStep();
-                    FrameWindow.Content = DiskSS;
+                    var diskStep = new DiskSelectStep();
+                    FrameWindow.Content = diskStep;
                     break;
                 case DiskSelectStep:
-                    ApplySelectStep ApplySS = new ApplySelectStep();
-                    FrameWindow.Content = ApplySS;
+                    if ((ApplyDetailsInstance.Name.ToLower().Contains("windows 7") || ApplyDetailsInstance.Name.ToLower().Contains("vista")) && ApplyDetailsInstance.UseEFI)
+                    {
+                        Debug.WriteLine("Detected Windows Vista / 7 with EFI - Showing UefiSeven Installation prompt ...");
+
+                        var message = "It looks like you're attempting to install Windows Vista/7 with EFI support. Normally Vista/7 does not natively support EFI, however an EFI module called UefiSeven can be installed to allow Vista/7 to boot on EFI machines.\n\nDo you want to install UefiSeven?";
+                        var title = "EFI Patch for Windows Vista / 7";
+                        var btn1 = "No";
+                        var btn2 = "Yes";
+
+                        var w = new MessageUI(title, message, btn1, btn2, true);
+                        if (w.ShowDialog() == false)
+                        {
+                            var summary = w.Summary;
+                            if (summary == "Btn2")
+                            {
+                                Debug.WriteLine("Using UefiSeven for EFI boot loader");
+                                Common.WindowsModification.InstallUefiSeven = true;
+                                var uefiSevenSettings = new Extras.UefiSevenSettings();
+                                uefiSevenSettings.ShowDialog();
+                            }
+                        }
+                    }
+
+                    //var applyPage = new ApplySelectStep(); // Old
+                    var applyPage = new ApplyImageStep(); // New
+                    FrameWindow.Content = applyPage;
                     break;
                 case ApplySelectStep:
+                case ApplyImageStep:
                     if (System.IO.File.Exists("X:\\Windows\\System32\\wpeutil.exe"))
                         System.Diagnostics.Process.Start("wpeutil.exe", "reboot");
                     else
-                        System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
-                    break;
-                default:
+                        Environment.Exit(0);
                     break;
             }
         }
@@ -59,14 +85,14 @@ namespace Dive.UI.Pages
             switch (FrameWindow.Content)
             {
                 case DeploymentSettingsStep:
-                    FrameWindow.Content = CSS;
+                    FrameWindow.Content = _css;
                     NextBtn.IsEnabled = true;
                     BackBtn.IsEnabled = false;
                     break;
                 case DiskSelectStep:
-                    FrameWindow.Content = deploymentSettingsStep;
+                    FrameWindow.Content = _deploymentSettingsStep;
                     NextBtn.IsEnabled = true;
-                    BackBtn.IsEnabled = false;
+                    BackBtn.IsEnabled = true;
                     break;
                 default:
                     break;
@@ -75,7 +101,7 @@ namespace Dive.UI.Pages
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
-            FrameWindow.Content = CSS;
+            FrameWindow.Content = _css;
             NextBtn.IsEnabled = false;
             NextBtn.Visibility = Visibility.Visible;
         }

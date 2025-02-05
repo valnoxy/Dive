@@ -1,4 +1,4 @@
-﻿using Debug = Dive.UI.Common.Debug;
+﻿using Debug = Dive.UI.Common.UserInterface.Debug;
 using Dive.UI.Common.Configuration;
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,7 @@ namespace Dive.UI.Pages.ApplyPages
             public string Arch { get; set; }
             public int Build { get; set; }
             public string NTVersion { get; set; }
+            public string Language { get; set; }
         }
 
         private List<Image> images;
@@ -149,7 +150,8 @@ namespace Dive.UI.Pages.ApplyPages
                             Index = image.Index,
                             Arch = productArch,
                             NTVersion = osVersion,
-                            Build = int.Parse(image.Version?.Build ?? "0")
+                            Build = int.Parse(image.Version?.Build ?? "0"),
+                            Language = image.Language
                         });
                         counter++;
                     }
@@ -185,13 +187,13 @@ namespace Dive.UI.Pages.ApplyPages
             applyDetailInstance.Build = item.Build;
             applyDetailInstance.NTVersion = item.NTVersion;
 
-            Common.Debug.Write("Selected ");
-            Common.Debug.Write(applyDetailInstance.Name, true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" with Index ", true);
-            Common.Debug.Write(applyDetailInstance.Index.ToString(), true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" in Image ", true);
-            Common.Debug.Write(applyDetailInstance.FileName, true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" for deployment.\n", true);
+            Debug.Write("Selected ");
+            Debug.Write(applyDetailInstance.Name, true, ConsoleColor.DarkYellow);
+            Debug.Write(" with Index ", true);
+            Debug.Write(applyDetailInstance.Index.ToString(), true, ConsoleColor.DarkYellow);
+            Debug.Write(" in Image ", true);
+            Debug.Write(applyDetailInstance.FileName, true, ConsoleColor.DarkYellow);
+            Debug.Write(" for deployment.\n", true);
 
             CloudContent.ContentWindow!.NextBtn.IsEnabled = true;
         }

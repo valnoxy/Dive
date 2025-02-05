@@ -11,7 +11,7 @@ namespace Dive.Core.Action.Deployment
 {
     internal class Apply
     {
-        internal static BackgroundWorker Bw = null;
+        internal static BackgroundWorker Bw;
 
         internal static void WriteToDisk(string imagePath, int index, string drive, BackgroundWorker worker = null)
         {
@@ -26,8 +26,10 @@ namespace Dive.Core.Action.Deployment
             };
 
             using var file = WimgApi.CreateFile(imagePath, WimFileAccess.Read, WimCreationDisposition.OpenExisting, option, WimCompressionType.None);
-            WimgApi.SetTemporaryPath(file, Environment.GetEnvironmentVariable("TEMP"));
-            WimgApi.RegisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
+            var tempDir = Path.Combine(Environment.GetEnvironmentVariable("TEMP")!, "Dive");
+            Directory.CreateDirectory(tempDir);
+            WimgApi.SetTemporaryPath(file, tempDir);
+            WimgApi.RegisterMessageCallback(file, ApplyCallbackMethod);
             try
             {
                 using var imageHandle = WimgApi.LoadImage(file, index);
@@ -35,7 +37,7 @@ namespace Dive.Core.Action.Deployment
             }
             finally
             {
-                WimgApi.UnregisterMessageCallback(file, new WimMessageCallback(ApplyCallbackMethod));
+                WimgApi.UnregisterMessageCallback(file, ApplyCallbackMethod);
             }
         }
 

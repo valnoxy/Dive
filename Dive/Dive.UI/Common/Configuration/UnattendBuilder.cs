@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using System.Xml.Serialization;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Common
 {
@@ -1112,7 +1113,7 @@ namespace Dive.UI.Common
 
         public static string Build()
         {
-            Common.Debug.WriteLine("[UnattendBuilder v2] Entering building process ...");
+            Debug.WriteLine("[UnattendBuilder v2] Entering building process ...");
             var currentSettings = 0;
 
             // Calculate Settings Array Size

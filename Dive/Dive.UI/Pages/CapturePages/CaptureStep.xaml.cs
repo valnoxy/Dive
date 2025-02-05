@@ -6,6 +6,7 @@ using System.Windows.Media;
 using Dive.UI.Common;
 using Newtonsoft.Json;
 using System;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.CapturePages
 {

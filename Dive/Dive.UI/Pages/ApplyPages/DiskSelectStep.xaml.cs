@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -110,14 +111,14 @@ namespace Dive.UI.Pages.ApplyPages
             {
                 EFIRadio.IsChecked = true;
 
-                Common.Debug.Write("Firmware detected: ");
-                Common.Debug.Write("EFI / CSM\n", true, ConsoleColor.DarkYellow);
+                Debug.Write("Firmware detected: ");
+                Debug.Write("EFI / CSM\n", true, ConsoleColor.DarkYellow);
             }
             else
             {
                 BIOSRadio.IsChecked = true;
-                Common.Debug.Write("Firmware detected: ");
-                Common.Debug.Write("BIOS (Legacy)\n", true, ConsoleColor.DarkYellow);
+                Debug.Write("Firmware detected: ");
+                Debug.Write("BIOS (Legacy)\n", true, ConsoleColor.DarkYellow);
             }
         }
 
@@ -141,12 +142,12 @@ namespace Dive.UI.Pages.ApplyPages
                         (from d in allDrives where File.Exists(Path.Combine(d.Name, ".diveusb")) 
                             select GetDiskNumber(d.Name[..1])).ToList();
 
-                    Common.Debug.Write("Disk ");
-                    Common.Debug.Write(model!, true, ConsoleColor.DarkYellow);
-                    Common.Debug.Write(" with ID ", true);
-                    Common.Debug.Write(deviceId!, true, ConsoleColor.DarkYellow);
-                    Common.Debug.Write(" and a size of ", true);
-                    Common.Debug.Write(sizeInGb + "GB", true, ConsoleColor.DarkYellow);
+                    Debug.Write("Disk ");
+                    Debug.Write(model!, true, ConsoleColor.DarkYellow);
+                    Debug.Write(" with ID ", true);
+                    Debug.Write(deviceId!, true, ConsoleColor.DarkYellow);
+                    Debug.Write(" and a size of ", true);
+                    Debug.Write(sizeInGb + "GB", true, ConsoleColor.DarkYellow);
 
                     if (deviceId != $"\\\\.\\PHYSICALDRIVE{ret}")
                     {
@@ -157,9 +158,9 @@ namespace Dive.UI.Pages.ApplyPages
 
                         if (blackListedDisks.Contains(driveId))
                         {
-                            Common.Debug.Write(" will be skipped (", true);
-                            Common.Debug.Write("Dive Medium", true, ConsoleColor.DarkYellow);
-                            Common.Debug.Write(").\n", true);
+                            Debug.Write(" will be skipped (", true);
+                            Debug.Write("Dive Medium", true, ConsoleColor.DarkYellow);
+                            Debug.Write(").\n", true);
                             continue;
                         }
                         if (deviceType == "Removable Media")
@@ -176,21 +177,21 @@ namespace Dive.UI.Pages.ApplyPages
                             IsRemovableMedia = isRemovable
                         });
 
-                        Common.Debug.Write(" is available", true);
+                        Debug.Write(" is available", true);
                         if (isRemovable)
                         {
-                            Common.Debug.Write(" (", true);
-                            Common.Debug.Write("removable", true, ConsoleColor.DarkYellow);
-                            Common.Debug.Write(").\n", true);
+                            Debug.Write(" (", true);
+                            Debug.Write("removable", true, ConsoleColor.DarkYellow);
+                            Debug.Write(").\n", true);
                         }
                         else
-                            Common.Debug.Write(".\n", true);
+                            Debug.Write(".\n", true);
                     }
                     else
                     {
-                        Common.Debug.Write(" will be skipped (", true);
-                        Common.Debug.Write("Current Windows Disk", true, ConsoleColor.DarkYellow);
-                        Common.Debug.Write(").\n", true);
+                        Debug.Write(" will be skipped (", true);
+                        Debug.Write("Current Windows Disk", true, ConsoleColor.DarkYellow);
+                        Debug.Write(").\n", true);
                     }
                 }
                 this.DataContext = this;
@@ -237,9 +238,9 @@ namespace Dive.UI.Pages.ApplyPages
             ApplyDetailsInstance.DiskIndex = Convert.ToInt32(diskIndex);
             ApplyDetailsInstance.IsDriveRemovable = item.IsRemovableMedia;
 
-            Common.Debug.Write("The disk with ID ");
-            Common.Debug.Write(ApplyDetailsInstance.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
-            Common.Debug.Write(" will be used for deployment.\n", true);
+            Debug.Write("The disk with ID ");
+            Debug.Write(ApplyDetailsInstance.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
+            Debug.Write(" will be used for deployment.\n", true);
             
             if (ApplyContent.ContentWindow != null)
             {
@@ -259,29 +260,29 @@ namespace Dive.UI.Pages.ApplyPages
         private void EFIRadio_Checked(object sender, RoutedEventArgs e)
         {
             ApplyDetailsInstance.UseEFI = true;
-            Common.Debug.Write("Firmware has been changed to: ");
-            Common.Debug.Write("EFI\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("Firmware has been changed to: ");
+            Debug.Write("EFI\n", true, ConsoleColor.DarkYellow);
         }
 
         private void BIOSRadio_Checked(object sender, RoutedEventArgs e)
         {
             ApplyDetailsInstance.UseEFI = false;
-            Common.Debug.Write("Firmware has been changed to: ");
-            Common.Debug.Write("BIOS\n", true, ConsoleColor.DarkYellow);
+            Debug.Write("Firmware has been changed to: ");
+            Debug.Write("BIOS\n", true, ConsoleColor.DarkYellow);
         }
 
         public bool IsNTLDRChecked()
         {
             if ((bool)UseNTLDRBtn.IsChecked)
             {
-                Common.Debug.Write("Bootloader has been changed to: ");
-                Common.Debug.Write("NTLDR\n", true, ConsoleColor.DarkYellow);
+                Debug.Write("Bootloader has been changed to: ");
+                Debug.Write("NTLDR\n", true, ConsoleColor.DarkYellow);
                 return true;
             }
             else
             {
-                Common.Debug.Write("Bootloader has been changed to: ");
-                Common.Debug.Write("BOOTMGR\n", true, ConsoleColor.DarkYellow);
+                Debug.Write("Bootloader has been changed to: ");
+                Debug.Write("BOOTMGR\n", true, ConsoleColor.DarkYellow);
                 return false;
             }
         }
@@ -290,14 +291,14 @@ namespace Dive.UI.Pages.ApplyPages
         {
             if ((bool)UseRecoveryBtn.IsChecked)
             {
-                Common.Debug.Write("Create separate recovery partition: ");
-                Common.Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
+                Debug.Write("Create separate recovery partition: ");
+                Debug.Write("Enabled\n", true, ConsoleColor.DarkYellow);
                 return true;
             }
             else
             {
-                Common.Debug.Write("Create separate recovery partition: ");
-                Common.Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
+                Debug.Write("Create separate recovery partition: ");
+                Debug.Write("Disabled\n", true, ConsoleColor.DarkYellow);
                 return false;
             }
         }

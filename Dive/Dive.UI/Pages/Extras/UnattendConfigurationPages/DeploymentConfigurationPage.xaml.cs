@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Dive.UI.Common.UserInterface;
 using Microsoft.Win32;
 
 namespace Dive.UI.Pages.Extras.UnattendConfigurationPages

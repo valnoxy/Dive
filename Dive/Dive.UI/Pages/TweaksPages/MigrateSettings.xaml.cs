@@ -4,6 +4,7 @@ using System.Management;
 using System.Text.RegularExpressions;
 using System.Windows;
 using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.TweaksPages
 {
@@ -46,12 +47,12 @@ namespace Dive.UI.Pages.TweaksPages
                     if (info["Size"] != null) size = info["Size"].ToString();
                     if (info["Size"] != null) sizeInGb = ByteToGb(Convert.ToDouble(info["Size"])).ToString();
 
-                    Common.Debug.WriteLine($"DeviceID: {deviceId}");
-                    Common.Debug.WriteLine($"Model: {model}");
-                    Common.Debug.WriteLine($"Interface: {interfaceType}");
-                    Common.Debug.WriteLine($"Serial: {serial}");
-                    Common.Debug.WriteLine($"Size: {size}");
-                    Common.Debug.WriteLine($"Size in GB: {sizeInGb}");
+                    Debug.WriteLine($"DeviceID: {deviceId}");
+                    Debug.WriteLine($"Model: {model}");
+                    Debug.WriteLine($"Interface: {interfaceType}");
+                    Debug.WriteLine($"Serial: {serial}");
+                    Debug.WriteLine($"Size: {size}");
+                    Debug.WriteLine($"Size in GB: {sizeInGb}");
 
                     var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 1));
 
@@ -68,10 +69,10 @@ namespace Dive.UI.Pages.TweaksPages
                     }
                     else
                     {
-                        Common.Debug.WriteLine("Skipping as this is the main disk ...", ConsoleColor.Yellow);
+                        Debug.WriteLine("Skipping as this is the main disk ...", ConsoleColor.Yellow);
                     }
 
-                    Common.Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
+                    Debug.WriteLine("==========================================================", ConsoleColor.DarkGray);
                 }
             }
             catch (Exception)

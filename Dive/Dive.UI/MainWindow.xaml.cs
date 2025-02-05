@@ -6,9 +6,11 @@ using System.Security.Principal;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Dive.Core.Common;
 using Dive.UI.Pages.Extras.FunPages;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using Debug = Dive.UI.Common.UserInterface.Debug;
 
 namespace Dive.UI
 {
@@ -18,7 +20,7 @@ namespace Dive.UI
     public partial class MainWindow
     {
         private bool _displayDebugConsole;
-        private string CurrentTheme = "Mica";
+        private string _currentTheme = "Mica";
         private readonly DispatcherTimer _timer = new()
         {
             Interval = TimeSpan.FromSeconds(1)
@@ -72,7 +74,7 @@ namespace Dive.UI
                     }
                     if (File.Exists($"{d.Name}Dive\\Dive.lic"))
                     {
-                        var licenseData = File.ReadAllText($"{d.Name}Dive\\Dive.txt");
+                        var licenseData = File.ReadAllText($"{d.Name}Dive\\Dive.lic");
                         Common.Licensing.Validation.Validate(licenseData);
                         break;
                     }
@@ -81,12 +83,14 @@ namespace Dive.UI
             if (Common.Licensing.Validation.Info.Valid)
             {
                 FoundersBanner.Visibility = Visibility.Visible;
-                Common.Debug.WriteLine("Founders License found!", ConsoleColor.Green);
+                Debug.WriteLine("Founders License found!", ConsoleColor.Green);
+                Logging.Log("Founders License found!");
             }
 
             if (Common.Licensing.Validation.Info.ValidationFailed)
             {
-                Common.Debug.WriteLine("License validation failed! Invalid license detected.", ConsoleColor.Red);
+                Debug.WriteLine("License validation failed! Invalid license detected.", ConsoleColor.Red);
+                Logging.Log("License validation failed! Invalid license detected.", Logging.LogLevel.ERROR);
             }
         }
 
@@ -122,34 +126,34 @@ namespace Dive.UI
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)
         {
-            Common.Debug.WriteLine("Drop");
+            Debug.WriteLine("Drop");
         }
 
         private void UIElement_OnDragEnter(object sender, DragEventArgs e)
         {
-            Common.Debug.WriteLine("DragEnter");
+            Debug.WriteLine("DragEnter");
         }
 
         private void ThemeSwitch_Click(object sender, RoutedEventArgs e)
         {
             //WindowBackdropType = WindowBackdropType == WindowBackdropType.Mica ? WindowBackdropType.Tabbed : WindowBackdropType.Mica;
-            switch (CurrentTheme)
+            switch (_currentTheme)
             {
                 case "Mica":
                     ApplicationThemeManager.Apply(
                         ApplicationTheme.Dark,
                         WindowBackdropType.Tabbed);
-                    CurrentTheme = "Tabbed";
+                    _currentTheme = "Tabbed";
                     break;
                 case "Tabbed":
                     //WindowBackdropType = WindowBackdropType.Mica;
-                    CurrentTheme = "Light";
+                    _currentTheme = "Light";
                     ApplicationThemeManager.Apply(
                         ApplicationTheme.Light,
                         WindowBackdropType.Mica);
                     break;
                 case "Light":
-                    CurrentTheme = "Mica";
+                    _currentTheme = "Mica";
                     ApplicationThemeManager.Apply(
                         ApplicationTheme.Dark,
                         WindowBackdropType.Mica);

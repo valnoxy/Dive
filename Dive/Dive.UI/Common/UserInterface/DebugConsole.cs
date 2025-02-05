@@ -1,14 +1,14 @@
-﻿using Konsole;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Reflection;
 using Dive.Core.Common;
+using Konsole;
 
-namespace Dive.UI.Common
+namespace Dive.UI.Common.UserInterface
 {
     public static class Debug
     {
-        private static readonly FileVersionInfo _versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
+        private static readonly FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
         private static IConsole? _logConsole;
         private static IConsole? _actionConsole;
 
@@ -127,7 +127,7 @@ namespace Dive.UI.Common
 
         public static void InitializeConsole()
         {
-            Console.Title = $@"{_versionInfo.ProductName} - Debug Console";
+            Console.Title = $@"{VersionInfo.ProductName} - Debug Console";
 
             try
             {
@@ -153,16 +153,16 @@ namespace Dive.UI.Common
                 Console.Write("Error: ");
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("The console window is too small. Please resize the window and try again.");
+                Logging.Log("The console window is too small. Please resize the window and try again.", Logging.LogLevel.ERROR);
                 Environment.Exit(1);
             }
             
-
-
-            _logConsole.WriteLine($"{_versionInfo.ProductName} [Version: {_versionInfo.ProductVersion}]"); // Header
-            _logConsole.WriteLine(_versionInfo.LegalCopyright + "\n"); // Copyright text
+            _logConsole.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
+            _logConsole.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
 #if DEBUG
             Debug.Write("Warning! ", false, ConsoleColor.Red);
             Debug.Write("This is a Debug build. This is not a production ready version.\n", true);
+            Logging.Log("This is a Debug build. This is not a production ready version.", Logging.LogLevel.WARNING);
 #endif
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Common
 {
@@ -50,7 +51,7 @@ namespace Dive.UI.Common
             }
             catch (Exception ex)
             {
-                Common.Debug.WriteLine(ex.ToString(), ConsoleColor.Red);
+                Debug.WriteLine(ex.ToString(), ConsoleColor.Red);
             }
         }
     }
