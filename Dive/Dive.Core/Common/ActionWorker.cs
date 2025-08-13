@@ -19,6 +19,7 @@
         InstallUnattend,
         InstallDrivers,
         InstallUefiSeven,
+        InstallCSMWrap,
         CaptureDisk,
         PrepareUSMT,
         MigrateUserState,

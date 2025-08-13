@@ -11,6 +11,8 @@ namespace Dive.UI.Common.UserInterface
             DependencyProperty.Register(nameof(Title), typeof(string), typeof(Skeleton));
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register(nameof(Value), typeof(string), typeof(Skeleton));
+        public static readonly DependencyProperty SizeProperty =
+            DependencyProperty.Register(nameof(Size), typeof(string), typeof(Skeleton));
 
         public string Title
         {
@@ -22,6 +24,12 @@ namespace Dive.UI.Common.UserInterface
         {
             get => (string)GetValue(ValueProperty);
             set => SetValue(ValueProperty, value);
+        }
+
+        public string Size
+        {
+            get => (string)GetValue(SizeProperty);
+            set => SetValue(SizeProperty, value);
         }
         
         public Skeleton()

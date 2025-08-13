@@ -824,11 +824,15 @@ namespace Dive.UI.Common
 
     public static class WindowsModification
     {
+        // UefiSeven
         public static bool InstallUefiSeven { get; set; }
         public static bool UsToggleLog { get; set; }
         public static bool UsToggleVerbose { get; set; }
         public static bool UsToggleFakeVesa { get; set; }
         public static bool UsToggleSkipErros { get; set; }
+
+        // CsmWrap
+        public static bool InstallCsmWrap { get; set; }
     }
     
     public enum TweakMode

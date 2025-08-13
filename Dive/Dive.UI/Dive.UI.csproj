@@ -15,8 +15,8 @@
 		<AssemblyName>Dive</AssemblyName>
 		<Company>Exploitox</Company>
 		<Authors>valnoxy</Authors>
-		<Version>1.0.0.540</Version>
-		<Copyright>Copyright © 2018 - 2024 Exploitox. All rights reserved.</Copyright>
+		<Version>1.0.0.569</Version>
+		<Copyright>Copyright © 2018 - 2025 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/valnoxy/dive</RepositoryUrl>
 		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
@@ -28,6 +28,8 @@
 	<ItemGroup>
 		<None Remove="Assets\autodive_background.jpg" />
 		<None Remove="Assets\banner.jpg" />
+		<None Remove="Assets\Banner_Left.png" />
+		<None Remove="Assets\Banner_Top.png" />
 		<None Remove="Assets\Fadi_Loop_f.gif" />
 		<None Remove="Assets\icon-hdd-40.png" />
 		<None Remove="Assets\icon-person-40.png" />
@@ -42,6 +44,9 @@
 		<None Remove="Assets\icon-windows-xp-40.png" />
 		<None Remove="Assets\icon-xorie-40.png" />
 		<None Remove="Assets\pexels-johannes-plenio-1103970.png" />
+		<None Remove="Assets\Windows-Bad.png" />
+		<None Remove="Assets\Windows-OK.png" />
+		<None Remove="Assets\Windows-Unknown.png" />
 		<None Remove="DiveV2.ico" />
 	</ItemGroup>
 	<ItemGroup>
@@ -49,8 +54,13 @@
 		<Page Remove="Localization\ResourceDictionary.xaml" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Resource Include="Assets\Windows-OK.png" />
+	</ItemGroup>
+	<ItemGroup>
 		<Resource Include="Assets\autodive_background.jpg" />
 		<Resource Include="Assets\banner.jpg" />
+		<Resource Include="Assets\Banner_Left.png" />
+		<Resource Include="Assets\Banner_Top.png" />
 		<Resource Include="Assets\Fadi_Loop_f.gif" />
 		<Resource Include="Assets\icon-hdd-40.png" />
 		<Resource Include="Assets\icon-person-40.png" />
@@ -66,6 +76,8 @@
 		<Resource Include="Assets\icon-windows-vista-40.png" />
 		<Resource Include="Assets\icon-windows-xp-40.png" />
 		<Resource Include="Assets\icon-xorie-40.png" />
+		<Resource Include="Assets\Windows-Bad.png" />
+		<Resource Include="Assets\Windows-Unknown.png" />
 		<Resource Include="DiveV2.ico" />
 		<Resource Include="Localization\ResourceDictionary.de-DE.xaml" />
 		<Resource Include="Localization\ResourceDictionary.xaml" />
@@ -73,12 +85,12 @@
 	<ItemGroup>
 		<PackageReference Include="Goblinfactory.Konsole" Version="6.2.2" />
 		<PackageReference Include="Standard.Licensing" Version="1.2.1" />
-		<PackageReference Include="System.Text.Json" Version="9.0.1" />
-		<PackageReference Include="WLED" Version="2.0.52" />
-		<PackageReference Include="WPF-UI" Version="4.0.0" />
+		<PackageReference Include="System.Text.Json" Version="9.0.5" />
+		<PackageReference Include="WLED" Version="2.0.54" />
+		<PackageReference Include="WPF-UI" Version="4.0.2" />
 		<PackageReference Include="XamlAnimatedGif" Version="2.3.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="System.Management" Version="9.0.1" />
+		<PackageReference Include="System.Management" Version="9.0.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Dive.Core\Dive.Core.csproj" />
@@ -108,7 +120,9 @@
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
 	</ItemGroup>
+
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (*.exe) do (&#xD;&#xA;    &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe&quot; sign /sha1 &quot;a80fd11ec378d1985237ee2b346fc5d63304c50d&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (..\Output\Release\*Dive*.dll) do (&#xD;&#xA;   &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe&quot; sign /sha1 &quot;ec73ea52b80dab1082ee88b3544161c48f3bb893&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;  for /r &quot;.&quot; %25%25a in (..\Output\Release\*Dive*.exe) do (&#xD;&#xA;   &quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe&quot; sign /sha1 &quot;ec73ea52b80dab1082ee88b3544161c48f3bb893&quot; /t http://time.certum.pl /fd sha256 /v %25%25a&#xD;&#xA;  )&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;" />
 	</Target>
 </Project>

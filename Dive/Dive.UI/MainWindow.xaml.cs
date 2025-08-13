@@ -31,13 +31,14 @@ namespace Dive.UI
             InitializeComponent();
 
 #if DEBUG
-            DebugString.Visibility = Visibility.Visible;
-            _displayDebugConsole = true;
+            _displayDebugConsole = true; 
             Branch.Text = "Development";
+            CloudPage.Visibility = Visibility.Visible;
             TweaksPage.Visibility = Visibility.Visible;
 #else
-            DebugString.Visibility = Visibility.Collapsed;
+            _displayDebugConsole = true;
             Branch.Text = "Pre-Release 2";
+            CloudPage.Visibility = Visibility.Collapsed;
             TweaksPage.Visibility = Visibility.Collapsed;
 #endif
             // Get version
@@ -86,8 +87,7 @@ namespace Dive.UI
                 Debug.WriteLine("Founders License found!", ConsoleColor.Green);
                 Logging.Log("Founders License found!");
             }
-
-            if (Common.Licensing.Validation.Info.ValidationFailed)
+            else if (Common.Licensing.Validation.Info.ValidationFailed)
             {
                 Debug.WriteLine("License validation failed! Invalid license detected.", ConsoleColor.Red);
                 Logging.Log("License validation failed! Invalid license detected.", Logging.LogLevel.ERROR);
@@ -121,7 +121,7 @@ namespace Dive.UI
             // run plugin startup
             Common.Plugin.PluginManager.RunStartup();
 
-            RootNavigation.Navigate(typeof(Pages.Dashboard));
+            RootNavigation.Navigate(typeof(Pages.Home));
         }
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)

@@ -18,7 +18,9 @@
         {
             Single,
             SeparateBoot,
-            Full
+            Full,
+            LegacyEfi,
+            LegacyEfiWithRecovery
         }
 
         public class CanarySettings

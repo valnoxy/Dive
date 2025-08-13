@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using Dive.UI.Common;
 using Dive.UI.Pages.TweaksPages;
 using Dive.UI.Pages.TweaksPages.PlayBook;
+using Dive.UI.Pages.TweaksPages.USMT;
 
 namespace Dive.UI.Pages
 {
@@ -48,12 +49,14 @@ namespace Dive.UI.Pages
                     }
                     break;
                 case TweakMode.Migrate:
+                    BackBtn.IsEnabled = true;
+
                     switch (FrameWindow.Content)
                     {
                         case MigrateSettings:
                             FrameWindow.Content = _td;
                             NextBtn.IsEnabled = false;
-                            BackBtn.IsEnabled = false;
+                            BackBtn.IsEnabled = true;
                             break;
                         default:
                             break;

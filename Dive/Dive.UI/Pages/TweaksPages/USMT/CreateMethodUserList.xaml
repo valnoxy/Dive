@@ -34,7 +34,7 @@
                              Margin="-10"
                              VerticalAlignment="Center"
                              SelectionChanged="UserListView_Selected"
-                             ItemsSource="{Binding UsersList}" 
+                             ItemsSource="{Binding UsersList}"
                              Height="310">
                     <ListView.ItemTemplate>
                         <DataTemplate>

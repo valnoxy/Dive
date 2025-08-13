@@ -118,7 +118,7 @@
                     </ui:CardControl>
             </StackPanel>
 
-            <StackPanel Grid.Row="4">
+            <StackPanel Grid.Row="4" x:Name="LicensePanel">
                 <ui:CardControl Icon="{ui:SymbolIcon Key24}" Margin="0,0,0,5">
                     <ui:CardControl.Header>
                         <Grid>

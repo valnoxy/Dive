@@ -39,6 +39,11 @@ namespace Dive.UI.Pages
             LicenseStatus.Text = Common.Licensing.Validation.Info.Valid 
                 ? $"Licensed to {Common.Licensing.Validation.Info.LicenseName} ({Common.Licensing.Validation.Info.LicenseEmail})" 
                 : "You are currently using the Free Edition.";
+
+            if (!Common.Licensing.Validation.Info.Valid)
+            {
+                LicensePanel.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void Homepage_OnClick(object sender, RoutedEventArgs e)

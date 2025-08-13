@@ -1,8 +1,6 @@
 ﻿using Dive.UI.Common;
 using Dive.UI.Pages.ApplyPages;
-using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Dive.UI.Common.UserInterface;

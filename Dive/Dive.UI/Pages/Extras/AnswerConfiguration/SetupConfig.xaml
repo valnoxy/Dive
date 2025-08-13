@@ -1,0 +1,136 @@
+﻿<Page x:Class="Dive.UI.Pages.Extras.AnswerConfiguration.SetupConfig"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Dive.UI.Pages.Extras.AnswerConfiguration"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="SetupConfig">
+
+    <Grid>
+        <Image Source="pack://application:,,,/Assets/Banner_Top.png" Margin="-70"/>
+        <StackPanel Margin="10,0,10,15">
+            <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource ConfigureTitle}"/>
+            <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource ConfigureTitleDescription}"/>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                <StackPanel>
+                    <ui:CardExpander Icon="{ui:SymbolIcon Person24}" IsExpanded="True" >
+                        <ui:CardExpander.Header>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" >
+                                <TextBlock
+                                    FontSize="13"
+                                    FontWeight="Medium"
+                                    Text="User Management" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                    Text="How Windows should create the User Account." />
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <ui:CardControl>
+                            <ui:CardControl.Header>
+                                <StackPanel>
+                                        <TextBlock
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Text="{DynamicResource AdminAccountTitle}" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                            Text="{DynamicResource AdminAccountDescription}"
+                                            Margin="0,0,0,5"/>
+                                        <ui:TextBox 
+                                                x:Name="TbUser" 
+                                                Icon="{ui:SymbolIcon Person24}" 
+                                                PlaceholderText="{DynamicResource UsernamePlaceholder}"
+                                                IsEnabled="true"
+                                                Margin="0,0,0,5"
+                                                />
+                                        <ui:TextBox
+                                                x:Name="TbPassword" 
+                                                Icon="{ui:SymbolIcon Key24}"
+                                                PlaceholderText="{DynamicResource PasswordPlaceholder}" 
+                                                IsEnabled="false"
+                                                />
+                                </StackPanel>
+                            </ui:CardControl.Header>
+                        </ui:CardControl>
+
+                    </ui:CardExpander>
+
+                    <ui:CardControl Icon="{ui:SymbolIcon LockOpen24}" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Bypass Network Enrollment" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Allow Windows 11 and newer to be installed without internet connection." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="BypassNroA" Grid.Column="1" Margin="0,0,8,0" />
+
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+
+                    <ui:CardControl Icon="{ui:SymbolIcon StoreMicrosoft24}" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Windows Code Integrity Mode (S-Mode)" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Allow only running apps from the Microsoft Store." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="SModeSwitch" Grid.Column="1" Margin="0,0,8,0" />
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+
+                    <ui:CardControl Icon="{ui:SymbolIcon PersonAccounts24}" Margin="0,5,0,0">
+                        <ui:CardControl.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="Medium"
+                                        Text="Copy User Profile" />
+                                    <TextBlock
+                                        FontSize="12"
+                                        Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                        Text="Copies the user profile that was captured when the instance was created." />
+                                </StackPanel>
+                                <ui:ToggleSwitch x:Name="CopyProfileToggle" Grid.Column="1" Margin="0,0,8,0" />
+                            </Grid>
+                        </ui:CardControl.Header>
+                    </ui:CardControl>
+
+                </StackPanel>
+            </ScrollViewer>
+        </StackPanel>
+    </Grid>
+</Page>

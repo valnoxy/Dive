@@ -78,6 +78,15 @@ namespace Dive.UI.Common.Deployment
             // Writing BootLoader to disk
             switch (Configuration.PartitionStyle)
             {
+                case PartitionStyle.LegacyEfi:
+                case PartitionStyle.LegacyEfiWithRecovery:
+                    Actions.InstallBootloader(
+                        Firmware.BIOS,
+                        Configuration.BootLoader,
+                        Configuration.WindowsDrive,
+                        Configuration.WindowsDrive,
+                        worker);
+                    break;
                 case PartitionStyle.SeparateBoot:
                 case PartitionStyle.Full:
                     Actions.InstallBootloader(
@@ -105,7 +114,6 @@ namespace Dive.UI.Common.Deployment
                 return;
             }
             Debug.WriteLine("Bootloader written to disk.");
-
 
             // Registering Recovery Image (only for Vista and higher)
             if (Configuration.BootLoader == Bootloader.BOOTMGR && ApplyDetailsInstance.UseRecovery)
@@ -150,7 +158,7 @@ namespace Dive.UI.Common.Deployment
             }
 
             // Install Drivers (only for Vista and higher)
-            if (ApplyDetailsInstance.DriverList != null && ApplyDetailsInstance.DriverList.Count > 0)
+            if (ApplyDetailsInstance.DriverList is { Count: > 0 })
             {
                 Configuration.DriverCount = ApplyDetailsInstance.DriverList.Count;
                 Actions.InstallDriver(Configuration.WindowsDrive, ApplyDetailsInstance.DriverList, worker);
@@ -186,6 +194,24 @@ namespace Dive.UI.Common.Deployment
             else
             {
                 Debug.WriteLine("UefiSeven disabled or not necessary. Skipping ...");
+            }
+
+            // Install CsmWrap
+            if (WindowsModification.InstallCsmWrap)
+            {
+                CSMWrap.Install(
+                    Configuration.BootDrive,
+                    worker);
+
+                if (Configuration.IsCanceled)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
+            else
+            {
+                Debug.WriteLine("CSMWrap disabled or not necessary. Skipping ...");
             }
 
             // Installation complete
@@ -225,16 +251,37 @@ namespace Dive.UI.Common.Deployment
             {
                 // pre-Vista
                 case true:
-                    letters = Actions.GetSystemLetters(PartitionStyle.Single);
-                    Configuration.PartitionStyle = PartitionStyle.Single;
+                    if ((Common.WindowsModification.InstallUefiSeven || Common.WindowsModification.InstallCsmWrap) && ApplyDetailsInstance.UseRecovery)
+                    {
+                        letters = Actions.GetSystemLetters(PartitionStyle.LegacyEfiWithRecovery);
+                        Configuration.PartitionStyle = PartitionStyle.LegacyEfiWithRecovery;
+                    }
+                    else if ((Common.WindowsModification.InstallUefiSeven || Common.WindowsModification.InstallCsmWrap) && ApplyDetailsInstance.UseRecovery == false)
+                    {
+                        letters = Actions.GetSystemLetters(PartitionStyle.LegacyEfi);
+                        Configuration.PartitionStyle = PartitionStyle.LegacyEfi;
+                    }
+                    else
+                    {
+                        letters = Actions.GetSystemLetters(PartitionStyle.Single);
+                        Configuration.PartitionStyle = PartitionStyle.Single;
+                    }
                     break;
 
                 case false:
                     switch (ApplyDetailsInstance.UseRecovery)
                     {
                         case true:
-                            letters = Actions.GetSystemLetters(PartitionStyle.Full);
-                            Configuration.PartitionStyle = PartitionStyle.Full;
+                            if (Common.WindowsModification.InstallUefiSeven || Common.WindowsModification.InstallCsmWrap)
+                            {
+                                letters = Actions.GetSystemLetters(PartitionStyle.LegacyEfiWithRecovery);
+                                Configuration.PartitionStyle = PartitionStyle.LegacyEfiWithRecovery;
+                            }
+                            else
+                            {
+                                letters = Actions.GetSystemLetters(PartitionStyle.Full);
+                                Configuration.PartitionStyle = PartitionStyle.Full;
+                            }
                             break;
 
                         case false:
@@ -244,8 +291,8 @@ namespace Dive.UI.Common.Deployment
                                 // Except if EFI is used, then we need to use the SeparateBoot partition layout
                                 if (ApplyDetailsInstance.UseEFI)
                                 {
-                                    letters = Actions.GetSystemLetters(PartitionStyle.SeparateBoot);
-                                    Configuration.PartitionStyle = PartitionStyle.SeparateBoot;
+                                    letters = Actions.GetSystemLetters(PartitionStyle.LegacyEfi);
+                                    Configuration.PartitionStyle = PartitionStyle.LegacyEfi;
                                 }
                                 else
                                 {
@@ -268,10 +315,12 @@ namespace Dive.UI.Common.Deployment
                 case PartitionStyle.Single:
                     Configuration.WindowsDrive = $"{letters[0]}:\\";
                     break;
+                case PartitionStyle.LegacyEfi:
                 case PartitionStyle.SeparateBoot:
                     Configuration.WindowsDrive = $"{letters[0]}:\\";
                     Configuration.BootDrive = $"{letters[1]}:\\";
                     break;
+                case PartitionStyle.LegacyEfiWithRecovery:
                 case PartitionStyle.Full:
                     Configuration.WindowsDrive = $"{letters[0]}:\\";
                     Configuration.BootDrive = $"{letters[1]}:\\";

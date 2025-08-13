@@ -29,9 +29,9 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <ui:NavigationView x:Name="RootNavigation" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" Margin="6,-5" Grid.Row="0">
+            <ui:NavigationView x:Name="RootNavigation" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed" Margin="8,-10" Grid.Row="0">
                 <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="{DynamicResource Home}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:Dashboard}">
+                    <ui:NavigationViewItem Content="{DynamicResource Home}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:Home}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Home24" />
                         </ui:NavigationViewItem.Icon>
@@ -46,19 +46,19 @@
                             <ui:SymbolIcon Symbol="Copy24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    <ui:NavigationViewItem Content="{DynamicResource Cloud}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:CloudContent}">
+                    <ui:NavigationViewItem x:Name="CloudPage" Content="{DynamicResource Cloud}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:CloudContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Cloud24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    
+
                     <!-- Currently for Debug purpose only -->
                     <ui:NavigationViewItem x:Name="TweaksPage" Content="{DynamicResource Tweaks}" NavigationCacheMode="Enabled" TargetPageType="{x:Type pages:TweaksContent}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Toolbox24" />
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
-                    
+
                 </ui:NavigationView.MenuItems>
                 
                 <ui:NavigationView.FooterMenuItems>
@@ -162,9 +162,5 @@
                 <ui:ImageIcon Source="pack://application:,,,/DiveV2.ico" />
             </ui:TitleBar.Icon>
         </ui:TitleBar>
-
-        <ui:Card x:Name="DebugString" Grid.Row="0" Padding="5" Margin="-315,4,0,0" Width="55">
-            <TextBlock Text="Debug" />
-        </ui:Card>
     </Grid>
 </ui:FluentWindow>

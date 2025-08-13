@@ -1,6 +1,6 @@
 ﻿/*
  * Dive (formally deploya) - Deployment is very easy.
- * Copyright (c) 2018 - 2024 Exploitox.
+ * Copyright (c) 2018 - 2025 Exploitox.
  *
  * Dive is licensed under MIT License (https://github.com/valnoxy/dive/blob/main/LICENSE).
  * So you are allowed to use freely and modify the application.
@@ -209,6 +209,41 @@ namespace Dive.Core
                                 Message = "You cannot use Single Partition layout on a system with EFI Firmware."
                             }));
                             return;
+                    }
+                    break;
+
+                case Entities.PartitionStyle.LegacyEfi:
+                case Entities.PartitionStyle.LegacyEfiWithRecovery:
+                    switch (firmware)
+                    {
+                        case Entities.Firmware.BIOS: // Windows on BIOS
+                            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                            {
+                                Action = Progress.PrepareDisk,
+                                IsError = true,
+                                IsIndeterminate = false,
+                                Message = "You cannot use Legacy EFI layout on a system without EFI Firmware."
+                            }));
+                            return;
+                        case Entities.Firmware.EFI: // Windows on EFI
+                            partDest.StandardInput.WriteLine("select disk " + disk);
+                            partDest.StandardInput.WriteLine("clean");
+                            partDest.StandardInput.WriteLine("create partition primary size=100");
+                            partDest.StandardInput.WriteLine("format quick fs=fat32 label=System");
+                            partDest.StandardInput.WriteLine("assign letter=" + bootDrive.Substring(0, 1));
+                            partDest.StandardInput.WriteLine("create partition primary");
+                            if (useRecovery) partDest.StandardInput.WriteLine("shrink minimum=800");
+                            partDest.StandardInput.WriteLine("format quick fs=ntfs label=Windows");
+                            partDest.StandardInput.WriteLine("active");
+                            partDest.StandardInput.WriteLine("assign letter=" + windowsDrive.Substring(0, 1));
+                            if (useRecovery)
+                            {
+                                partDest.StandardInput.WriteLine("create partition primary");
+                                partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery"); 
+                                partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
+                            }
+                            partDest.StandardInput.WriteLine("exit");
+                            break;
                     }
                     break;
             }
@@ -730,7 +765,7 @@ namespace Dive.Core
         }
 
         /// <summary>
-        /// Get information about an Windows deployment image (WIM).
+        /// Get information about a Windows deployment image (WIM).
         /// </summary>
         /// <param name="imagePath">Path to image file</param>
         /// <returns>Information about the image file as XML</returns>
@@ -757,7 +792,7 @@ namespace Dive.Core
         /// <returns>Array of unused Drive letters. Length depends on the partition style.</returns>
         public static char[] GetSystemLetters(Entities.PartitionStyle style)
         {
-            // Search for non used drive letters
+            // Search for non-used drive letters
             var getDrives = Management.GetAvailableDriveLetters();
             var arr = new List<char>();
 
@@ -772,7 +807,18 @@ namespace Dive.Core
                     arr.Add(getDrives[1]);
                     return arr.ToArray();
 
+                case Entities.PartitionStyle.LegacyEfi when getDrives.Length >= 2:
+                    arr.Add(getDrives[0]);
+                    arr.Add(getDrives[1]);
+                    return arr.ToArray();
+
                 case Entities.PartitionStyle.Full when getDrives.Length >= 3:
+                    arr.Add(getDrives[0]);
+                    arr.Add(getDrives[1]);
+                    arr.Add(getDrives[2]);
+                    return arr.ToArray();
+
+                case Entities.PartitionStyle.LegacyEfiWithRecovery when getDrives.Length >= 3:
                     arr.Add(getDrives[0]);
                     arr.Add(getDrives[1]);
                     arr.Add(getDrives[2]);

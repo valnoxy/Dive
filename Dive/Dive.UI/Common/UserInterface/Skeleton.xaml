@@ -13,12 +13,12 @@
         </Storyboard>
     </UserControl.Resources>
 
-    <StackPanel Width="140" Height="140">
+    <StackPanel Width="30" Height="30">
         <Grid x:Name="SkeletonGrid" Visibility="Visible">
-            <Rectangle x:Name="SkeletonRect" Fill="LightGray" Width="100" Height="82" Margin="5" Opacity="0.2" RadiusX="5" RadiusY="5"/>
+            <Rectangle x:Name="SkeletonRect" Fill="LightGray" Width="20" Height="20" Margin="5" Opacity="0.2" RadiusX="5" RadiusY="5"/>
         </Grid>
         <Grid x:Name="ContentGrid" Visibility="Collapsed">
-            <ui:TextBlock Text="{Binding Value}" x:Name="ValueBox" HorizontalAlignment="Center" FontTypography="Display" />
+            <ui:TextBlock Text="{Binding Value}" x:Name="ValueBox" HorizontalAlignment="Center" FontSize="{Binding Size}" />
         </Grid>
         <ui:TextBlock Text="{Binding Title}" HorizontalAlignment="Center" FontTypography="Subtitle" />
     </StackPanel>

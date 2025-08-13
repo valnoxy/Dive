@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using Dive.UI.Common.UserInterface;
+using Exception = System.Exception;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -54,8 +55,7 @@ namespace Dive.UI.Pages.ApplyPages
 
         private List<Disk> disks;
         public List<Disk> DiskList => disks;
-
-
+        
         public DiskSelectStep()
         {
             InitializeComponent();
@@ -124,82 +124,92 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void LoadDisks()
         {
-            disks = new List<Disk>();
+            disks = [];
             try
             {
                 var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
                 foreach (var info in searcher.Get())
                 {
-                    var deviceId = info["DeviceID"].ToString();
-                    var model = info["Model"].ToString();
-                    var sizeInGb = ByteToGb(Convert.ToDouble(info["Size"])).ToString();
-                    var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System)[..1]);
-                    var deviceType = info["MediaType"].ToString();
-
-                    // Check for Dive Medium
-                    var allDrives = DriveInfo.GetDrives();
-                    var blackListedDisks = 
-                        (from d in allDrives where File.Exists(Path.Combine(d.Name, ".diveusb")) 
-                            select GetDiskNumber(d.Name[..1])).ToList();
-
-                    Debug.Write("Disk ");
-                    Debug.Write(model!, true, ConsoleColor.DarkYellow);
-                    Debug.Write(" with ID ", true);
-                    Debug.Write(deviceId!, true, ConsoleColor.DarkYellow);
-                    Debug.Write(" and a size of ", true);
-                    Debug.Write(sizeInGb + "GB", true, ConsoleColor.DarkYellow);
-
-                    if (deviceId != $"\\\\.\\PHYSICALDRIVE{ret}")
+                    try
                     {
-                        // Add to list
-                        var driveId = deviceId;
-                        var isRemovable = false;
-                        driveId = Regex.Match(driveId!, @"\d+").Value;
+                        var deviceId = info["DeviceID"].ToString();
+                        var model = info["Model"].ToString();
+                        var sizeInGb = ByteToGb(Convert.ToDouble(info["Size"])).ToString();
+                        var ret = GetDiskNumber(Environment.GetFolderPath(Environment.SpecialFolder.System)[..1]);
+                        var deviceType = info["MediaType"].ToString();
 
-                        if (blackListedDisks.Contains(driveId))
-                        {
-                            Debug.Write(" will be skipped (", true);
-                            Debug.Write("Dive Medium", true, ConsoleColor.DarkYellow);
-                            Debug.Write(").\n", true);
-                            continue;
-                        }
-                        if (deviceType == "Removable Media")
-                        {
-                            isRemovable = true;
-                        }
+                        Debug.WriteLine($"[DEBUG] found device: {model} as {deviceType}");
 
-                        disks.Add(new Disk
-                        {
-                            Picture = "pack://application:,,,/assets/icon-hdd-40.png",
-                            Model = model!,
-                            Size = $"{sizeInGb} GB",
-                            DiskId = $"Disk {driveId}",
-                            IsRemovableMedia = isRemovable
-                        });
+                        // Check for Dive Medium
+                        var allDrives = DriveInfo.GetDrives();
+                        var blackListedDisks =
+                            (from d in allDrives
+                             where File.Exists(Path.Combine(d.Name, ".diveusb"))
+                             select GetDiskNumber(d.Name[..1])).ToList();
 
-                        Debug.Write(" is available", true);
-                        if (isRemovable)
+                        Debug.Write("Disk ");
+                        Debug.Write(model!, true, ConsoleColor.DarkYellow);
+                        Debug.Write(" with ID ", true);
+                        Debug.Write(deviceId!, true, ConsoleColor.DarkYellow);
+                        Debug.Write(" and a size of ", true);
+                        Debug.Write(sizeInGb + "GB", true, ConsoleColor.DarkYellow);
+
+                        if (deviceId != $"\\\\.\\PHYSICALDRIVE{ret}")
                         {
-                            Debug.Write(" (", true);
-                            Debug.Write("removable", true, ConsoleColor.DarkYellow);
-                            Debug.Write(").\n", true);
+                            // Add to list
+                            var driveId = deviceId;
+                            var isRemovable = false;
+                            driveId = Regex.Match(driveId!, @"\d+").Value;
+
+                            if (blackListedDisks.Contains(driveId))
+                            {
+                                Debug.Write(" will be skipped (", true);
+                                Debug.Write("Dive Medium", true, ConsoleColor.DarkYellow);
+                                Debug.Write(").\n", true);
+                                continue;
+                            }
+                            if (deviceType == "Removable Media")
+                            {
+                                isRemovable = true;
+                            }
+
+                            disks.Add(new Disk
+                            {
+                                Picture = "pack://application:,,,/assets/icon-hdd-40.png",
+                                Model = model!,
+                                Size = $"{sizeInGb} GB",
+                                DiskId = $"Disk {driveId}",
+                                IsRemovableMedia = isRemovable
+                            });
+
+                            Debug.Write(" is available", true);
+                            if (isRemovable)
+                            {
+                                Debug.Write(" (", true);
+                                Debug.Write("removable", true, ConsoleColor.DarkYellow);
+                                Debug.Write(").\n", true);
+                            }
+                            else
+                                Debug.Write(".\n", true);
                         }
                         else
-                            Debug.Write(".\n", true);
+                        {
+                            Debug.Write(" will be skipped (", true);
+                            Debug.Write("Current Windows Disk", true, ConsoleColor.DarkYellow);
+                            Debug.Write(").\n", true);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        Debug.Write(" will be skipped (", true);
-                        Debug.Write("Current Windows Disk", true, ConsoleColor.DarkYellow);
-                        Debug.Write(").\n", true);
+                        Debug.WriteLine($"[DEBUG] Exception happened:\n {ex}");
                     }
                 }
                 this.DataContext = this;
                 DiskListView.ItemsSource = disks;
             }
-            catch
+            catch (Exception ex)
             {
-                // throw;
+                Debug.WriteLine($"[DEBUG] Exception happened:\n {ex}");
             }
         }
 

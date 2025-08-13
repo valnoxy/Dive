@@ -33,10 +33,6 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void Import_OnClicked(object sender, RoutedEventArgs e)
         {
-            var w = new Extras.ConfigAssistent.ConfigAssistentWindow();
-            w.ShowDialog();
-
-            return;
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "Dive Configuration (*.xml)|*.xml"
@@ -252,6 +248,12 @@ namespace Dive.UI.Pages.ApplyPages
         private void DeploymentSettingsStep_OnLoaded(object sender, RoutedEventArgs e)
         {
             NavView.Navigate(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage));
+        }
+
+        private void ConfigAssistant(object sender, RoutedEventArgs e)
+        {
+            var w = new Extras.ConfigAssistant.ConfigAssistantWindow();
+            w.ShowDialog();
         }
     }
 }

@@ -22,19 +22,20 @@ namespace Dive.UI.Common.USMT
         public const bool HideBuiltInAccounts = true;
         public const bool HideUnknownSIDs = true;
 
-        public static List<User> GetUsersFromHost(string host)
+        public static List<User?>? GetUsersFromHost(string host)
         {
-            var users = new List<User>();
+            var users = new List<User?>();
             var manObjCol = WMI.Query("SELECT SID, LocalPath FROM Win32_UserProfile", host);
             foreach (var man in manObjCol)
             {
                 var user = GetUserFromHost(host, man);
-                users.Add(user);
+                if (user != null)
+                    users.Add(user);
             }
             return users;
         }
 
-        private static User GetUserFromHost(string host, ManagementBaseObject userObject)
+        private static User? GetUserFromHost(string host, ManagementBaseObject userObject)
         {
             var sid = userObject.GetPropertyValue("SID").ToString();
             var username = GetUserByIdentity(sid!, host);
@@ -43,23 +44,29 @@ namespace Dive.UI.Common.USMT
             {
                 return null;
             }
-            if (HideUnknownSIDs && sid == username)
+            if (HideUnknownSIDs && (sid == username || string.IsNullOrEmpty(username)))
             {
                 return null;
             }
 
+            var firstCreated = string.Empty;
+            var lastModified = string.Empty;
             var profilePath = userObject.GetPropertyValue("LocalPath").ToString();
-            var firstCreated = Directory.GetCreationTime(profilePath).ToFileTime().ToString();
-            var lastModified = File.GetLastWriteTime(Path.Combine(profilePath, "NTUSER.DAT")).ToFileTime().ToString();
+            if (profilePath != null)
+            {
+                firstCreated = Directory.GetCreationTime(profilePath).ToFileTime().ToString();
+                lastModified = File.GetLastWriteTime(Path.Combine(profilePath, "NTUSER.DAT")).ToFileTime().ToString();
+            }
 
             return new User
-            {
-                SID = sid!,
-                ProfilePath = profilePath!,
-                FirstCreated = firstCreated,
-                LastModified = lastModified,
-                Username = username
-            };
+                {
+                    SID = sid!,
+                    ProfilePath = profilePath!,
+                    FirstCreated = firstCreated,
+                    LastModified = lastModified,
+                    Username = username
+                };
+
         }
 
         /// <summary>

@@ -59,7 +59,7 @@ namespace Dive.UI.Pages.ApplyPages
                 var allDrives = DriveInfo.GetDrives();
                 foreach (var d in allDrives)
                 {
-                    string[] dirs = { };
+                    string[] dirs = [];
                     if (Directory.Exists(Path.Combine(d.Name, "WIMs")))
                         dirs = Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.wim")
                             .Concat(Directory.GetFiles(Path.Combine(d.Name, "WIMs"), "*.esd"))
@@ -94,6 +94,7 @@ namespace Dive.UI.Pages.ApplyPages
                                 var productBuild = node.SelectSingleNode("WINDOWS/VERSION/BUILD")?.InnerText;
                                 var productMajor = node.SelectSingleNode("WINDOWS/VERSION/MAJOR")?.InnerText;
                                 var productMinor = node.SelectSingleNode("WINDOWS/VERSION/MINOR")?.InnerText;
+                                var productPatch = node.SelectSingleNode("WINDOWS/VERSION/SPBUILD")?.InnerText;
                                 var productType = node.SelectSingleNode("WINDOWS/PRODUCTTYPE")?.InnerText;
 
                                 productArch = productArch switch
@@ -107,7 +108,7 @@ namespace Dive.UI.Pages.ApplyPages
                                 };
 
                                 if (!string.IsNullOrEmpty(productBuild))
-                                    productArch = $"NT {productMajor}.{productMinor}.{productBuild} - {productArch}";
+                                    productArch = $"NT {productMajor}.{productMinor}.{productBuild}.{productPatch} - {productArch}";
 
                                 // Skip if image is Windows PE
                                 if (productName != null && productName.ToLower().Contains("pe"))

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using Dive.Core.Common;
+using Dive.UI.Common.UserInterface;
 using Dive.UI.Common.USMT;
 
 namespace Dive.UI.Pages.TweaksPages.USMT
@@ -11,8 +14,8 @@ namespace Dive.UI.Pages.TweaksPages.USMT
     /// </summary>
     public partial class UserList
     {
-        private List<RetrieveUsers.User> users;
-        public List<RetrieveUsers.User> UsersList => users;
+        public List<RetrieveUsers.User?>? UsersList { get; private set; }
+        internal string SelectedSid = string.Empty;
 
         public UserList()
         {
@@ -22,20 +25,41 @@ namespace Dive.UI.Pages.TweaksPages.USMT
 
         private void LoadUsers()
         {
-            users = RetrieveUsers.GetUsersFromHost(Environment.MachineName);
+            UsersList = RetrieveUsers.GetUsersFromHost(Environment.MachineName)!;
             this.DataContext = this;
             UserListView.ItemsSource = UsersList;
         }
 
-        private void UserListView_Selected(object sender, SelectionChangedEventArgs e)
+        private void UserListView_Selected(object sender, RoutedEventArgs e)
         {
+            if (UserListView.SelectedItem is not RetrieveUsers.User item) return;
+            Debug.Write("Selected ");
+            Debug.Write(item.Username, true, ConsoleColor.DarkYellow);
+            Debug.Write(" with SID ", true);
+            Debug.Write(item.SID, true, ConsoleColor.DarkYellow);
+            Debug.Write(" for migration.\n", true);
+            Logging.Log($"Selected {item.Username} with SID {item.SID} for migration.");
             TestMigrationBtn.IsEnabled = true;
+            SelectedSid = item.SID;
+            //ApplyContent.ContentWindow!.NextBtn.IsEnabled = true;
         }
 
         private void TestMigrationBtn_OnClick(object sender, RoutedEventArgs e)
         {
             // Perform USMT - ScanState
+            // Extract and unzip the USMT resource
+            var tempPath = System.IO.Path.GetTempPath();
+            var usmtPath = Path.Combine(tempPath, "Dive", "USMT");
+            var scanStatePath = Path.Combine(usmtPath, "USMT_x64", "scanstate.exe");
+            const string repositoryPath = "C:\\Dive\\Store";
+            Core.Action.USMT.USMTAction.PrepareEnvironment(usmtPath, repositoryPath);
 
+            using var outputStream = Console.OpenStandardOutput();
+            var result = Core.Action.USMT.USMTAction.ScanState(
+                scanStatePath,
+                repositoryPath,
+                SelectedSid,
+                msg => Debug.WriteLine(msg, ConsoleColor.Gray));
         }
     }
 }

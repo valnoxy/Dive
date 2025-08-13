@@ -41,12 +41,12 @@ namespace Dive.UI.Pages
                     FrameWindow.Content = diskStep;
                     break;
                 case DiskSelectStep:
-                    if ((ApplyDetailsInstance.Name.ToLower().Contains("windows 7") || ApplyDetailsInstance.Name.ToLower().Contains("vista")) && ApplyDetailsInstance.UseEFI)
+                    if (ApplyDetailsInstance is { Build: < 7849, UseEFI: true }) // Windows 8 Build 7849 and lower 
                     {
-                        Debug.WriteLine("Detected Windows Vista / 7 with EFI - Showing UefiSeven Installation prompt ...");
+                        Debug.WriteLine("Detected legacy Windows with EFI!");
 
-                        var message = "It looks like you're attempting to install Windows Vista/7 with EFI support. Normally Vista/7 does not natively support EFI, however an EFI module called UefiSeven can be installed to allow Vista/7 to boot on EFI machines.\n\nDo you want to install UefiSeven?";
-                        var title = "EFI Patch for Windows Vista / 7";
+                        var message = "You are trying to install a legacy Windows version with EFI bootloader. The Windows version you have selected does not support UEFI, but a patch can be applied. Should all available patches be shown?";
+                        var title = "EFI Patch for legacy Windows Versions";
                         var btn1 = "No";
                         var btn2 = "Yes";
 
@@ -56,10 +56,8 @@ namespace Dive.UI.Pages
                             var summary = w.Summary;
                             if (summary == "Btn2")
                             {
-                                Debug.WriteLine("Using UefiSeven for EFI boot loader");
-                                Common.WindowsModification.InstallUefiSeven = true;
-                                var uefiSevenSettings = new Extras.UefiSevenSettings();
-                                uefiSevenSettings.ShowDialog();
+                                var efiSettings = new Extras.LegacyEFI();
+                                efiSettings.ShowDialog();
                             }
                         }
                     }

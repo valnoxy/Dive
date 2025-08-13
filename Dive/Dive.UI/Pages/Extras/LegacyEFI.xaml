@@ -1,0 +1,189 @@
+﻿<ui:FluentWindow x:Class="Dive.UI.Pages.Extras.LegacyEFI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dive.UI"
+        mc:Ignorable="d"
+        Title="Dive" Height="500" Width="650" MaxHeight="500" MaxWidth="650"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        WindowCornerPreference="Round"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+        <Grid Margin="20,30,20,55">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <!-- Title with button text -->
+                <RowDefinition Height="*"/>
+                <!-- Content -->
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0">
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+                        Which Patch should be applied?
+                </TextBlock>
+
+                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                        Please choose one option to continue.
+                </TextBlock>
+            </StackPanel>
+
+            <Grid Grid.Row="1" Height="350">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
+                    <StackPanel>
+                        <ui:CardExpander Icon="{ui:SymbolIcon Wrench24}" IsExpanded="False">
+                            <ui:CardExpander.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <Grid>
+                                            <TextBlock
+                                                FontSize="13"
+                                                FontWeight="Medium"
+                                                Text="UefiSeven" />
+                                            <ui:Card Padding="3" Margin="63,-1,0,0" HorizontalAlignment="Left" Width="50">
+                                                <TextBlock Text="manatails" FontSize="10"/>
+                                            </ui:Card>
+                                            <ui:Card Padding="3" Margin="118,-1,0,0" HorizontalAlignment="Left" Width="50">
+                                                <TextBlock Text="v1.30" FontSize="10"/>
+                                            </ui:Card>
+                                        </Grid>
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                            Text="An EFI loader that emulates Int10h interrupts." />
+                                    </StackPanel>
+                                    <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="ToggleUefiSeven_OnChecked" Unchecked="ToggleUefiSeven_OnUnchecked" x:Name="ToggleUefiSeven" />
+                                </Grid>
+                            </ui:CardExpander.Header>
+                            <StackPanel>
+                                <ui:CardControl Icon="{ui:SymbolIcon ErrorCircleSettings20}" Margin="0,5,0,0">
+                                    <ui:CardControl.Header>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock
+                                                    FontSize="13"
+                                                    FontWeight="Medium"
+                                                    Text="Skip Errors" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                                    Text="Skip warnings and prompts at startup." />
+                                            </StackPanel>
+                                            <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="ToggleSkipErrors_OnChecked" Unchecked="ToggleSkipErrors_OnUnchecked" x:Name="ToggleSkipErrors" />
+                                        </Grid>
+                                    </ui:CardControl.Header>
+                                </ui:CardControl>
+                                <ui:CardControl Icon="{ui:SymbolIcon DesktopArrowRight24}" Margin="0,5,0,0">
+                                    <ui:CardControl.Header>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Text="Force Fake Vesa" />
+                                                <TextBlock
+                                            FontSize="12"
+                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                            Text="Overwrite Int10h handler with Fakevesa even when the native handler is present." />
+                                            </StackPanel>
+                                            <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="ToggleFakeVesa_OnChecked" Unchecked="ToggleFakeVesa_OnUnchecked" x:Name="ToggleFakeVesa" />
+                                        </Grid>
+                                    </ui:CardControl.Header>
+                                </ui:CardControl>
+                                <ui:CardControl Icon="{ui:SymbolIcon DesktopCheckmark24}" Margin="0,5,0,0">
+                                    <ui:CardControl.Header>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Text="Verbose" />
+                                                <TextBlock
+                                            FontSize="12"
+                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                            Text="Enable verbose mode at startup." />
+                                            </StackPanel>
+                                            <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="ToggleVerbose_OnChecked_OnChecked" Unchecked="ToggleVerbose_OnUnchecked" x:Name="ToggleVerbose" />
+                                        </Grid>
+                                    </ui:CardControl.Header>
+                                </ui:CardControl>
+                                <ui:CardControl Icon="{ui:SymbolIcon DocumentBulletList24}" Margin="0,5,0,0">
+                                    <ui:CardControl.Header>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock
+                                            FontSize="13"
+                                            FontWeight="Medium"
+                                            Text="Log startup to file" />
+                                                <TextBlock
+                                            FontSize="12"
+                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                            Text="Log to UefiSeven.log file." />
+                                            </StackPanel>
+                                            <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="ToggleLog_OnChecked" Unchecked="ToggleLog_OnUnchecked" x:Name="ToggleLog" />
+                                        </Grid>
+                                    </ui:CardControl.Header>
+                                </ui:CardControl>
+                            </StackPanel>
+                        </ui:CardExpander>
+                        <ui:CardControl Icon="{ui:SymbolIcon Wrench24}" Margin="0,5,0,0">
+                            <ui:CardControl.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <Grid>
+                                            <TextBlock
+                                                FontSize="13"
+                                                FontWeight="Medium"
+                                                Text="CSMWrap" />
+                                            <ui:Card Padding="3" Margin="63,-1,0,0" HorizontalAlignment="Left" Width="41">
+                                                <TextBlock Text="FlyGoat" FontSize="10"/>
+                                            </ui:Card>
+                                            <ui:Card Padding="3" Margin="109,-1,0,0" HorizontalAlignment="Left" Width="50">
+                                                <TextBlock Text="v1.3.0" FontSize="10"/>
+                                            </ui:Card>
+                                        </Grid>
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                            Text="CSM Replacement for UEFI-only systems (based of SeaBIOS)." />
+                                    </StackPanel>
+                                    <ui:ToggleSwitch Grid.Column="1" Margin="0,0,16,0" Padding="30,6" Checked="ToggleCsmWrap_OnChecked" Unchecked="ToggleCsmWrap_OnUnchecked" x:Name="ToggleCsmWrap" />
+                                </Grid>
+                            </ui:CardControl.Header>
+                        </ui:CardControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+        <ui:TitleBar ShowMinimize="False" ShowMaximize="False" CanMaximize="False"/>
+        <ui:Button Content="Install now" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="20" Click="ExitButton_Click"/>
+    </Grid>
+</ui:FluentWindow>
