@@ -32,7 +32,7 @@ namespace Dive.AutoInit
                     var configPath = arg.Split(':')[1];
                     var configJson = File.ReadAllText(configPath);
                     _config = JsonConvert.DeserializeObject<Common.Configuration>(configJson);
-                    
+
                 }
                 if (arg.Contains("--create-config"))
                 {

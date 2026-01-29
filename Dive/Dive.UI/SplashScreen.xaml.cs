@@ -15,13 +15,13 @@ namespace Dive.UI
     public partial class SplashScreen
     {
         private static bool _switchToDashboard = false;
-        
+
         public new class Language
         {
             public string? Name { get; set; }
             public string? Code { get; set; }
         }
-        
+
         private readonly List<Language> _languages = new()
         {
             new Language { Name = "English", Code = "en-US" }, // Default language
@@ -29,7 +29,7 @@ namespace Dive.UI
         };
 
         public SplashScreen()
-        { 
+        {
             InitializeComponent();
 
             // Get application version
@@ -67,7 +67,7 @@ namespace Dive.UI
                 Logging.Log($"Trying to load language '{language}' with code '{languageCode}' ...");
                 Common.LocalizationManager.LoadLanguage(languageCode!);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString(), ConsoleColor.Red);
             }

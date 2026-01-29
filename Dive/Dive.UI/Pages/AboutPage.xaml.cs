@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Dive.UI.Common;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using Dive.UI.Common;
 
 namespace Dive.UI.Pages
 {
@@ -36,8 +36,8 @@ namespace Dive.UI.Pages
             LicenseTitle.Text = Common.Licensing.Validation.Info.Valid
                 ? $"Founders Edition"
                 : "License Status";
-            LicenseStatus.Text = Common.Licensing.Validation.Info.Valid 
-                ? $"Licensed to {Common.Licensing.Validation.Info.LicenseName} ({Common.Licensing.Validation.Info.LicenseEmail})" 
+            LicenseStatus.Text = Common.Licensing.Validation.Info.Valid
+                ? $"Licensed to {Common.Licensing.Validation.Info.LicenseName} ({Common.Licensing.Validation.Info.LicenseEmail})"
                 : "You are currently using the Free Edition.";
 
             if (!Common.Licensing.Validation.Info.Valid)

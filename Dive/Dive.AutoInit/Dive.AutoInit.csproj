@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<RootNamespace>Dive.AutoInit</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>
@@ -23,7 +23,7 @@
 		<Company>Exploitox</Company>
 		<Product>Dive</Product>
 		<Title>Dive AutoInit Plugin</Title>
-		<Copyright>Copyright © 2018 - 2024 Exploitox. All rights reserved.</Copyright>
+		<Copyright>Copyright © 2018 - 2026 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<PackageReleaseNotes>Dive AutoInit Module</PackageReleaseNotes>
 		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

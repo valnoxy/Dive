@@ -1,7 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using Dive.UI.Common;
+﻿using Dive.UI.Common;
 using Dive.UI.Pages.TweaksPages.PlayBook;
+using System.Windows;
 
 namespace Dive.UI.Pages.TweaksPages
 {

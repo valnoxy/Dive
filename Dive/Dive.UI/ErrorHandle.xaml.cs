@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Windows;
-using System.Windows.Threading;
+﻿using System.Windows;
 
 namespace Dive.UI
 {
@@ -31,7 +28,7 @@ namespace Dive.UI
 
             _mainThread = isMainThread;
         }
-        
+
         private void Btn1_OnClick(object sender, RoutedEventArgs e)
         {
             _buttonPressed = "Btn1";

@@ -1,5 +1,5 @@
 ﻿using Dive.UI.Common;
-using Microsoft.VisualBasic;
+using Dive.UI.Common.UserInterface;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +8,6 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
-using Dive.UI.Common.UserInterface;
 using Exception = System.Exception;
 
 namespace Dive.UI.Pages.ApplyPages
@@ -55,11 +53,11 @@ namespace Dive.UI.Pages.ApplyPages
 
         private List<Disk> disks;
         public List<Disk> DiskList => disks;
-        
+
         public DiskSelectStep()
         {
             InitializeComponent();
-            
+
             if (ApplyContent.ContentWindow != null)
             {
                 ApplyContent.ContentWindow.NextBtn.IsEnabled = false;
@@ -251,7 +249,7 @@ namespace Dive.UI.Pages.ApplyPages
             Debug.Write("The disk with ID ");
             Debug.Write(ApplyDetailsInstance.DiskIndex.ToString(), true, ConsoleColor.DarkYellow);
             Debug.Write(" will be used for deployment.\n", true);
-            
+
             if (ApplyContent.ContentWindow != null)
             {
                 ApplyContent.ContentWindow.NextBtn.IsEnabled = true;

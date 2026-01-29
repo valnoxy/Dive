@@ -1,9 +1,8 @@
-﻿using System;
-using System.Security.Policy;
+﻿using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using Dive.UI.Common;
-using Dive.UI.Common.UserInterface;
 using TimeZone = Dive.UI.Common.Configuration.TimeZone;
 
 namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
@@ -288,7 +287,7 @@ namespace Dive.UI.Pages.Extras.UnattendConfigurationPages
             Debug.Write("Selected Network Location in Unattend: ");
             Debug.Write($"{OutOfBoxExperienceInfoInstance.NetworkLocation}\n", true, ConsoleColor.DarkYellow);
         }
-        
+
         private void TimeZoneDropDown_SelectionChanged(object sender, RoutedEventArgs e)
         {
             var cmb = (ComboBox)sender;

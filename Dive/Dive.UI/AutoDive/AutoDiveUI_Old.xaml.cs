@@ -1,16 +1,16 @@
-﻿using System;
-using System.IO;
-using Dive.Core;
-using System.Xml;
+﻿using Dive.Core;
+using Dive.Core.Action.Deployment;
+using Dive.Core.Common;
 using Dive.UI.Common;
+using Dive.UI.Common.Configuration;
+using Dive.UI.Common.UserInterface;
+using Dive.UI.Pages;
+using System;
+using System.ComponentModel;
+using System.IO;
 using System.Management;
 using System.Windows.Media;
-using System.ComponentModel;
-using Dive.UI.Pages;
-using Dive.Core.Common;
-using Dive.UI.Common.Configuration;
-using Dive.Core.Action.Deployment;
-using Dive.UI.Common.UserInterface;
+using System.Xml;
 
 namespace Dive.UI.AutoDive
 {

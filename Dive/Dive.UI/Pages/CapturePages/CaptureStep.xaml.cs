@@ -1,12 +1,11 @@
 ﻿using Dive.Core;
 using Dive.Core.Common;
+using Dive.UI.Common.UserInterface;
+using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
-using Dive.UI.Common;
-using Newtonsoft.Json;
-using System;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.CapturePages
 {
@@ -18,7 +17,7 @@ namespace Dive.UI.Pages.CapturePages
         private BackgroundWorker captureBackgroundWorker;
         private string FullFilePath = Path.Combine(Common.CaptureInfo.PathToImage, Common.CaptureInfo.ImageFileName);
         bool IsCanceled = false;
-        
+
         public CaptureStep()
         {
             InitializeComponent();
@@ -139,11 +138,11 @@ namespace Dive.UI.Pages.CapturePages
             }
 
             // Installation complete
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 IsDebug = true,
                 Message = "Job Done."
-            }));
+            });
         }
     }
 }

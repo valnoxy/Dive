@@ -13,12 +13,12 @@
 using Dive.UI.AutoDive;
 using Dive.UI.Common;
 using System;
-using System.Linq;
-using System.Windows;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Reflection;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Threading;
 using Action = System.Action;
 using Debug = Dive.UI.Common.UserInterface.Debug;
@@ -147,7 +147,7 @@ namespace Dive.UI
                 oemInfoInstance.SupportHours = "24/7";
                 oemInfoInstance.SupportURL = "https://fabrikam.com";
                 oemInfoInstance.SupportPhone = "+1 111 11111111";
-                
+
                 Debug.WriteLine("Use User: " + deploymentInfoInstance.UseUserInfo);
                 Debug.WriteLine("Username: " + deploymentInfoInstance.Username);
                 Debug.WriteLine("Password: " + deploymentInfoInstance.Password);

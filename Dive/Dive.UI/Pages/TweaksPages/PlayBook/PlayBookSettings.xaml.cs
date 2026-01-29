@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dive.Core.Common;
+using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
-using Dive.Core.Common;
-using Microsoft.Win32;
 
 namespace Dive.UI.Pages.TweaksPages.PlayBook
 {
@@ -53,7 +53,7 @@ namespace Dive.UI.Pages.TweaksPages.PlayBook
             }
             catch (Exception ex)
             {
-                Output.WriteLine( $"Failed to prepare post-configuration: {ex.Message}", ConsoleColor.Red);
+                Output.WriteLine($"Failed to prepare post-configuration: {ex.Message}", ConsoleColor.Red);
             }
         }
 

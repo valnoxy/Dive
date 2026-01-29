@@ -1,11 +1,9 @@
 ﻿using Dive.Core.Common;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
-using System.IO.Compression;
-using System.IO;
-using System.Reflection;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 
 namespace Dive.Core.Action.USMT
 {
@@ -27,7 +25,7 @@ namespace Dive.Core.Action.USMT
         {
             Bw = worker;
 
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareUSMT,
                 IsError = false,
@@ -35,7 +33,7 @@ namespace Dive.Core.Action.USMT
                 IsDebug = false,
                 IsIndeterminate = true,
                 Message = "Extracting USMT files ..."
-            }));
+            });
 
             if (Directory.Exists(tempPath))
                 Directory.Delete(tempPath, true);
@@ -57,7 +55,7 @@ namespace Dive.Core.Action.USMT
 
             if (!File.Exists(LoadStateExe))
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.PrepareUSMT,
                     IsError = true,
@@ -65,12 +63,12 @@ namespace Dive.Core.Action.USMT
                     IsDebug = false,
                     IsIndeterminate = true,
                     Message = "File 'LoadState.exe' cannot be found."
-                }));
+                });
                 return false;
             }
             if (!File.Exists(ScanStateExe))
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.PrepareUSMT,
                     IsError = true,
@@ -78,12 +76,12 @@ namespace Dive.Core.Action.USMT
                     IsDebug = false,
                     IsIndeterminate = true,
                     Message = "File 'ScanState.exe' cannot be found."
-                }));
+                });
                 return false;
             }
             if (!File.Exists(MigHostExe))
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.PrepareUSMT,
                     IsError = true,
@@ -91,11 +89,11 @@ namespace Dive.Core.Action.USMT
                     IsDebug = false,
                     IsIndeterminate = true,
                     Message = "File 'MigHost.exe' cannot be found."
-                }));
+                });
                 return false;
             }
 
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareUSMT,
                 IsError = false,
@@ -103,7 +101,7 @@ namespace Dive.Core.Action.USMT
                 IsDebug = true,
                 IsIndeterminate = true,
                 Message = "Done."
-            }));
+            });
             return true;
         }
 
@@ -129,7 +127,7 @@ namespace Dive.Core.Action.USMT
         {
             Bw = worker;
 
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareUSMT,
                 IsError = false,
@@ -137,7 +135,7 @@ namespace Dive.Core.Action.USMT
                 IsDebug = false,
                 IsIndeterminate = true,
                 Message = "Saving Profile Data ..."
-            }));
+            });
 
             try
             {
@@ -163,7 +161,7 @@ namespace Dive.Core.Action.USMT
             }
             catch (Exception ex)
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.PrepareUSMT,
                     IsError = true,
@@ -171,12 +169,12 @@ namespace Dive.Core.Action.USMT
                     IsDebug = false,
                     IsIndeterminate = false,
                     Message = $"ScanState failed: {ex.Message}"
-                }));
+                });
 
                 return false;
             }
 
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareUSMT,
                 IsError = false,
@@ -184,7 +182,7 @@ namespace Dive.Core.Action.USMT
                 IsDebug = true,
                 IsIndeterminate = true,
                 Message = "Done."
-            }));
+            });
 
             return true;
         }

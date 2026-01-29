@@ -1,5 +1,4 @@
 ﻿using Dive.Core.Common;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.Management;
@@ -48,6 +47,8 @@ namespace Dive.Core.Action.DiskPreparation
             /// <returns>Result of disk preparation</returns>
             public static bool PrepareFull(int diskIndex, string bootDrive, string windowsDrive, string recoveryDrive, BackgroundWorker worker = null)
             {
+                return false;
+
                 var sizeInBytes = GetDiskSize(diskIndex.ToString());
                 if (sizeInBytes == 0)
                 {
@@ -166,24 +167,24 @@ namespace Dive.Core.Action.DiskPreparation
 
         private static void ReportDebug(string message, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareDisk,
                 IsError = true,
                 IsIndeterminate = false,
                 Message = message
-            }));
+            });
         }
 
         private static void ReportError(string message, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareDisk,
                 IsError = true,
                 IsIndeterminate = false,
                 Message = message
-            }));
+            });
         }
 
         private static double GetDiskSize(string diskId)
@@ -215,7 +216,7 @@ namespace Dive.Core.Action.DiskPreparation
                 var query = $"select * from Win32_Volume WHERE DriveLetter = \"{driveLetter}:\"";
                 using var searcher = new ManagementObjectSearcher(query);
                 var found = false;
-                
+
                 foreach (var o in searcher.Get())
                 {
                     var volume = (ManagementObject)o;

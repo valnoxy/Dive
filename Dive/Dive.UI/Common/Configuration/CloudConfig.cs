@@ -19,7 +19,7 @@ namespace Dive.UI.Common.Configuration
             var cloudInfo = JsonConvert.DeserializeObject<CloudInfo?>(json);
             var uri = new Uri(url);
             var domain = uri.GetLeftPart(UriPartial.Authority);
-            
+
             // Adjust file paths if necessary
             if (cloudInfo?.Images == null) return new CloudInfo();
             foreach (var image in cloudInfo.Images)

@@ -1,12 +1,11 @@
 ﻿using Dive.Core.Common;
 using Dive.UI.Common;
-using Newtonsoft.Json;
+using Dive.UI.Common.Deployment;
+using Dive.UI.Common.UserInterface;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
-using Dive.UI.Common.Deployment;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -89,12 +88,10 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void ApplyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
-            var responseJson = e.UserState as string;
-            if (string.IsNullOrEmpty(responseJson)) return;
-
             try
             {
-                var response = JsonConvert.DeserializeObject<ActionWorker>(responseJson);
+                var response = e.UserState as ActionWorker;
+
                 if (response!.IsError)
                 {
                     ProgrText.Text = response.Message;
@@ -149,122 +146,122 @@ namespace Dive.UI.Pages.ApplyPages
                 switch (response.Action)
                 {
                     case Progress.PrepareDisk:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.PrepareDisk, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                     case Progress.ApplyImage:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.ApplyImage, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                     case Progress.InstallBootloader:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.InstallBootloader, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                     case Progress.InstallRecovery:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.InstallRecovery, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.InstallRecovery, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                     case Progress.InstallUnattend:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.InstallUnattend, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.InstallUnattend, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                     case Progress.InstallDrivers:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.InstallDrivers, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.InstallDrivers, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                     case Progress.InstallUefiSeven:
-                    {
-                        ProgrText.Text = response.Message;
-                        if (response.IsIndeterminate)
-                            ProgrBar.IsIndeterminate = true;
-                        else
                         {
-                            ProgrBar.IsIndeterminate = false;
-                            ProgrBar.Value = e.ProgressPercentage;
-                        }
+                            ProgrText.Text = response.Message;
+                            if (response.IsIndeterminate)
+                                ProgrBar.IsIndeterminate = true;
+                            else
+                            {
+                                ProgrBar.IsIndeterminate = false;
+                                ProgrBar.Value = e.ProgressPercentage;
+                            }
 
-                        Debug.RefreshProgressBar(Progress.InstallUefiSeven, e.ProgressPercentage, response.Message);
-                        if (Common.Configuration.FunConfig.WledCommunication)
-                            _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
-                        break;
-                    }
+                            Debug.RefreshProgressBar(Progress.InstallUefiSeven, e.ProgressPercentage, response.Message);
+                            if (Common.Configuration.FunConfig.WledCommunication)
+                                _ = Common.Fun.WLED.IncreaseProgress(e.ProgressPercentage);
+                            break;
+                        }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error while parsing JSON response: {ex.Message}", ConsoleColor.Red);
+                Debug.WriteLine($"Error while parsing response: {ex.Message}", ConsoleColor.Red);
             }
         }
     }

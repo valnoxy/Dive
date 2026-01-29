@@ -1,14 +1,14 @@
 ﻿using Dive.Core;
+using Dive.Core.Common;
+using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
-using Dive.UI.Common;
-using System.Threading.Tasks;
-using Dive.Core.Common;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -24,7 +24,7 @@ namespace Dive.UI.Pages.ApplyPages
             public string Picture { get; set; }
             public string Name { get; set; }
             public string ImageFile { get; set; }
-            public string Index { get; set;}
+            public string Index { get; set; }
             public string Arch { get; set; }
             public int Build { get; set; }
             public string NTVersion { get; set; }

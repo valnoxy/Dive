@@ -1,9 +1,9 @@
 ﻿using Dive.UI.Common;
 using System;
 using System.ComponentModel;
-using System.Windows.Media;
 using System.Diagnostics;
 using System.Management;
+using System.Windows.Media;
 
 namespace Dive.UI.Pages.TweaksPages
 {
@@ -29,7 +29,7 @@ namespace Dive.UI.Pages.TweaksPages
 
             // Set active Image to card
             ImageName.Text = $"Disk {TweaksInstance.DiskIndex}";
-            
+
             // ImageFile.Text = Common.ApplyDetails.FileName;
             var img = new ImageSourceConverter();
             try
@@ -221,7 +221,7 @@ namespace Dive.UI.Pages.TweaksPages
                     }
                     IsCanceled = true;
                     break;
-                #endregion
+                    #endregion
             }
 
             // Progressbar percentage

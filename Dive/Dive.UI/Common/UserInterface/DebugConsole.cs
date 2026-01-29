@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dive.Core.Common;
+using Konsole;
+using System;
 using System.Diagnostics;
 using System.Reflection;
-using Dive.Core.Common;
-using Konsole;
 
 namespace Dive.UI.Common.UserInterface
 {
@@ -156,7 +156,7 @@ namespace Dive.UI.Common.UserInterface
                 Logging.Log("The console window is too small. Please resize the window and try again.", Logging.LogLevel.ERROR);
                 Environment.Exit(1);
             }
-            
+
             _logConsole.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
             _logConsole.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
 #if DEBUG

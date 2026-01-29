@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
-using System.IO;
-using Dive.Core.Assets;
+﻿using Dive.Core.Assets;
 using Dive.Core.Common;
-using Newtonsoft.Json;
+using System.ComponentModel;
+using System.IO;
 
 namespace Dive.Core.Action.Deployment
 {
@@ -19,13 +18,13 @@ namespace Dive.Core.Action.Deployment
         /// <param name="verboseBoot">Enable verbose mode</param>
         public static void InstallUefiSeven(string bootLetter, bool skipErrors, bool fakeVesaForce, bool verboseBoot, bool logToFile, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.InstallUefiSeven,
                 IsError = false,
                 IsIndeterminate = true,
                 Message = "Installing UefiSeven ..."
-            }));
+            });
 
             // Find bootmgfw.efi and rename it to bootmgfw.original.efi
             try
@@ -53,46 +52,46 @@ namespace Dive.Core.Action.Deployment
                     }
                     catch
                     {
-                        worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                        worker?.ReportProgress(0, new ActionWorker
                         {
                             Action = Progress.InstallUefiSeven,
                             IsError = true,
                             IsIndeterminate = false,
                             Message = "Failed to install UefiSeven."
-                        }));
+                        });
                         return;
                     }
                 }
                 else
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallUefiSeven,
                         IsError = true,
                         IsIndeterminate = false,
                         Message = "File 'bootmgfw.efi' is missing."
-                    }));
+                    });
                     return;
                 }
             }
             catch
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallUefiSeven,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Cannot create a copy of the EFI bootloader."
-                }));
+                });
             }
 
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.InstallUefiSeven,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
     }
 }

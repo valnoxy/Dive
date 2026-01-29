@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
+using System;
 using System.ComponentModel;
 using System.Windows;
-using Dive.UI.Common;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.Extras
 {
@@ -28,7 +28,7 @@ namespace Dive.UI.Pages.Extras
             // Define state of DeviceInfo
             if (!string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOwner) ||
                 !string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOrganization) ||
-                !string.IsNullOrEmpty(DeviceInfoInstance.ProductKey) || 
+                !string.IsNullOrEmpty(DeviceInfoInstance.ProductKey) ||
                 !string.IsNullOrEmpty(DeviceInfoInstance.DeviceName))
             {
                 DeviceInfoInstance.UseDeviceInfo = true;

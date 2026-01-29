@@ -1,10 +1,9 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using Dive.UI.Common;
+﻿using Dive.UI.Common;
 using Dive.UI.Pages.TweaksPages;
 using Dive.UI.Pages.TweaksPages.PlayBook;
-using Dive.UI.Pages.TweaksPages.USMT;
+using System;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Dive.UI.Pages
 {

@@ -1,7 +1,5 @@
-﻿using Dive.UI.Pages.CapturePages;
+﻿using Dive.UI.Pages.Extras.AnswerConfiguration;
 using System.Windows;
-using System;
-using Dive.UI.Pages.Extras.AnswerConfiguration;
 
 namespace Dive.UI.Pages.Extras.ConfigAssistant
 {

@@ -31,7 +31,7 @@ namespace Dive.UI.Common.UserInterface
             get => (string)GetValue(SizeProperty);
             set => SetValue(SizeProperty, value);
         }
-        
+
         public Skeleton()
         {
             InitializeComponent();

@@ -1,9 +1,9 @@
 ﻿using Dive.Core.Common;
+using Dive.UI.Common.UserInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Common
 {
@@ -12,7 +12,7 @@ namespace Dive.UI.Common
         private static readonly Dictionary<string, List<string>> CompatibleCpus = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
         {
             // Intel-CPUs
-            { 
+            {
                 "Intel Core", [
                     "3 100HL",
                     "3 100U",
@@ -472,7 +472,7 @@ namespace Dive.UI.Common
                     "U303L"
                 ]
             },
-            { 
+            {
                 "Intel Core Ultra", [
                     "3 105UL",
                     "3 205T",
@@ -1249,7 +1249,7 @@ namespace Dive.UI.Common
             var fullCpuName = GetFullCpuName();
             Debug.WriteLine("Got CPU: " + fullCpuName, ConsoleColor.Yellow);
             Logging.Log("Got CPU: " + fullCpuName, Logging.LogLevel.ERROR);
-            
+
             if (string.IsNullOrEmpty(fullCpuName))
             {
                 return false;

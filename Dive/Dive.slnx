@@ -1,0 +1,25 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Addons/">
+    <Project Path="Dive.AutoInit/Dive.AutoInit.csproj">
+      <BuildDependency Project="Dive.PluginContext/Dive.PluginContext.csproj" />
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Dive.PluginContext/Dive.PluginContext.csproj" />
+  </Folder>
+  <Project Path="Dive.Core/Dive.Core.csproj">
+    <BuildDependency Project="Dive.DiskOperation/Dive.DiskOperation.vcxproj" />
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Dive.DiskMgr/Dive.DiskMgr.vcxproj" Id="51ce982e-1144-4a4f-8c62-928e6a3286c2" />
+  <Project Path="Dive.DiskOperation/Dive.DiskOperation.vcxproj" Id="28b19472-19c4-4af4-9d5e-712dad33cfcb" />
+  <Project Path="Dive.UI/Dive.UI.csproj">
+    <BuildDependency Project="Dive.Core/Dive.Core.csproj" />
+    <BuildDependency Project="Dive.PluginContext/Dive.PluginContext.csproj" />
+    <Platform Project="x64" />
+  </Project>
+</Solution>

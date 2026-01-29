@@ -59,13 +59,13 @@ namespace Dive.UI.Common.USMT
             }
 
             return new User
-                {
-                    SID = sid!,
-                    ProfilePath = profilePath!,
-                    FirstCreated = firstCreated,
-                    LastModified = lastModified,
-                    Username = username
-                };
+            {
+                SID = sid!,
+                ProfilePath = profilePath!,
+                FirstCreated = firstCreated,
+                LastModified = lastModified,
+                Username = username
+            };
 
         }
 
@@ -97,7 +97,7 @@ namespace Dive.UI.Common.USMT
             {
                 var fNtAccount = Path.Combine(MigrationStorePath, id, "ntaccount");
                 if (!File.Exists(fNtAccount)) return id;
-                
+
                 var ntAccount = File.ReadAllText(fNtAccount);
                 return ntAccount != "" ? ntAccount : id;
             }

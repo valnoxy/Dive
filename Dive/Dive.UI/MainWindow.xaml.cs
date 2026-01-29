@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dive.Core.Common;
+using Dive.UI.Pages.Extras.FunPages;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -6,8 +8,6 @@ using System.Security.Principal;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Dive.Core.Common;
-using Dive.UI.Pages.Extras.FunPages;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Debug = Dive.UI.Common.UserInterface.Debug;
@@ -31,7 +31,7 @@ namespace Dive.UI
             InitializeComponent();
 
 #if DEBUG
-            _displayDebugConsole = true; 
+            _displayDebugConsole = true;
             Branch.Text = "Development";
             CloudPage.Visibility = Visibility.Visible;
             TweaksPage.Visibility = Visibility.Visible;

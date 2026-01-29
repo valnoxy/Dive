@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using Dive.UI.Common.UserInterface;
+﻿using Dive.UI.Common.UserInterface;
+using System.Windows;
 
 namespace Dive.UI.Pages.Extras
 {

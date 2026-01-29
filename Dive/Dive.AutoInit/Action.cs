@@ -14,7 +14,7 @@ namespace Dive.AutoInit
             if (config.Telemetry.DisableAit)
                 if (!Telemetry.DisableAit())
                     CurrentAction.ErrorCounter++;
-            
+
             if (config.Telemetry.DisableCeip)
                 if (!Telemetry.DisableCeip())
                     CurrentAction.ErrorCounter++;
@@ -26,7 +26,7 @@ namespace Dive.AutoInit
             if (config.Telemetry.DisableLicenseTelemetry)
                 if (!Telemetry.DisableLicenseTel())
                     CurrentAction.ErrorCounter++;
-            
+
             if (config.Telemetry.DisableDeviceCensus)
                 if (!Telemetry.DisableDeviceCensus())
                     CurrentAction.ErrorCounter++;

@@ -1,8 +1,6 @@
-﻿using System;
-using Dive.UI.Pages.ApplyPages;
-using Dive.UI.Pages.CapturePages;
+﻿using Dive.UI.Pages.CapturePages;
+using System;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Dive.UI.Pages
 {
@@ -14,7 +12,7 @@ namespace Dive.UI.Pages
         public static CaptureContent? ContentWindow;
 
         SettingsStep settingsStep = new SettingsStep();
-        
+
         public CaptureContent()
         {
             InitializeComponent();

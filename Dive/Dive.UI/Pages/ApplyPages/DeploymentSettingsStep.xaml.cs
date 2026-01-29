@@ -1,12 +1,12 @@
-﻿using System;
-using Dive.UI.Common;
+﻿using Dive.UI.Common;
+using Dive.UI.Common.Configuration;
+using Dive.UI.Common.UserInterface;
+using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using Dive.UI.Common.Configuration;
-using Dive.UI.Common.UserInterface;
-using Microsoft.Win32;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -21,7 +21,7 @@ namespace Dive.UI.Pages.ApplyPages
         private static readonly DomainInfo DomainInfoInstance = DomainInfo.Instance;
         private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
         private static readonly OutOfBoxExperienceInfo OutOfBoxExperienceInfoInstance = OutOfBoxExperienceInfo.Instance;
-        
+
         public DeploymentSettingsStep()
         {
             InitializeComponent();
@@ -170,7 +170,7 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void Export_OnClicked(object sender, RoutedEventArgs e)
         {
-            
+
             var saveFileDialog = new SaveFileDialog
             {
                 Filter = "Dive Configuration (*.xml)|*.xml"

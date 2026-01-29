@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Dive.Core.Common;
+using Dive.UI.Common;
+using Dive.UI.Common.Deployment;
+using Dive.UI.Common.UserInterface;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using Dive.Core.Common;
-using Dive.UI.Common;
-using Dive.UI.Common.Deployment;
-using Dive.UI.Common.UserInterface;
-using Newtonsoft.Json;
 
 namespace Dive.UI.Pages.ApplyPages
 {
@@ -89,12 +88,10 @@ namespace Dive.UI.Pages.ApplyPages
 
         private void ApplyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
-            var responseJson = e.UserState as string;
-            if (string.IsNullOrEmpty(responseJson)) return;
-
             try
             {
-                var response = JsonConvert.DeserializeObject<ActionWorker>(responseJson);
+                if (e.UserState is not ActionWorker response) return;
+
                 if (response!.IsError)
                 {
                     ProgrText.Text = response.Message;
@@ -171,7 +168,7 @@ namespace Dive.UI.Pages.ApplyPages
                             ProgrText.Text = response.Message;
                             if (response.IsIndeterminate)
                                 ProgrBar.IsIndeterminate = true;
-                            
+
                             else
                             {
                                 ProgrBar.IsIndeterminate = false;
@@ -314,7 +311,7 @@ namespace Dive.UI.Pages.ApplyPages
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error while parsing JSON response: {ex.Message}", ConsoleColor.Red);
+                Debug.WriteLine($"Error while parsing response: {ex.Message}", ConsoleColor.Red);
             }
         }
     }

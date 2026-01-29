@@ -1,9 +1,9 @@
 ﻿using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
 using Dive.UI.Pages.ApplyPages;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages
 {
@@ -17,7 +17,7 @@ namespace Dive.UI.Pages
 
         SKUSelectStep SKUSS = new();
         DeploymentSettingsStep deploymentSettingsStep = new();
-        
+
         public ApplyContent()
         {
             InitializeComponent();
@@ -32,7 +32,7 @@ namespace Dive.UI.Pages
         {
             switch (FrameWindow.Content)
             {
-                case SKUSelectStep:                    
+                case SKUSelectStep:
                     FrameWindow.Content = deploymentSettingsStep;
                     BackBtn.IsEnabled = true;
                     break;

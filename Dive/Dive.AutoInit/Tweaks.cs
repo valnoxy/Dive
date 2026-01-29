@@ -5,7 +5,7 @@ namespace Dive.AutoInit
 {
     public class Tweaks
     {
-        public enum MemoryDumpOption:int
+        public enum MemoryDumpOption : int
         {
             None = 0,
             Complete = 1,
@@ -72,7 +72,7 @@ namespace Dive.AutoInit
         {
             var build = Environment.OSVersion.Version.Build;
             if (build < 22000) return true; // Windows 11+
-            
+
             var root = Path.Combine(Path.GetPathRoot(Environment.SystemDirectory)!, "Users");
             var subdirectoriesEntries = Directory.GetDirectories(root);
             foreach (var subdirectory in subdirectoriesEntries)

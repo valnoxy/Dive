@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Management;
-using System.Threading.Tasks;
 
 namespace Dive.UI.Common.USMT
 {

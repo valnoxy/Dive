@@ -25,7 +25,7 @@
 
         public class CanarySettings
         {
-            public static readonly bool UseNewDiskOperation = false;
+            public static readonly bool UseNewDiskOperation = true;
         }
     }
 }

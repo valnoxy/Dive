@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Dive.UI.Common.UserInterface;
+using System;
 using System.Windows;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Common
 {

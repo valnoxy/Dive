@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<RootNamespace>Dive.Core</RootNamespace>
 		<PublishSingleFile>true</PublishSingleFile>
 		<PublishTrimmed>true</PublishTrimmed>
@@ -17,12 +17,12 @@
 		<DebugType>embedded</DebugType>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PackageId>Dive.Core</PackageId>
-		<Version>12.0.0.473</Version>
+		<Version>12.0.0.481</Version>
 		<Authors>valnoxy</Authors>
 		<Company>Exploitox</Company>
 		<Product>Dive</Product>
 		<Title>Dive Core</Title>
-		<Copyright>Copyright © 2018 - 2025 Exploitox. All rights reserved.</Copyright>
+		<Copyright>Copyright © 2018 - 2026 Exploitox. All rights reserved.</Copyright>
 		<PackageProjectUrl>https://github.com/valnoxy/dive</PackageProjectUrl>
 		<PackageReleaseNotes>Dive Core</PackageReleaseNotes>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -38,6 +38,10 @@
 		<PackageReference Include="Microsoft.Wim" Version="1.2.11" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="System.Management" Version="9.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Dive.DiskMgr\Dive.DiskMgr.vcxproj" />
 	</ItemGroup>
 
 	<ItemGroup>

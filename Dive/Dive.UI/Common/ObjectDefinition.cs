@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Dive.UI.Common.Plugins;
+using System;
 using System.Collections.Generic;
-using Dive.UI.Common.Plugins;
 
 namespace Dive.UI.Common
 {
@@ -834,7 +834,7 @@ namespace Dive.UI.Common
         // CsmWrap
         public static bool InstallCsmWrap { get; set; }
     }
-    
+
     public enum TweakMode
     {
         AutoInit,

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Dive.Core.Common;
+using Dive.UI.Common.UserInterface;
+using Dive.UI.Common.USMT;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using Dive.Core.Common;
-using Dive.UI.Common.UserInterface;
-using Dive.UI.Common.USMT;
 
 namespace Dive.UI.Pages.TweaksPages.USMT
 {

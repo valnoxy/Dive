@@ -1,11 +1,11 @@
-﻿using Debug = Dive.UI.Common.UserInterface.Debug;
-using Dive.UI.Common.Configuration;
+﻿using Dive.UI.Common.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
 using System.Threading.Tasks;
+using System.Windows;
+using Debug = Dive.UI.Common.UserInterface.Debug;
 
 namespace Dive.UI.Pages.ApplyPages
 {

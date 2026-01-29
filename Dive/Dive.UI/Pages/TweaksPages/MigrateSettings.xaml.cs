@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
+using System;
 using System.Linq;
 using System.Management;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Dive.UI.Common;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages.TweaksPages
 {

@@ -10,18 +10,17 @@
  * Source code: https://github.com/valnoxy/dive
  */
 
+using Dive.Core.Action.Capturing;
+using Dive.Core.Action.Deployment;
+using Dive.Core.Assets;
 using Dive.Core.Common;
+using Microsoft.Dism;
 using Microsoft.Wim;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using Dive.Core.Assets;
-using Microsoft.Dism;
-using Newtonsoft.Json;
-using Dive.Core.Action.Deployment;
-using Dive.Core.Action.Capturing;
 
 namespace Dive.Core
 {
@@ -42,13 +41,13 @@ namespace Dive.Core
         public static void PrepareDisk(Entities.Firmware firmware, Entities.Bootloader bootloader, int disk, bool isRemovable, Entities.PartitionStyle partitionStyle, bool useRecovery, string windowsDrive, string bootDrive = "\0", string recoveryDrive = "\0", BackgroundWorker worker = null)
         {
             // General message
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.PrepareDisk,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Partitioning disk ..."
-            }));
+            });
 
             // Validate parsed arguments
             if (useRecovery && (windowsDrive == "\0" || bootDrive == "\0" || recoveryDrive == "\0"))
@@ -58,18 +57,21 @@ namespace Dive.Core
 
             if (Entities.CanarySettings.UseNewDiskOperation)
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     IsDebug = true,
                     Message = "Using new disk operation!"
-                }));
+                });
                 switch (partitionStyle)
                 {
                     case Entities.PartitionStyle.Full:
                         switch (firmware)
                         {
                             case Entities.Firmware.EFI:
-                                Action.DiskPreparation.PrepareDisk.EFI.PrepareFull(disk, bootDrive, windowsDrive, recoveryDrive, worker);
+                                var diskManager = new Action.DiskPreparation.GptDiskManager(disk);
+                                diskManager.CreateFullLayout(bootDrive, windowsDrive, recoveryDrive, worker);
+
+                                //Action.DiskPreparation.PrepareDisk.EFI.PrepareFull(disk, bootDrive, windowsDrive, recoveryDrive, worker);
                                 break;
                             case Entities.Firmware.BIOS:
                                 // Not implemented - use diskpart
@@ -89,13 +91,13 @@ namespace Dive.Core
                         throw new ArgumentOutOfRangeException(nameof(partitionStyle), partitionStyle, null);
                 }
 
-                worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(100, new ActionWorker
                 {
                     Action = Progress.PrepareDisk,
                     IsError = false,
                     IsIndeterminate = false,
                     Message = "Done."
-                }));
+                });
                 return;
             }
 
@@ -201,13 +203,13 @@ namespace Dive.Core
                             partDest.StandardInput.WriteLine("exit");
                             break;
                         case Entities.Firmware.EFI: // Windows on EFI
-                            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                            worker?.ReportProgress(0, new ActionWorker
                             {
                                 Action = Progress.PrepareDisk,
                                 IsError = true,
                                 IsIndeterminate = false,
                                 Message = "You cannot use Single Partition layout on a system with EFI Firmware."
-                            }));
+                            });
                             return;
                     }
                     break;
@@ -217,13 +219,13 @@ namespace Dive.Core
                     switch (firmware)
                     {
                         case Entities.Firmware.BIOS: // Windows on BIOS
-                            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                            worker?.ReportProgress(0, new ActionWorker
                             {
                                 Action = Progress.PrepareDisk,
                                 IsError = true,
                                 IsIndeterminate = false,
                                 Message = "You cannot use Legacy EFI layout on a system without EFI Firmware."
-                            }));
+                            });
                             return;
                         case Entities.Firmware.EFI: // Windows on EFI
                             partDest.StandardInput.WriteLine("select disk " + disk);
@@ -239,7 +241,7 @@ namespace Dive.Core
                             if (useRecovery)
                             {
                                 partDest.StandardInput.WriteLine("create partition primary");
-                                partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery"); 
+                                partDest.StandardInput.WriteLine("format quick fs=ntfs label=Recovery");
                                 partDest.StandardInput.WriteLine("assign letter=" + recoveryDrive.Substring(0, 1));
                             }
                             partDest.StandardInput.WriteLine("exit");
@@ -251,23 +253,23 @@ namespace Dive.Core
 
             if (partDest.ExitCode != 0)
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.PrepareDisk,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Diskpart terminated with exit code " + partDest.ExitCode + "."
-                }));
+                });
                 return;
             }
 
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.PrepareDisk,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
 
         /// <summary>
@@ -279,13 +281,13 @@ namespace Dive.Core
         /// <param name="worker">Background worker for Graphical user interface</param>
         public static void ApplyWim(string path, string wimFile, int index, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.ApplyImage,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Applying image ..."
-            }));
+            });
 
             // Checking if WIM File is an HTTP/S URL -> Download file to WINDOWS-DISK:\Dive\image.wim
             var isUrl = Uri.TryCreate(wimFile, UriKind.Absolute, out var uriResult)
@@ -299,13 +301,13 @@ namespace Dive.Core
 
                 var progress = new Progress<int>(percentage =>
                 {
-                    worker?.ReportProgress(percentage, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(percentage, new ActionWorker
                     {
                         Action = Progress.ApplyImage,
                         IsError = false,
                         IsIndeterminate = false,
                         Message = $"Downloading Windows Image file ({percentage}%) ..."
-                    }));
+                    });
                 });
 
                 try
@@ -314,13 +316,13 @@ namespace Dive.Core
                 }
                 catch (Exception ex)
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.ApplyImage,
                         IsError = true,
                         IsIndeterminate = false,
                         Message = $"Failed to download Windows Image: {ex.Message}"
-                    }));
+                    });
                     return;
                 }
 
@@ -328,13 +330,13 @@ namespace Dive.Core
             }
 
             Apply.WriteToDisk(wimFile, index, path, worker);
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.ApplyImage,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
 
         /// <summary>
@@ -347,40 +349,40 @@ namespace Dive.Core
         /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallBootloader(Entities.Firmware firmware, Entities.Bootloader bootloader, string windowsPath, string bootloaderLetter, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.InstallBootloader,
                 IsError = false,
                 IsIndeterminate = true,
                 Message = "Installing bootloader ..."
-            }));
+            });
             var bootLd = new Process();
 
             #region Bootloader check
             switch (bootloader)
             {
                 case Entities.Bootloader.NTLDR:
-                {
-                    var strBl = bootloaderLetter[..2];
-                    bootLd.StartInfo.FileName = "bootsect.exe";
-                    bootLd.StartInfo.Arguments = $"/nt52 {strBl} /force /mbr";
-                    break;
-                }
-                case Entities.Bootloader.BOOTMGR:
-                {
-                    windowsPath = $"{windowsPath}Windows";
-                    bootLd.StartInfo.FileName = "bcdboot.exe";
-
-                    bootLd.StartInfo.Arguments = firmware switch
                     {
-                        // BIOS
-                        Entities.Firmware.BIOS => $"{windowsPath} /s {bootloaderLetter} /f BIOS",
-                        // EFI
-                        Entities.Firmware.EFI => $"{windowsPath} /s {bootloaderLetter} /f UEFI",
-                        _ => bootLd.StartInfo.Arguments
-                    };
-                    break;
-                }
+                        var strBl = bootloaderLetter[..2];
+                        bootLd.StartInfo.FileName = "bootsect.exe";
+                        bootLd.StartInfo.Arguments = $"/nt52 {strBl} /force /mbr";
+                        break;
+                    }
+                case Entities.Bootloader.BOOTMGR:
+                    {
+                        windowsPath = $"{windowsPath}Windows";
+                        bootLd.StartInfo.FileName = "bcdboot.exe";
+
+                        bootLd.StartInfo.Arguments = firmware switch
+                        {
+                            // BIOS
+                            Entities.Firmware.BIOS => $"{windowsPath} /s {bootloaderLetter} /f BIOS",
+                            // EFI
+                            Entities.Firmware.EFI => $"{windowsPath} /s {bootloaderLetter} /f UEFI",
+                            _ => bootLd.StartInfo.Arguments
+                        };
+                        break;
+                    }
             }
             #endregion
 
@@ -392,23 +394,23 @@ namespace Dive.Core
 
             if (bootLd.ExitCode != 0)
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallBootloader,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Bootsect / bcdboot terminated with exit code " + bootLd.ExitCode + "."
-                }));
+                });
                 return;
             }
 
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.InstallBootloader,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
 
         /// <summary>
@@ -420,28 +422,28 @@ namespace Dive.Core
         /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallRecovery(string windowsPath, string recoveryLetter, bool implementDive = false, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.InstallRecovery,
                 IsError = false,
                 IsIndeterminate = true,
                 Message = "Copying recovery image to partition ..."
-            }));
+            });
 
             // Create Recovery directory
             try
             {
                 System.IO.Directory.CreateDirectory(System.IO.Path.Combine(recoveryLetter, "Recovery", "WindowsRE"));
             }
-            catch 
+            catch
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallRecovery,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Failed to create recovery directory."
-                }));
+                });
                 return;
             }
 
@@ -458,26 +460,26 @@ namespace Dive.Core
                 }
                 else
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallRecovery,
                         IsError = true,
                         IsIndeterminate = false,
                         Message = "Recovery image does not exist in this image."
-                    }));
+                    });
                     return;
                 }
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallRecovery,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Failed to copy recovery image: " + ex.Message
-                }));
+                });
             }
 
             // Implement Dive
@@ -485,20 +487,20 @@ namespace Dive.Core
             {
                 try
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallRecovery,
                         IsError = false,
                         IsIndeterminate = true,
                         Message = "Implementing Dive into Windows Recovery image ..."
-                    }));
+                    });
 
                     // Initialize Dism API
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Initializing DISM API ..."
-                    }));
+                    });
                     DismApi.Initialize(DismLogLevel.LogErrors);
 
                     // Prepare session
@@ -509,58 +511,58 @@ namespace Dive.Core
                     Directory.CreateDirectory(mountPath);
 
                     // Mount image
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Mounting Recovery Image ..."
-                    }));
+                    });
                     DismApi.MountImage(imageFile, mountPath, imageIndex);
 
                     // Copy Dive
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Copying Dive into Recovery Image ..."
-                    }));
+                    });
                     var strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
                     Common.FileIO.CopyFilesRecursively(new DirectoryInfo(strWorkPath), new DirectoryInfo(Path.Combine(targetPath, "Dive")));
 
                     // Create WinREConfig.xml
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Creating and injecting WinREConfig.xml ..."
-                    }));
+                    });
                     File.WriteAllText(Path.Combine(targetPath, "WinREConfig.xml"), WinRE.WinREConfig);
 
                     // Unmount image
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Commiting changes to recovery image ..."
-                    }));
+                    });
                     DismApi.UnmountImage(mountPath, true);
                 }
                 catch
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallRecovery,
                         IsError = true,
                         IsIndeterminate = true,
                         Message = "Failed to inject Dive into Recovery image."
-                    }));
+                    });
                     return;
                 }
                 finally
                 {
                     // Shutdown Dism API
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Shutting down DISM API ..."
-                    })); 
+                    });
                     DismApi.Shutdown();
                 }
             }
@@ -568,13 +570,13 @@ namespace Dive.Core
             // Register recovery partition
             try
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallRecovery,
                     IsError = false,
                     IsIndeterminate = true,
                     Message = "Registering Recovery image to Windows ..."
-                }));
+                });
                 var p = new Process();
                 p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Reagentc.exe");
                 p.StartInfo.Arguments = $"/Setreimage /Path {recoveryLetter}\\Recovery\\WindowsRE /Target {windowsPath}";
@@ -585,11 +587,11 @@ namespace Dive.Core
 
                 if (implementDive)
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = "Apply Diagnostics Tool configuration to recovery image ..."
-                    }));
+                    });
                     var recoveryBootMenuPath = System.IO.Path.Combine(recoveryLetter, "Recovery", "BootMenu");
                     Directory.CreateDirectory(recoveryBootMenuPath);
 
@@ -601,23 +603,23 @@ namespace Dive.Core
             }
             catch
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallRecovery,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Failed to register recovery image."
-                }));
+                });
                 return;
             }
 
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.InstallRecovery,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
 
         /// <summary>
@@ -630,13 +632,13 @@ namespace Dive.Core
         /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallUnattend(string windowsPath, string configuration, string oemLogoPath = null, bool performDismApply = false, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.InstallUnattend,
                 IsError = false,
                 IsIndeterminate = true,
                 Message = "Installing Unattend configuration ..."
-            }));
+            });
 
             // Create Recovery directory
             try
@@ -645,13 +647,13 @@ namespace Dive.Core
             }
             catch
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallUnattend,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Failed to create Panther directory."
-                }));
+                });
                 return;
             }
 
@@ -662,13 +664,13 @@ namespace Dive.Core
             }
             catch
             {
-                worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                worker?.ReportProgress(0, new ActionWorker
                 {
                     Action = Progress.InstallUnattend,
                     IsError = true,
                     IsIndeterminate = false,
                     Message = "Failed to write Unattend configuration to disk."
-                }));
+                });
                 return;
             }
 
@@ -681,13 +683,13 @@ namespace Dive.Core
                 }
                 catch
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallUnattend,
                         IsError = true,
                         IsIndeterminate = false,
                         Message = "Failed to copy OEM logo to disk."
-                    }));
+                    });
                     return;
                 }
             }
@@ -697,16 +699,16 @@ namespace Dive.Core
             {
                 try
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallUnattend,
                         IsError = false,
                         IsIndeterminate = true,
                         Message = "Registering Unattend configuration with DISM ..."
-                    }));
+                    });
                     var f = new FileInfo(windowsPath);
                     var drive = Path.GetPathRoot(f.FullName);
-                    
+
                     var p = new Process();
                     p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Dism.exe");
                     p.StartInfo.Arguments = $"/Image:{drive} /Apply-Unattend:{System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml")}";
@@ -717,24 +719,24 @@ namespace Dive.Core
                 }
                 catch
                 {
-                    worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+                    worker?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.InstallUnattend,
                         IsError = true,
                         IsIndeterminate = false,
                         Message = "Failed to apply Unattend configuration with DISM."
-                    }));
+                    });
                     return;
                 }
             }
 
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.InstallUnattend,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
 
         /// <summary>
@@ -745,23 +747,23 @@ namespace Dive.Core
         /// <param name="worker">Background worker for Graphical user interface</param>
         public static void InstallDriver(string windowsDrive, List<string> driverPath, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.InstallDrivers,
                 IsError = false,
                 IsIndeterminate = true,
                 Message = "Installing drivers ..."
-            }));
+            });
 
             Apply.AddDriverToDisk(windowsDrive, driverPath, worker);
 
-            worker?.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.InstallDrivers,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
 
         /// <summary>
@@ -779,7 +781,7 @@ namespace Dive.Core
                 _ => WimCreateFileOptions.None
             };
 
-            using var file = WimgApi.CreateFile(imagePath, 
+            using var file = WimgApi.CreateFile(imagePath,
                 WimFileAccess.Read, WimCreationDisposition.OpenExisting, option, WimCompressionType.None);
             var a = WimgApi.GetImageInformationAsString(file);
             return a;
@@ -839,22 +841,22 @@ namespace Dive.Core
         /// <param name="worker">Background worker for Graphical user interface</param>
         public static void CaptureToWim(string name, string description, string pathToCapture, string pathToImage, BackgroundWorker worker = null)
         {
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.CaptureDisk,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Capturing disk ..."
-            }));
+            });
 
             Capture.CreateWim(name, description, pathToCapture, pathToImage, worker);
-            worker?.ReportProgress(0, JsonConvert.SerializeObject(new ActionWorker
+            worker?.ReportProgress(0, new ActionWorker
             {
                 Action = Progress.CaptureDisk,
                 IsError = false,
                 IsIndeterminate = false,
                 Message = "Done."
-            }));
+            });
         }
     }
 }

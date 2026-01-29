@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using Dive.UI.Common.UserInterface;
+using System.IO;
 using System.Text;
 using System.Xml.Serialization;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Common
 {
@@ -637,7 +637,7 @@ namespace Dive.UI.Common
                     this.logoField = value;
                 }
             }
-            
+
             /// <remarks/>
             public string Manufacturer
             {
@@ -1312,7 +1312,7 @@ namespace Dive.UI.Common
                         uc.settings[currentSettings].component[currentComponent].ComputerName = DeviceInfoInstance.DeviceName;
                         uc.settings[currentSettings].component[currentComponent].ProductKey = DeviceInfoInstance.ProductKey;
                         uc.settings[currentSettings].component[currentComponent].RegisteredOwner = DeviceInfoInstance.RegisteredOwner;
-                        uc.settings[currentSettings].component[currentComponent].RegisteredOrganization= DeviceInfoInstance.RegisteredOrganization;
+                        uc.settings[currentSettings].component[currentComponent].RegisteredOrganization = DeviceInfoInstance.RegisteredOrganization;
                         uc.settings[currentSettings].component[currentComponent].TimeZone = DeviceInfoInstance.TimeZone;
                     }
 
@@ -1391,7 +1391,7 @@ namespace Dive.UI.Common
             Debug.WriteLine("[UnattendBuilder v2] Building completed.");
             return textWriter.ToString();
         }
-        
+
         public class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding => Encoding.UTF8;

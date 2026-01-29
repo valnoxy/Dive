@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using Dive.Core;
+﻿using Dive.Core;
 using Dive.Core.Action.Deployment;
 using Dive.Core.Common;
 using Dive.UI.Common.UserInterface;
-using Newtonsoft.Json;
+using System;
+using System.ComponentModel;
+using System.IO;
 using static Dive.Core.Common.Entities;
 
 namespace Dive.UI.Common.Deployment
@@ -21,9 +20,9 @@ namespace Dive.UI.Common.Deployment
         {
             internal static bool IsCanceled = false;
             internal static int DriverCount;
-            internal static Firmware Firmware {get; set;}
-            internal static Bootloader BootLoader { get; set;}
-            internal static PartitionStyle PartitionStyle { get; set;}
+            internal static Firmware Firmware { get; set; }
+            internal static Bootloader BootLoader { get; set; }
+            internal static PartitionStyle PartitionStyle { get; set; }
             internal static string? WindowsDrive { get; set; }
             internal static string? BootDrive { get; set; }
             internal static string? RecoveryDrive { get; set; }
@@ -215,11 +214,11 @@ namespace Dive.UI.Common.Deployment
             }
 
             // Installation complete
-            worker.ReportProgress(100, JsonConvert.SerializeObject(new ActionWorker
+            worker.ReportProgress(100, new ActionWorker
             {
                 IsDebug = true,
                 Message = "Job Done."
-            }));
+            });
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using Standard.Licensing;
+﻿using Standard.Licensing;
 using Standard.Licensing.Validation;
+using System.Linq;
 
 namespace Dive.UI.Common.Licensing
 {

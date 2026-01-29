@@ -1,9 +1,9 @@
 ﻿using Dive.UI.Common;
+using Dive.UI.Common.UserInterface;
 using Dive.UI.Pages.ApplyPages;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using Dive.UI.Common.UserInterface;
 
 namespace Dive.UI.Pages
 {

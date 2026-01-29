@@ -1,5 +1,4 @@
 ﻿using Dive.Core;
-using Dive.UI.Common;
 using Dive.UI.Common.UserInterface;
 using System;
 using System.IO;
