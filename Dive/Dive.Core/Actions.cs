@@ -21,11 +21,33 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Dive.Core
 {
     public class Actions
     {
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
+
+        /// <summary>
+        /// Loads all native library into the current application domain.
+        /// </summary>
+        /// <remarks>This method must be called before invoking any functionality that depends on any native library.
+        /// Calling this method multiple times has no additional effect if the library is already loaded.
+        /// </remarks>
+        /// <exception cref="Exception">Thrown if an error occurs.</exception>
+        public static void Initialize()
+        {
+            var dllPath = Path.Combine(AppContext.BaseDirectory, "Dive.DiskMgr.dll");
+            var handle = LoadLibrary(dllPath);
+
+            if (handle == IntPtr.Zero)
+            {
+                throw new Exception($"Failed to load library: {dllPath}");
+            }
+        }
+
         /// <summary>
         /// Prepare and format the specified disk for Windows deployment.
         /// </summary>
@@ -68,13 +90,12 @@ namespace Dive.Core
                         switch (firmware)
                         {
                             case Entities.Firmware.EFI:
-                                var diskManager = new Action.DiskPreparation.GptDiskManager(disk);
-                                diskManager.CreateFullLayout(bootDrive, windowsDrive, recoveryDrive, worker);
-
-                                //Action.DiskPreparation.PrepareDisk.EFI.PrepareFull(disk, bootDrive, windowsDrive, recoveryDrive, worker);
+                                var diskManagerGpt = new Action.DiskPreparation.GptDiskManager(disk);
+                                diskManagerGpt.CreateFullLayout(bootDrive, windowsDrive, recoveryDrive, worker);
                                 break;
                             case Entities.Firmware.BIOS:
-                                // Not implemented - use diskpart
+                                var diskManagerMbr = new Action.DiskPreparation.MbrDiskManager(disk);
+                                diskManagerMbr.CreateFullLayout(bootDrive, windowsDrive, recoveryDrive, worker);
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException(nameof(firmware), firmware, null);
@@ -82,10 +103,34 @@ namespace Dive.Core
 
                         break;
                     case Entities.PartitionStyle.Single:
-                        // Not implemented - use diskpart
+                        switch (firmware)
+                        {
+                            case Entities.Firmware.EFI:
+                                // not supported
+                                throw new NotSupportedException("You need at least a separate EFI partition, use SeparateBoot!");
+                                break;
+                            case Entities.Firmware.BIOS:
+                                var diskManagerMbr = new Action.DiskPreparation.MbrDiskManager(disk);
+                                diskManagerMbr.CreateSinglePartition(windowsDrive, worker);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(firmware), firmware, null);
+                        }
                         break;
                     case Entities.PartitionStyle.SeparateBoot:
-                        // Not implemented - use diskpart
+                        switch (firmware)
+                        {
+                            case Entities.Firmware.EFI:
+                                var diskManagerGpt = new Action.DiskPreparation.GptDiskManager(disk);
+                                diskManagerGpt.CreateStandardLayout(bootDrive, windowsDrive, worker);
+                                break;
+                            case Entities.Firmware.BIOS:
+                                var diskManagerMbr = new Action.DiskPreparation.MbrDiskManager(disk);
+                                diskManagerMbr.CreateBootAndWindowsPartitions(bootDrive, windowsDrive, worker);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException(nameof(firmware), firmware, null);
+                        }
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(partitionStyle), partitionStyle, null);

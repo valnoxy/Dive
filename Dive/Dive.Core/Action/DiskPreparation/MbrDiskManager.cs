@@ -1,12 +1,10 @@
 using System;
 using System.ComponentModel;
-using System.Management;
 using System.Runtime.InteropServices;
 
 namespace Dive.Core.Action.DiskPreparation
 {
-    [Obsolete("NOT TESTED")]
-    public class MbrDiskManager
+    public class MbrDiskManager(int diskNumber)
     {
         private const string DllPath = "Dive.DiskMgr.dll";
 
@@ -28,15 +26,16 @@ namespace Dive.Core.Action.DiskPreparation
         [DllImport(DllPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int DiskMgr_GetPartitionCount(int diskNumber);
 
+        [DllImport(DllPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool DiskMgr_AssignDriveLetter(int diskNumber, int partitionIndex, char driveLetter);
+
+        [DllImport(DllPath, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
+        private static extern int DiskMgr_FormatPartition(char driveLetter,
+            [MarshalAs(UnmanagedType.LPWStr)] string fileSystem,
+            [MarshalAs(UnmanagedType.LPWStr)] string label,
+            bool quickFormat);
+
         private const byte MBR_NTFS = 0x07;
-        private const byte MBR_FAT32 = 0x0B;
-
-        private readonly int _diskNumber;
-
-        public MbrDiskManager(int diskNumber)
-        {
-            _diskNumber = diskNumber;
-        }
 
         /// <summary>
         /// Creates a single NTFS partition on the specified disk and formats it for Windows use.
@@ -52,37 +51,132 @@ namespace Dive.Core.Action.DiskPreparation
         public bool CreateSinglePartition(string windowsDrive, BackgroundWorker worker = null)
         {
             ReportProgress(worker, "Cleaning disk...");
-            if (!DiskMgr_CleanDisk(_diskNumber))
+            if (!DiskMgr_CleanDisk(diskNumber))
             {
                 ReportError(worker, "Failed to clean disk");
                 return false;
             }
 
             ReportProgress(worker, "Initializing MBR...");
-            if (!DiskMgr_InitializeMBR(_diskNumber))
+            if (!DiskMgr_InitializeMBR(diskNumber))
             {
                 ReportError(worker, "Failed to initialize MBR");
                 return false;
             }
 
-            var diskSizeMB = DiskMgr_GetDiskSize(_diskNumber);
-            var partitionSize = diskSizeMB - 2; // Reserve 2 MB
+            var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
+            var partitionSize = diskSizeMB - 4; // Reserve 4 MB
 
             ReportProgress(worker, "Creating Windows partition...");
-            if (!DiskMgr_CreateMBRPartition(_diskNumber, partitionSize, MBR_NTFS, true))
+            if (!DiskMgr_CreateMBRPartition(diskNumber, partitionSize, MBR_NTFS, true))
             {
                 ReportError(worker, "Failed to create Windows partition");
                 return false;
             }
 
             ReportProgress(worker, "Formatting Windows partition...");
-            if (!FormatPartition(windowsDrive, "NTFS", true, "Windows"))
+            var windowsFormatSummary = DiskMgr_FormatPartition(windowsDrive[0], "NTFS", "Windows", true);
+            if (windowsFormatSummary != 0)
             {
                 ReportError(worker, "Failed to format Windows partition");
                 return false;
             }
 
-            ReportProgress(worker, "MBR Single Partition layout created successfully");
+            ReportProgress(worker, "Layout created successfully");
+            return true;
+        }
+
+        public bool CreateFullLayout(string bootDrive, string windowsDrive, string recoveryDrive, BackgroundWorker worker)
+        {
+            ReportProgress(worker, "Cleaning disk...");
+            if (!DiskMgr_CleanDisk(diskNumber))
+            {
+                ReportError(worker, "Failed to clean disk");
+                return false;
+            }
+
+            ReportProgress(worker, "Initializing MBR...");
+            if (!DiskMgr_InitializeMBR(diskNumber))
+            {
+                ReportError(worker, "Failed to initialize MBR");
+                return false;
+            }
+
+            var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
+            const ulong bootSize = 500; // Boot Partition
+            const ulong recoverySize = 1024; // Recovery Partition
+            var windowsSize = diskSizeMB - bootSize - recoverySize - 4; // Reserve 4 MB
+
+            // Boot Partition 
+            ReportProgress(worker, "Creating Boot partition...");
+            if (!DiskMgr_CreateMBRPartition(diskNumber, bootSize, MBR_NTFS, true))
+            {
+                ReportError(worker, "Failed to create Boot partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Assigning drive letter to Boot partition...");
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 0, bootDrive[0]))
+            {
+                ReportError(worker, "Failed to assign drive letter to Boot partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Formatting Boot partition...");
+            var bootFormatSummary = DiskMgr_FormatPartition(bootDrive[0], "NTFS", "System", true);
+            if (bootFormatSummary != 0)
+            {
+                ReportError(worker, "Failed to format Boot partition");
+                return false;
+            }
+
+            // Windows Partition
+            ReportProgress(worker, "Creating Windows partition...");
+            if (!DiskMgr_CreateMBRPartition(diskNumber, windowsSize, MBR_NTFS, false))
+            {
+                ReportError(worker, "Failed to create Windows partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Assigning drive letter to Windows partition...");
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 1, windowsDrive[0]))
+            {
+                ReportError(worker, "Failed to assign drive letter to Windows partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Formatting Windows partition...");
+            var windowsFormatSummary = DiskMgr_FormatPartition(windowsDrive[0], "NTFS", "Windows", true);
+            if (windowsFormatSummary != 0)
+            {
+                ReportError(worker, "Failed to format Windows partition");
+                return false;
+            }
+
+            // Recovery Partition
+            ReportProgress(worker, "Creating Recovery partition...");
+            if (!DiskMgr_CreateMBRPartition(diskNumber, recoverySize, MBR_NTFS, false))
+            {
+                ReportError(worker, "Failed to create Recovery partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Assigning drive letter to Recovery partition...");
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 2, recoveryDrive[0]))
+            {
+                ReportError(worker, "Failed to assign drive letter to Recovery partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Formatting Recovery partition...");
+            var recoveryFormatSummary = DiskMgr_FormatPartition(recoveryDrive[0], "NTFS", "Recovery", true);
+            if (recoveryFormatSummary != 0)
+            {
+                ReportError(worker, "Failed to format Recovery partition");
+                return false;
+            }
+
+            ReportProgress(worker, "Layout created successfully");
             return true;
         }
 
@@ -103,93 +197,71 @@ namespace Dive.Core.Action.DiskPreparation
         public bool CreateBootAndWindowsPartitions(string bootDrive, string windowsDrive, BackgroundWorker worker = null)
         {
             ReportProgress(worker, "Cleaning disk...");
-            if (!DiskMgr_CleanDisk(_diskNumber))
+            if (!DiskMgr_CleanDisk(diskNumber))
             {
                 ReportError(worker, "Failed to clean disk");
                 return false;
             }
 
             ReportProgress(worker, "Initializing MBR...");
-            if (!DiskMgr_InitializeMBR(_diskNumber))
+            if (!DiskMgr_InitializeMBR(diskNumber))
             {
                 ReportError(worker, "Failed to initialize MBR");
                 return false;
             }
 
-            var diskSizeMB = DiskMgr_GetDiskSize(_diskNumber);
-            const ulong bootSize = 500; // 500 MB Boot-Partition
-            var windowsSize = diskSizeMB - bootSize - 2; // Reserve 2 MB
+            var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
+            const ulong bootSize = 500; // 500 MB Boot Partition
+            var windowsSize = diskSizeMB - bootSize - 4; // Reserve 4 MB
 
-            // Boot-Partition erstellen
+            // Boot Partition 
             ReportProgress(worker, "Creating Boot partition...");
-            if (!DiskMgr_CreateMBRPartition(_diskNumber, bootSize, MBR_NTFS, true))
+            if (!DiskMgr_CreateMBRPartition(diskNumber, bootSize, MBR_NTFS, true))
             {
                 ReportError(worker, "Failed to create Boot partition");
                 return false;
             }
 
+            ReportProgress(worker, "Assigning drive letter to Boot partition...");
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 0, bootDrive[0]))
+            {
+                ReportError(worker, "Failed to assign drive letter to Boot partition");
+                return false;
+            }
+
             ReportProgress(worker, "Formatting Boot partition...");
-            if (!FormatPartition(bootDrive, "NTFS", true, "System"))
+            var bootFormatSummary = DiskMgr_FormatPartition(bootDrive[0], "NTFS", "System", true);
+            if (bootFormatSummary != 0)
             {
                 ReportError(worker, "Failed to format Boot partition");
                 return false;
             }
 
-            // Windows-Partition erstellen
+            // Windows Partition
             ReportProgress(worker, "Creating Windows partition...");
-            if (!DiskMgr_CreateMBRPartition(_diskNumber, windowsSize, MBR_NTFS, false))
+            if (!DiskMgr_CreateMBRPartition(diskNumber, windowsSize, MBR_NTFS, false))
             {
                 ReportError(worker, "Failed to create Windows partition");
                 return false;
             }
 
+            ReportProgress(worker, "Assigning drive letter to Windows partition...");
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 1, windowsDrive[0]))
+            {
+                ReportError(worker, "Failed to assign drive letter to Windows partition");
+                return false;
+            }
+
             ReportProgress(worker, "Formatting Windows partition...");
-            if (!FormatPartition(windowsDrive, "NTFS", true, "Windows"))
+            var windowsFormatSummary = DiskMgr_FormatPartition(windowsDrive[0], "NTFS", "Windows", true);
+            if (windowsFormatSummary != 0)
             {
                 ReportError(worker, "Failed to format Windows partition");
                 return false;
             }
 
-            // Boot-Partition als aktiv setzen
-            ReportProgress(worker, "Setting Boot partition as active...");
-            if (!DiskMgr_SetMBRPartitionActive(_diskNumber, 0))
-            {
-                ReportError(worker, "Failed to set Boot partition as active");
-                return false;
-            }
-
-            ReportProgress(worker, "MBR Boot + Windows layout created successfully");
+            ReportProgress(worker, "Layout created successfully");
             return true;
-        }
-
-        [Obsolete("Use DiskMgr_FormatPartition()")]
-        private bool FormatPartition(string driveLetter, string fileSystem, bool quickFormat, string label)
-        {
-            try
-            {
-                var query = $"select * from Win32_Volume WHERE DriveLetter = \"{driveLetter}:\"";
-                using var searcher = new ManagementObjectSearcher(query);
-
-                foreach (var o in searcher.Get())
-                {
-                    var volume = (ManagementObject)o;
-                    using var inParams = volume.GetMethodParameters("Format");
-                    inParams["FileSystem"] = fileSystem;
-                    inParams["QuickFormat"] = quickFormat;
-                    inParams["Label"] = label;
-
-                    using var outParams = volume.InvokeMethod("Format", inParams, null);
-                    var returnValue = (uint)outParams["ReturnValue"];
-
-                    return returnValue == 0;
-                }
-
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         private void ReportProgress(BackgroundWorker worker, string message)

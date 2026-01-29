@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Dive.Core.Action.DiskPreparation
 {
-    public class GptDiskManager
+    public class GptDiskManager(int diskNumber)
     {
         private const string DllPath = "Dive.DiskMgr.dll";
 
@@ -44,13 +44,6 @@ namespace Dive.Core.Action.DiskPreparation
         private const ulong GPT_ATTR_NO_AUTO_MOUNT = 0x8000000000000000;
         private const ulong GPT_ATTR_REQUIRED_PARTITION = 0x0000000000000001;
 
-        private readonly int _diskNumber;
-
-        public GptDiskManager(int diskNumber)
-        {
-            _diskNumber = diskNumber;
-        }
-
         /// <summary>
         /// Creates a full GPT disk layout with EFI, MSR, Windows, and Recovery partitions, assigning the specified
         /// drive letters and formatting each partition as required.
@@ -69,35 +62,35 @@ namespace Dive.Core.Action.DiskPreparation
         public bool CreateFullLayout(string bootDrive, string windowsDrive, string recoveryDrive, BackgroundWorker worker = null)
         {
             ReportProgress(worker, "Cleaning disk...");
-            if (!DiskMgr_CleanDisk(_diskNumber))
+            if (!DiskMgr_CleanDisk(diskNumber))
             {
                 ReportError(worker, "Failed to clean disk");
                 return false;
             }
 
             ReportProgress(worker, "Initializing GPT...");
-            if (!DiskMgr_InitializeGPT(_diskNumber))
+            if (!DiskMgr_InitializeGPT(diskNumber))
             {
                 ReportError(worker, "Failed to initialize GPT");
                 return false;
             }
 
-            var diskSizeMB = DiskMgr_GetDiskSize(_diskNumber);
+            var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
             const ulong efiSize = 300;
             const ulong msrSize = 16;
             const ulong recoverySize = 1024;
-            var windowsSize = diskSizeMB - efiSize - msrSize - recoverySize - 5; // little buffer
+            var windowsSize = diskSizeMB - efiSize - msrSize - recoverySize - 4; // little buffer
 
             // EFI Partition
             ReportProgress(worker, "Creating EFI partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, efiSize, GUID_BASIC_DATA))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, efiSize, GUID_BASIC_DATA))
             {
                 ReportError(worker, "Failed to create EFI partition");
                 return false;
             }
 
             ReportProgress(worker, "Assigning drive letter to EFI partition...");
-            if (!DiskMgr_AssignDriveLetter(_diskNumber, 0, bootDrive[0]))
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 0, bootDrive[0]))
             {
                 ReportError(worker, "Failed to assign drive letter to EFI partition");
                 return false;
@@ -112,7 +105,7 @@ namespace Dive.Core.Action.DiskPreparation
             }
 
             ReportProgress(worker, "Changing EFI partition type...");
-            if (!DiskMgr_ChangeGPTPartitionType(_diskNumber, 0, GUID_EFI_SYSTEM))
+            if (!DiskMgr_ChangeGPTPartitionType(diskNumber, 0, GUID_EFI_SYSTEM))
             {
                 ReportError(worker, "Failed to change EFI partition type");
                 return false;
@@ -120,7 +113,7 @@ namespace Dive.Core.Action.DiskPreparation
 
             // MSR Partition
             ReportProgress(worker, "Creating MSR partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, msrSize, GUID_MSR))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, msrSize, GUID_MSR))
             {
                 ReportError(worker, "Failed to create MSR partition");
                 return false;
@@ -128,14 +121,14 @@ namespace Dive.Core.Action.DiskPreparation
 
             // Windows Partition
             ReportProgress(worker, "Creating Windows partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, windowsSize, GUID_BASIC_DATA))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, windowsSize, GUID_BASIC_DATA))
             {
                 ReportError(worker, "Failed to create Windows partition");
                 return false;
             }
 
             ReportProgress(worker, "Assigning drive letter to Windows partition...");
-            if (!DiskMgr_AssignDriveLetter(_diskNumber, 2, windowsDrive[0]))
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 2, windowsDrive[0]))
             {
                 ReportError(worker, "Failed to assign drive letter to Windows partition");
                 return false;
@@ -151,14 +144,14 @@ namespace Dive.Core.Action.DiskPreparation
 
             // Recovery Partition
             ReportProgress(worker, "Creating Recovery partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, recoverySize, GUID_BASIC_DATA))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, recoverySize, GUID_BASIC_DATA))
             {
                 ReportError(worker, "Failed to create Recovery partition");
                 return false;
             }
 
             ReportProgress(worker, "Assigning drive letter to Recovery partition...");
-            if (!DiskMgr_AssignDriveLetter(_diskNumber, 3, recoveryDrive[0]))
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 3, recoveryDrive[0]))
             {
                 ReportError(worker, "Failed to assign drive letter to Recovery partition");
                 return false;
@@ -173,21 +166,27 @@ namespace Dive.Core.Action.DiskPreparation
             }
 
             ReportProgress(worker, "Changing Recovery partition type...");
-            if (!DiskMgr_ChangeGPTPartitionType(_diskNumber, 3, GUID_RECOVERY))
+            if (!DiskMgr_ChangeGPTPartitionType(diskNumber, 3, GUID_RECOVERY))
             {
                 ReportError(worker, "Failed to change Recovery partition type");
                 return false;
             }
 
-            // Recovery partition attributes
-            ReportProgress(worker, "Setting Recovery partition attributes...");
-            if (!DiskMgr_SetGPTPartitionAttributes(_diskNumber, 3, GPT_ATTR_REQUIRED_PARTITION | GPT_ATTR_NO_AUTO_MOUNT))
+            // Some partition attributes
+            ReportProgress(worker, "Setting partition attributes...");
+            if (!DiskMgr_SetGPTPartitionAttributes(diskNumber, 3, GPT_ATTR_REQUIRED_PARTITION | GPT_ATTR_NO_AUTO_MOUNT)) // Recovery
             {
                 ReportError(worker, "Failed to set Recovery partition attributes");
                 return false;
             }
 
-            ReportProgress(worker, "GPT Full layout created successfully");
+            if (!DiskMgr_SetGPTPartitionAttributes(diskNumber, 0, GPT_ATTR_REQUIRED_PARTITION | GPT_ATTR_NO_AUTO_MOUNT)) // EFI
+            {
+                ReportError(worker, "Failed to set EFI partition attributes");
+                return false;
+            }
+
+            ReportProgress(worker, "Layout created successfully");
             return true;
         }
 
@@ -204,38 +203,37 @@ namespace Dive.Core.Action.DiskPreparation
         /// <param name="worker">An optional BackgroundWorker used to report progress and errors during the operation. If null, progress is
         /// not reported.</param>
         /// <returns>true if the standard layout is created successfully; otherwise, false.</returns>
-        [Obsolete("NOT TESTED")]
         public bool CreateStandardLayout(string bootDrive, string windowsDrive, BackgroundWorker worker = null)
         {
             ReportProgress(worker, "Cleaning disk...");
-            if (!DiskMgr_CleanDisk(_diskNumber))
+            if (!DiskMgr_CleanDisk(diskNumber))
             {
                 ReportError(worker, "Failed to clean disk");
                 return false;
             }
 
             ReportProgress(worker, "Initializing GPT...");
-            if (!DiskMgr_InitializeGPT(_diskNumber))
+            if (!DiskMgr_InitializeGPT(diskNumber))
             {
                 ReportError(worker, "Failed to initialize GPT");
                 return false;
             }
 
-            var diskSizeMB = DiskMgr_GetDiskSize(_diskNumber);
+            var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
             const ulong efiSize = 300;
             const ulong msrSize = 16;
-            var windowsSize = diskSizeMB - efiSize - msrSize - 5;
+            var windowsSize = diskSizeMB - efiSize - msrSize - 4;
 
             // EFI Partition
             ReportProgress(worker, "Creating EFI partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, efiSize, GUID_EFI_SYSTEM))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, efiSize, GUID_EFI_SYSTEM))
             {
                 ReportError(worker, "Failed to create EFI partition");
                 return false;
             }
 
             ReportProgress(worker, "Assigning drive letter to EFI partition...");
-            if (!DiskMgr_AssignDriveLetter(_diskNumber, 0, bootDrive[0]))
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 0, bootDrive[0]))
             {
                 ReportError(worker, "Failed to assign drive letter to EFI partition");
                 return false;
@@ -251,7 +249,7 @@ namespace Dive.Core.Action.DiskPreparation
 
             // MSR Partition
             ReportProgress(worker, "Creating MSR partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, msrSize, GUID_MSR))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, msrSize, GUID_MSR))
             {
                 ReportError(worker, "Failed to create MSR partition");
                 return false;
@@ -259,14 +257,14 @@ namespace Dive.Core.Action.DiskPreparation
 
             // Windows Partition
             ReportProgress(worker, "Creating Windows partition...");
-            if (!DiskMgr_CreateGPTPartition(_diskNumber, windowsSize, GUID_BASIC_DATA))
+            if (!DiskMgr_CreateGPTPartition(diskNumber, windowsSize, GUID_BASIC_DATA))
             {
                 ReportError(worker, "Failed to create Windows partition");
                 return false;
             }
 
             ReportProgress(worker, "Assigning drive letter to Windows partition...");
-            if (!DiskMgr_AssignDriveLetter(_diskNumber, 2, windowsDrive[0]))
+            if (!DiskMgr_AssignDriveLetter(diskNumber, 2, windowsDrive[0]))
             {
                 ReportError(worker, "Failed to assign drive letter to Windows partition");
                 return false;
@@ -280,7 +278,7 @@ namespace Dive.Core.Action.DiskPreparation
                 return false;
             }
 
-            ReportProgress(worker, "GPT Standard layout created successfully");
+            ReportProgress(worker, "Layout created successfully");
             return true;
         }
 

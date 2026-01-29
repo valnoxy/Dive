@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <combaseapi.h>
+#include <vector>
 
 static std::wstring g_lastError;
 
@@ -114,9 +115,13 @@ bool DiskMgr_CreateMBRPartition(int diskNumber, unsigned long long sizeInMB, uns
         return false;
     }
 
+    // Update disk properties first
+    DWORD bytesReturned;
+    DeviceIoControl(diskHandle, IOCTL_DISK_UPDATE_PROPERTIES, nullptr, 0, nullptr, 0, &bytesReturned, nullptr);
+
     DWORD layoutSize = sizeof(DRIVE_LAYOUT_INFORMATION_EX) + (sizeof(PARTITION_INFORMATION_EX) * 128);
     auto layoutBuffer = new BYTE[layoutSize];
-    DWORD bytesReturned;
+    ZeroMemory(layoutBuffer, layoutSize);
 
     if (!DeviceIoControl(diskHandle, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
         nullptr, 0, layoutBuffer, layoutSize, &bytesReturned, nullptr)) {
@@ -128,30 +133,62 @@ bool DiskMgr_CreateMBRPartition(int diskNumber, unsigned long long sizeInMB, uns
 
     auto layoutInfo = reinterpret_cast<DRIVE_LAYOUT_INFORMATION_EX*>(layoutBuffer);
 
-    if (layoutInfo->PartitionCount >= 4) {
+    // Collect valid partitions and rebuild layout
+    std::vector<PARTITION_INFORMATION_EX> validPartitions;
+    for (DWORD i = 0; i < layoutInfo->PartitionCount; i++) {
+        if (layoutInfo->PartitionEntry[i].PartitionLength.QuadPart > 0 &&
+            layoutInfo->PartitionEntry[i].StartingOffset.QuadPart > 0) {
+            validPartitions.push_back(layoutInfo->PartitionEntry[i]);
+        }
+    }
+
+    if (validPartitions.size() >= 4) {
         SetLastError(L"Maximum MBR partition count reached");
         delete[] layoutBuffer;
         DiskMgr_CloseDisk(diskHandle);
         return false;
     }
 
+    // Create new partition entry
     PARTITION_INFORMATION_EX partitionInfo = {};
     partitionInfo.PartitionStyle = PARTITION_STYLE_MBR;
     partitionInfo.Mbr.PartitionType = partitionType;
     partitionInfo.Mbr.BootIndicator = makeActive;
     partitionInfo.Mbr.RecognizedPartition = TRUE;
     partitionInfo.Mbr.HiddenSectors = 0;
+    partitionInfo.RewritePartition = TRUE;
 
-    partitionInfo.StartingOffset.QuadPart = (layoutInfo->PartitionCount == 0)
-        ? 1024 * 1024LL  // 1 MB offset
-        : layoutInfo->PartitionEntry[layoutInfo->PartitionCount - 1].StartingOffset.QuadPart +
-          layoutInfo->PartitionEntry[layoutInfo->PartitionCount - 1].PartitionLength.QuadPart + (1024 * 1024LL);
+    // Calculate starting offset
+    if (validPartitions.empty()) {
+        partitionInfo.StartingOffset.QuadPart = 1024 * 1024LL;  // 1 MB offset
+    }
+    else {
+        // Find the last partition
+        LONGLONG maxEnd = 0;
+        for (const auto& part : validPartitions) {
+            LONGLONG end = part.StartingOffset.QuadPart + part.PartitionLength.QuadPart;
+            if (end > maxEnd) {
+                maxEnd = end;
+            }
+        }
+        partitionInfo.StartingOffset.QuadPart = maxEnd + (1024 * 1024LL);
+    }
 
     partitionInfo.PartitionLength.QuadPart = sizeInMB * 1024 * 1024;
-    partitionInfo.PartitionNumber = layoutInfo->PartitionCount + 1;
+    partitionInfo.PartitionNumber = (DWORD)validPartitions.size() + 1;
 
-    layoutInfo->PartitionEntry[layoutInfo->PartitionCount] = partitionInfo;
-    layoutInfo->PartitionCount++;
+    // Rebuild layout with valid partitions + new partition
+    layoutInfo->PartitionStyle = PARTITION_STYLE_MBR;
+    layoutInfo->PartitionCount = (DWORD)validPartitions.size() + 1;
+
+    // Copy valid partitions back
+    for (size_t i = 0; i < validPartitions.size(); i++) {
+        layoutInfo->PartitionEntry[i] = validPartitions[i];
+        layoutInfo->PartitionEntry[i].RewritePartition = TRUE;
+    }
+
+    // Add new partition
+    layoutInfo->PartitionEntry[validPartitions.size()] = partitionInfo;
 
     BOOL success = DeviceIoControl(
         diskHandle,
@@ -164,12 +201,17 @@ bool DiskMgr_CreateMBRPartition(int diskNumber, unsigned long long sizeInMB, uns
     );
 
     delete[] layoutBuffer;
-    DiskMgr_CloseDisk(diskHandle);
 
     if (!success) {
-        SetLastError(L"Failed to create MBR partition");
+        DWORD error = GetLastError();
+        DiskMgr_CloseDisk(diskHandle);
+        SetLastError(L"Failed to create MBR partition. Error: " + std::to_wstring(error));
         return false;
     }
+
+    // Update disk properties after layout change
+    DeviceIoControl(diskHandle, IOCTL_DISK_UPDATE_PROPERTIES, nullptr, 0, nullptr, 0, &bytesReturned, nullptr);
+    DiskMgr_CloseDisk(diskHandle);
 
     std::wcout << L"[DiskMgr] MBR partition created successfully\n";
     return true;

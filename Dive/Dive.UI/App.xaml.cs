@@ -94,6 +94,10 @@ namespace Dive.UI
                 Plugin.PluginManager.InitPlugins();
                 Debug.WriteLine("Initialized all plugins.");
 
+                // Load Core initialization
+                Debug.WriteLine("Initialize Core ...");
+                Core.Actions.Initialize();
+
                 var allDrives = DriveInfo.GetDrives();
                 foreach (var d in allDrives)
                 {
