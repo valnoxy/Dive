@@ -124,9 +124,8 @@ namespace Dive.UI
                 ShowGui();
             }
 
-            Console.Title = $"{VersionInfo.ProductName} - Debug Console";
-            Console.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-            Console.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+            Core.Common.Logging.Initialize();
+            Debug.InitializeConsole();
 
 #if DEBUG
             // Debug switches

@@ -45,6 +45,7 @@
                                   TextAlignment="Right"/>
                     <ui:ProgressRing Grid.Column="2" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden" x:Name="CopyWindowsProgRing"/>
                     <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" x:Name="CopyWindowsCheck"/>
+                    <ui:SymbolIcon Symbol="ErrorCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" Foreground="#E0605A" x:Name="CopyWindowsError"/>
                 </Grid>
             </ui:Card>
             <ui:Card Width="400" Margin="0,10,0,0" x:Name="FinalizeDiskCard">
@@ -68,6 +69,7 @@
                                   TextAlignment="Right"/>
                     <ui:ProgressRing Grid.Column="2" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden" x:Name="FinalizeDiskProgRing"/>
                     <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" x:Name="FinalizeDiskCheck"/>
+                    <ui:SymbolIcon Symbol="ErrorCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" Foreground="#E0605A" x:Name="FinalizeDiskError"/>
                 </Grid>
             </ui:Card>
             <ui:Card Width="400" Margin="0,10,0,0" x:Name="FeaturesAndDriversCard">
@@ -91,13 +93,14 @@
                                   TextAlignment="Right"/>
                     <ui:ProgressRing Grid.Column="2" Height="30" Width="30" IsIndeterminate="True" Visibility="Hidden" x:Name="FeaturesAndDriversProgRing"/>
                     <ui:SymbolIcon Symbol="CheckmarkCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" x:Name="FeaturesAndDriversCheck"/>
+                    <ui:SymbolIcon Symbol="ErrorCircle24" Grid.Column="2" FontSize="26" Visibility="Hidden" Foreground="#E0605A" x:Name="FeaturesAndDriversError"/>
                 </Grid>
             </ui:Card>
             
             <Grid>
                 <StackPanel VerticalAlignment="Center" Margin="0,25,0,0">
                     <ProgressBar x:Name="ProgrBar" Value="0" IsIndeterminate="True"/>
-                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource InstallPageWaiting}"/>
+                    <TextBlock x:Name="ProgrText" Margin="0,5,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource InstallPageWaiting}"/>
                 </StackPanel>
             </Grid>
         </StackPanel>

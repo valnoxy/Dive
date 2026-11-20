@@ -41,7 +41,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Dive.DiskMgr\Dive.DiskMgr.vcxproj" />
+	  <ProjectReference Include="..\DiskMgrLib\DiskMgr.vcxproj" />
 	</ItemGroup>
 
 	<ItemGroup>

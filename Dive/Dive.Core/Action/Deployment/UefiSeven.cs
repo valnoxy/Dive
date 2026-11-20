@@ -1,4 +1,5 @@
-﻿using Dive.Core.Assets;
+﻿using System;
+using Dive.Core.Assets;
 using Dive.Core.Common;
 using System.ComponentModel;
 using System.IO;
@@ -50,39 +51,19 @@ namespace Dive.Core.Action.Deployment
                         config.Write("verbose", verboseBoot ? "1" : "0", "config");
                         config.Write("logfile", logToFile ? "1" : "0", "config");
                     }
-                    catch
+                    catch (Exception ex) when (ex is not DeploymentException)
                     {
-                        worker?.ReportProgress(0, new ActionWorker
-                        {
-                            Action = Progress.InstallUefiSeven,
-                            IsError = true,
-                            IsIndeterminate = false,
-                            Message = "Failed to install UefiSeven."
-                        });
-                        return;
+                        throw new DeploymentException(Progress.InstallUefiSeven, "Failed to install UefiSeven.", ex);
                     }
                 }
                 else
                 {
-                    worker?.ReportProgress(0, new ActionWorker
-                    {
-                        Action = Progress.InstallUefiSeven,
-                        IsError = true,
-                        IsIndeterminate = false,
-                        Message = "File 'bootmgfw.efi' is missing."
-                    });
-                    return;
+                    throw new DeploymentException(Progress.InstallUefiSeven, "File 'bootmgfw.efi' is missing.");
                 }
             }
-            catch
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallUefiSeven,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Cannot create a copy of the EFI bootloader."
-                });
+                throw new DeploymentException(Progress.InstallUefiSeven, "Cannot create a copy of the EFI bootloader.", ex);
             }
 
             worker?.ReportProgress(100, new ActionWorker

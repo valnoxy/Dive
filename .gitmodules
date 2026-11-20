@@ -1,0 +1,3 @@
+[submodule "Dive/DiskMgrLib"]
+	path = Dive/DiskMgrLib
+	url = https://github.com/valnoxy/DiskMgrLib.git

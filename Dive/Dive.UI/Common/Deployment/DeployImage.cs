@@ -18,7 +18,6 @@ namespace Dive.UI.Common.Deployment
 
         internal class Configuration
         {
-            internal static bool IsCanceled = false;
             internal static int DriverCount;
             internal static Firmware Firmware { get; set; }
             internal static Bootloader BootLoader { get; set; }
@@ -28,9 +27,14 @@ namespace Dive.UI.Common.Deployment
             internal static string? RecoveryDrive { get; set; }
         }
 
-        internal static void ApplyWindowsImage(DoWorkEventArgs e, BackgroundWorker worker)
+        /// <summary>
+        /// Runs the complete deployment. Every failing step throws a <see cref="DeploymentException"/>,
+        /// which ends the deployment and is handed to the caller (RunWorkerCompleted).
+        /// </summary>
+        internal static void ApplyWindowsImage(BackgroundWorker worker)
         {
             Debug.WriteLine("Using new deployment class 'DeployImage v2'", ConsoleColor.DarkGreen);
+            ResetConfiguration();
 
             // Initialization
             InitializeWorkingEnvironment();
@@ -58,20 +62,10 @@ namespace Dive.UI.Common.Deployment
                 Configuration.BootDrive,
                 Configuration.RecoveryDrive,
                 worker);
-            if (Configuration.IsCanceled)
-            {
-                e.Cancel = true;
-                return;
-            }
             Debug.WriteLine("Disk Preparation done.");
 
             // Applying image to Windows Partition
             Actions.ApplyWim(Configuration.WindowsDrive, ApplyDetailsInstance.FileName, ApplyDetailsInstance.Index, worker);
-            if (Configuration.IsCanceled)
-            {
-                e.Cancel = true;
-                return;
-            }
             Debug.WriteLine("Windows Image applied to partition.");
 
             // Writing BootLoader to disk
@@ -107,11 +101,6 @@ namespace Dive.UI.Common.Deployment
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (Configuration.IsCanceled)
-            {
-                e.Cancel = true;
-                return;
-            }
             Debug.WriteLine("Bootloader written to disk.");
 
             // Registering Recovery Image (only for Vista and higher)
@@ -123,11 +112,6 @@ namespace Dive.UI.Common.Deployment
                     DeploymentOptionInstance.AddDiveToWinRE,
                     worker);
 
-                if (Configuration.IsCanceled)
-                {
-                    e.Cancel = true;
-                    return;
-                }
                 Debug.WriteLine("Recovery Image registered.");
             }
 
@@ -138,18 +122,12 @@ namespace Dive.UI.Common.Deployment
                 var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : UnattendBuilder.Build();
 
                 if (string.IsNullOrEmpty(config))
-                    throw new Exception("Could not build or read unattended configuration file.");
+                    throw new DeploymentException(Progress.InstallUnattend, "Could not build or read the unattended configuration file.");
 
                 Actions.InstallUnattend($"{Configuration.WindowsDrive}Windows", config, OemInfoInstance.LogoPath, DeploymentOptionInstance.UseSMode, worker);
                 Debug.Write("Configuration file written to ");
                 Debug.Write($"{Configuration.WindowsDrive}Windows\\Panther\\unattend.xml\n", true, ConsoleColor.DarkYellow);
 
-                if (Configuration.IsCanceled)
-                {
-                    Debug.WriteLine("Cancelling process...");
-                    e.Cancel = true;
-                    return;
-                }
             }
             else
             {
@@ -162,11 +140,6 @@ namespace Dive.UI.Common.Deployment
                 Configuration.DriverCount = ApplyDetailsInstance.DriverList.Count;
                 Actions.InstallDriver(Configuration.WindowsDrive, ApplyDetailsInstance.DriverList, worker);
 
-                if (Configuration.IsCanceled)
-                {
-                    e.Cancel = true;
-                    return;
-                }
             }
             else
             {
@@ -184,11 +157,6 @@ namespace Dive.UI.Common.Deployment
                     WindowsModification.UsToggleLog,
                     worker);
 
-                if (Configuration.IsCanceled)
-                {
-                    e.Cancel = true;
-                    return;
-                }
             }
             else
             {
@@ -202,23 +170,33 @@ namespace Dive.UI.Common.Deployment
                     Configuration.BootDrive,
                     worker);
 
-                if (Configuration.IsCanceled)
-                {
-                    e.Cancel = true;
-                    return;
-                }
             }
             else
             {
                 Debug.WriteLine("CSMWrap disabled or not necessary. Skipping ...");
             }
 
-            // Installation complete
-            worker.ReportProgress(100, new ActionWorker
-            {
-                IsDebug = true,
-                Message = "Job Done."
-            });
+            Debug.WriteLine("All deployment steps finished.");
+        }
+
+        /// <summary>
+        /// Builds a readable error message, including the cause of a wrapped exception.
+        /// </summary>
+        internal static string DescribeError(Exception error)
+        {
+            var message = error is DeploymentException ? error.Message : $"Unexpected error: {error.Message}";
+            var inner = error.InnerException;
+            if (inner != null && !message.Contains(inner.Message, StringComparison.Ordinal))
+                message += $" ({inner.Message})";
+            return message;
+        }
+
+        private static void ResetConfiguration()
+        {
+            Configuration.DriverCount = 0;
+            Configuration.WindowsDrive = null;
+            Configuration.BootDrive = null;
+            Configuration.RecoveryDrive = null;
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using Dive.Core.Common;
+﻿using System;
+using Dive.Core.Common;
 using System.ComponentModel;
 using System.IO;
 
@@ -25,16 +26,9 @@ namespace Dive.Core.Action.Deployment
                 File.WriteAllBytes(Path.Combine(targetPath, "bootia32.efi"), bootIA32);
                 File.WriteAllBytes(Path.Combine(targetPath, "bootx64.efi"), bootX64);
             }
-            catch
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallCSMWrap,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Failed to install CSMWrap."
-                });
-                return;
+                throw new DeploymentException(Progress.InstallCSMWrap, "Failed to install CSMWrap.", ex);
             }
 
             worker?.ReportProgress(100, new ActionWorker

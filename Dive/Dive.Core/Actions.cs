@@ -39,13 +39,104 @@ namespace Dive.Core
         /// <exception cref="Exception">Thrown if an error occurs.</exception>
         public static void Initialize()
         {
-            var dllPath = Path.Combine(AppContext.BaseDirectory, "Dive.DiskMgr.dll");
+            var dllPath = Path.Combine(AppContext.BaseDirectory, "DiskMgr.dll");
             var handle = LoadLibrary(dllPath);
 
             if (handle == IntPtr.Zero)
             {
                 throw new Exception($"Failed to load library: {dllPath}");
             }
+        }
+
+        /// <summary>
+        /// Runs a command line tool and returns its exit code and combined output.
+        /// The output is read before waiting for the exit, so a full pipe cannot block the tool.
+        /// </summary>
+        private static (int ExitCode, string Output) RunProcess(string fileName, string arguments)
+        {
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo(fileName, arguments)
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+            process.Start();
+            var errorTask = process.StandardError.ReadToEndAsync();
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return (process.ExitCode, (output + Environment.NewLine + errorTask.Result).Trim());
+        }
+
+        /// <summary>
+        /// Determines which bcdboot.exe to use for the given Windows installation.
+        /// </summary>
+        /// <remarks>
+        /// Newer bcdboot versions (Windows 11 24H2+) switch to the "Windows UEFI CA 2023" boot files in
+        /// Windows\Boot\EFI_EX when the firmware trusts that CA. Older images do not contain these files,
+        /// so the host bcdboot fails ("Failed to validate boot manager checksum", 0xc1). For such images
+        /// the bcdboot of the image itself is preferred - as long as it can run on this machine.
+        /// The host bcdboot is always kept as fallback.
+        /// </remarks>
+        private static List<string> GetBcdbootCandidates(string windowsDir, BackgroundWorker worker)
+        {
+            const string hostBcdboot = "bcdboot.exe";
+            var imageBcdboot = Path.Combine(windowsDir, "System32", "bcdboot.exe");
+            var imageHasExBootFiles = Directory.Exists(Path.Combine(windowsDir, "Boot", "EFI_EX"));
+            var imageBcdbootUsable = File.Exists(imageBcdboot) && IsRunnableOnHost(imageBcdboot);
+
+            var candidates = new List<string>();
+            if (!imageHasExBootFiles && imageBcdbootUsable)
+                candidates.Add(imageBcdboot);
+            candidates.Add(hostBcdboot);
+            if (imageHasExBootFiles && imageBcdbootUsable)
+                candidates.Add(imageBcdboot);
+
+            worker?.ReportProgress(0, new ActionWorker
+            {
+                IsDebug = true,
+                Message = $"bcdboot selection: EFI_EX in image: {imageHasExBootFiles}, image bcdboot usable: {imageBcdbootUsable} -> {string.Join(", ", candidates)}"
+            });
+            return candidates;
+        }
+
+        /// <summary>
+        /// Checks whether the executable was built for the architecture of the running OS.
+        /// </summary>
+        private static bool IsRunnableOnHost(string executable)
+        {
+            try
+            {
+                using var stream = File.OpenRead(executable);
+                using var reader = new BinaryReader(stream);
+                stream.Seek(0x3C, SeekOrigin.Begin);
+                var peOffset = reader.ReadInt32();
+                stream.Seek(peOffset + 4, SeekOrigin.Begin);
+                var machine = reader.ReadUInt16();
+
+                return RuntimeInformation.OSArchitecture switch
+                {
+                    Architecture.X64 => machine is 0x8664 or 0x014C,          // x64, x86 (WOW64)
+                    Architecture.X86 => machine is 0x014C,
+                    Architecture.Arm64 => machine is 0xAA64 or 0x8664 or 0x014C, // ARM64 runs x64/x86 emulated
+                    _ => false
+                };
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the last meaningful line of a tool output for use in an error message.
+        /// </summary>
+        private static string FormatToolOutput(string output)
+        {
+            if (string.IsNullOrWhiteSpace(output)) return string.Empty;
+            var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return lines.Length == 0 ? string.Empty : $" {lines[^1]}";
         }
 
         /// <summary>
@@ -71,13 +162,21 @@ namespace Dive.Core
                 Message = "Partitioning disk ..."
             });
 
-            // Validate parsed arguments
-            if (useRecovery && (windowsDrive == "\0" || bootDrive == "\0" || recoveryDrive == "\0"))
-                throw new ArgumentException("Invalid arguments");
-            if (bootloader == Entities.Bootloader.BOOTMGR && firmware == Entities.Firmware.EFI && (windowsDrive == "\0" || bootDrive == "\0"))
-                throw new ArgumentException("Invalid arguments");
+            // Validate the drive letters required by the selected layout
+            static bool IsMissing(string letter) => string.IsNullOrEmpty(letter) || letter == "\0";
 
-            if (Entities.CanarySettings.UseNewDiskOperation)
+            if (IsMissing(windowsDrive))
+                throw new DeploymentException(Progress.PrepareDisk, "No drive letter for the Windows partition was assigned.");
+            if (partitionStyle is not Entities.PartitionStyle.Single && IsMissing(bootDrive))
+                throw new DeploymentException(Progress.PrepareDisk, "No drive letter for the boot partition was assigned.");
+            if (partitionStyle is Entities.PartitionStyle.Full or Entities.PartitionStyle.LegacyEfiWithRecovery && IsMissing(recoveryDrive))
+                throw new DeploymentException(Progress.PrepareDisk, "No drive letter for the recovery partition was assigned.");
+
+            // The legacy EFI layouts are only implemented with diskpart.
+            var useNewDiskOperation = Entities.CanarySettings.UseNewDiskOperation
+                                      && partitionStyle is not (Entities.PartitionStyle.LegacyEfi or Entities.PartitionStyle.LegacyEfiWithRecovery);
+
+            if (useNewDiskOperation)
             {
                 worker?.ReportProgress(0, new ActionWorker
                 {
@@ -106,9 +205,7 @@ namespace Dive.Core
                         switch (firmware)
                         {
                             case Entities.Firmware.EFI:
-                                // not supported
-                                throw new NotSupportedException("You need at least a separate EFI partition, use SeparateBoot!");
-                                break;
+                                throw new DeploymentException(Progress.PrepareDisk, "You cannot use Single Partition layout on a system with EFI Firmware.");
                             case Entities.Firmware.BIOS:
                                 var diskManagerMbr = new Action.DiskPreparation.MbrDiskManager(disk);
                                 diskManagerMbr.CreateSinglePartition(windowsDrive, worker);
@@ -145,6 +242,12 @@ namespace Dive.Core
                 });
                 return;
             }
+
+            // Reject unsupported combinations before diskpart is started
+            if (partitionStyle == Entities.PartitionStyle.Single && firmware == Entities.Firmware.EFI)
+                throw new DeploymentException(Progress.PrepareDisk, "You cannot use Single Partition layout on a system with EFI Firmware.");
+            if (partitionStyle is Entities.PartitionStyle.LegacyEfi or Entities.PartitionStyle.LegacyEfiWithRecovery && firmware != Entities.Firmware.EFI)
+                throw new DeploymentException(Progress.PrepareDisk, "You cannot use Legacy EFI layout on a system without EFI Firmware.");
 
             // Start Diskpart tool
             var partDest = new Process();
@@ -248,14 +351,7 @@ namespace Dive.Core
                             partDest.StandardInput.WriteLine("exit");
                             break;
                         case Entities.Firmware.EFI: // Windows on EFI
-                            worker?.ReportProgress(0, new ActionWorker
-                            {
-                                Action = Progress.PrepareDisk,
-                                IsError = true,
-                                IsIndeterminate = false,
-                                Message = "You cannot use Single Partition layout on a system with EFI Firmware."
-                            });
-                            return;
+                            throw new DeploymentException(Progress.PrepareDisk, "You cannot use Single Partition layout on a system with EFI Firmware.");
                     }
                     break;
 
@@ -264,14 +360,7 @@ namespace Dive.Core
                     switch (firmware)
                     {
                         case Entities.Firmware.BIOS: // Windows on BIOS
-                            worker?.ReportProgress(0, new ActionWorker
-                            {
-                                Action = Progress.PrepareDisk,
-                                IsError = true,
-                                IsIndeterminate = false,
-                                Message = "You cannot use Legacy EFI layout on a system without EFI Firmware."
-                            });
-                            return;
+                            throw new DeploymentException(Progress.PrepareDisk, "You cannot use Legacy EFI layout on a system without EFI Firmware.");
                         case Entities.Firmware.EFI: // Windows on EFI
                             partDest.StandardInput.WriteLine("select disk " + disk);
                             partDest.StandardInput.WriteLine("clean");
@@ -294,18 +383,19 @@ namespace Dive.Core
                     }
                     break;
             }
+            partDest.StandardInput.Close();
+            // Read the output before waiting, otherwise a full output buffer blocks diskpart.
+            var diskpartOutput = partDest.StandardOutput.ReadToEnd();
             partDest.WaitForExit();
 
             if (partDest.ExitCode != 0)
             {
                 worker?.ReportProgress(0, new ActionWorker
                 {
-                    Action = Progress.PrepareDisk,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Diskpart terminated with exit code " + partDest.ExitCode + "."
+                    IsDebug = true,
+                    Message = "Diskpart output:\n" + diskpartOutput
                 });
-                return;
+                throw new DeploymentException(Progress.PrepareDisk, "Diskpart terminated with exit code " + partDest.ExitCode + ".");
             }
 
             worker?.ReportProgress(100, new ActionWorker
@@ -359,22 +449,22 @@ namespace Dive.Core
                 {
                     downloader.DownloadFile(wimFile, outputPath, progress);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not DeploymentException)
                 {
-                    worker?.ReportProgress(0, new ActionWorker
-                    {
-                        Action = Progress.ApplyImage,
-                        IsError = true,
-                        IsIndeterminate = false,
-                        Message = $"Failed to download Windows Image: {ex.Message}"
-                    });
-                    return;
+                    throw new DeploymentException(Progress.ApplyImage, $"Failed to download Windows Image: {ex.Message}");
                 }
 
                 wimFile = outputPath;
             }
 
-            Apply.WriteToDisk(wimFile, index, path, worker);
+            try
+            {
+                Apply.WriteToDisk(wimFile, index, path, worker);
+            }
+            catch (Exception ex) when (ex is not DeploymentException)
+            {
+                throw new DeploymentException(Progress.ApplyImage, $"Failed to apply the Windows image: {ex.Message}", ex);
+            }
             worker?.ReportProgress(100, new ActionWorker
             {
                 Action = Progress.ApplyImage,
@@ -401,53 +491,77 @@ namespace Dive.Core
                 IsIndeterminate = true,
                 Message = "Installing bootloader ..."
             });
-            var bootLd = new Process();
-
-            #region Bootloader check
+            // Candidates in order of preference; the next one is only tried if the previous one fails.
+            var candidates = new List<(string FileName, string Arguments)>();
             switch (bootloader)
             {
                 case Entities.Bootloader.NTLDR:
-                    {
-                        var strBl = bootloaderLetter[..2];
-                        bootLd.StartInfo.FileName = "bootsect.exe";
-                        bootLd.StartInfo.Arguments = $"/nt52 {strBl} /force /mbr";
-                        break;
-                    }
+                    candidates.Add(("bootsect.exe", $"/nt52 {bootloaderLetter[..2]} /force /mbr"));
+                    break;
+
                 case Entities.Bootloader.BOOTMGR:
                     {
-                        windowsPath = $"{windowsPath}Windows";
-                        bootLd.StartInfo.FileName = "bcdboot.exe";
-
-                        bootLd.StartInfo.Arguments = firmware switch
+                        var windowsDir = $"{windowsPath}Windows";
+                        // bcdboot expects the system partition as "S:" (without trailing backslash)
+                        var systemPartition = bootloaderLetter.TrimEnd('\\');
+                        var firmwareType = firmware switch
                         {
-                            // BIOS
-                            Entities.Firmware.BIOS => $"{windowsPath} /s {bootloaderLetter} /f BIOS",
-                            // EFI
-                            Entities.Firmware.EFI => $"{windowsPath} /s {bootloaderLetter} /f UEFI",
-                            _ => bootLd.StartInfo.Arguments
+                            Entities.Firmware.BIOS => "BIOS",
+                            Entities.Firmware.EFI => "UEFI",
+                            _ => throw new DeploymentException(Progress.InstallBootloader, $"Unsupported firmware type '{firmware}'.")
                         };
+                        // /v: verbose output, logged if bcdboot fails
+                        var arguments = $"{windowsDir} /s {systemPartition} /f {firmwareType} /v";
+
+                        foreach (var bcdboot in GetBcdbootCandidates(windowsDir, worker))
+                            candidates.Add((bcdboot, arguments));
                         break;
                     }
+
+                default:
+                    throw new DeploymentException(Progress.InstallBootloader, $"Unsupported bootloader '{bootloader}'.");
             }
-            #endregion
 
-            bootLd.StartInfo.UseShellExecute = false;
-            bootLd.StartInfo.RedirectStandardOutput = true;
-            bootLd.StartInfo.CreateNoWindow = true;
-            bootLd.Start();
-            bootLd.WaitForExit();
-
-            if (bootLd.ExitCode != 0)
+            string lastError = null;
+            Exception lastException = null;
+            var succeeded = false;
+            foreach (var (fileName, arguments) in candidates)
             {
+                int exitCode;
+                string output;
+                try
+                {
+                    (exitCode, output) = RunProcess(fileName, arguments);
+                }
+                catch (Exception ex)
+                {
+                    lastError = $"Failed to start {fileName}: {ex.Message}";
+                    lastException = ex;
+                    worker?.ReportProgress(0, new ActionWorker { Action = Progress.InstallBootloader, IsWarning = true, Message = lastError });
+                    continue;
+                }
+
                 worker?.ReportProgress(0, new ActionWorker
                 {
-                    Action = Progress.InstallBootloader,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Bootsect / bcdboot terminated with exit code " + bootLd.ExitCode + "."
+                    IsDebug = true,
+                    Message = $"{fileName} {arguments} -> exit code {exitCode}"
                 });
-                return;
+
+                if (exitCode == 0)
+                {
+                    succeeded = true;
+                    break;
+                }
+
+                lastError = $"{fileName} terminated with exit code {exitCode}.{FormatToolOutput(output)}";
+                lastException = null;
+                worker?.ReportProgress(0, new ActionWorker { IsDebug = true, Message = $"{fileName} output:\n{output}" });
+                worker?.ReportProgress(0, new ActionWorker { Action = Progress.InstallBootloader, IsWarning = true, Message = lastError });
+                Common.Logging.Log($"{fileName} {arguments} failed with exit code {exitCode}:\n{output}", Common.Logging.LogLevel.ERROR);
             }
+
+            if (!succeeded)
+                throw new DeploymentException(Progress.InstallBootloader, lastError ?? "No bootloader tool available.", lastException);
 
             worker?.ReportProgress(100, new ActionWorker
             {
@@ -480,16 +594,9 @@ namespace Dive.Core
             {
                 System.IO.Directory.CreateDirectory(System.IO.Path.Combine(recoveryLetter, "Recovery", "WindowsRE"));
             }
-            catch
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallRecovery,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Failed to create recovery directory."
-                });
-                return;
+                throw new DeploymentException(Progress.InstallRecovery, "Failed to create recovery directory.", ex);
             }
 
             // Copy WinRE image to Recovery partition
@@ -505,26 +612,13 @@ namespace Dive.Core
                 }
                 else
                 {
-                    worker?.ReportProgress(0, new ActionWorker
-                    {
-                        Action = Progress.InstallRecovery,
-                        IsError = true,
-                        IsIndeterminate = false,
-                        Message = "Recovery image does not exist in this image."
-                    });
-                    return;
+                    throw new DeploymentException(Progress.InstallRecovery, "Recovery image does not exist in this image.");
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not DeploymentException)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallRecovery,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Failed to copy recovery image: " + ex.Message
-                });
+                throw new DeploymentException(Progress.InstallRecovery, "Failed to copy recovery image: " + ex.Message);
             }
 
             // Implement Dive
@@ -589,16 +683,9 @@ namespace Dive.Core
                     });
                     DismApi.UnmountImage(mountPath, true);
                 }
-                catch
+                catch (Exception ex) when (ex is not DeploymentException)
                 {
-                    worker?.ReportProgress(0, new ActionWorker
-                    {
-                        Action = Progress.InstallRecovery,
-                        IsError = true,
-                        IsIndeterminate = true,
-                        Message = "Failed to inject Dive into Recovery image."
-                    });
-                    return;
+                    throw new DeploymentException(Progress.InstallRecovery, "Failed to inject Dive into Recovery image.", ex);
                 }
                 finally
                 {
@@ -622,13 +709,17 @@ namespace Dive.Core
                     IsIndeterminate = true,
                     Message = "Registering Recovery image to Windows ..."
                 });
-                var p = new Process();
-                p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Reagentc.exe");
-                p.StartInfo.Arguments = $"/Setreimage /Path {recoveryLetter}\\Recovery\\WindowsRE /Target {windowsPath}";
-                p.StartInfo.RedirectStandardOutput = true;
-                p.StartInfo.CreateNoWindow = true;
-                p.Start();
-                p.WaitForExit();
+                var reagentc = System.IO.Path.Combine(windowsPath, "System32", "Reagentc.exe");
+                var (reExitCode, reOutput) = RunProcess(reagentc, $"/Setreimage /Path {recoveryLetter}\\Recovery\\WindowsRE /Target {windowsPath}");
+                if (reExitCode != 0)
+                {
+                    worker?.ReportProgress(0, new ActionWorker
+                    {
+                        Action = Progress.InstallRecovery,
+                        IsWarning = true,
+                        Message = $"Reagentc /Setreimage terminated with exit code {reExitCode}.{FormatToolOutput(reOutput)}"
+                    });
+                }
 
                 if (implementDive)
                 {
@@ -641,21 +732,21 @@ namespace Dive.Core
                     Directory.CreateDirectory(recoveryBootMenuPath);
 
                     File.WriteAllText(Path.Combine(recoveryBootMenuPath, "AddDiagnosticsToolToBootMenu.xml"), WinRE.AddDiagnosticsToolToBootMenu);
-                    p.StartInfo.Arguments = $"/setbootshelllink /configfile {Path.Combine(recoveryBootMenuPath, "AddDiagnosticsToolToBootMenu.xml")}";
-                    p.Start();
-                    p.WaitForExit();
+                    var (linkExitCode, linkOutput) = RunProcess(reagentc, $"/setbootshelllink /configfile {Path.Combine(recoveryBootMenuPath, "AddDiagnosticsToolToBootMenu.xml")}");
+                    if (linkExitCode != 0)
+                    {
+                        worker?.ReportProgress(0, new ActionWorker
+                        {
+                            Action = Progress.InstallRecovery,
+                            IsWarning = true,
+                            Message = $"Reagentc /setbootshelllink terminated with exit code {linkExitCode}.{FormatToolOutput(linkOutput)}"
+                        });
+                    }
                 }
             }
-            catch
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallRecovery,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Failed to register recovery image."
-                });
-                return;
+                throw new DeploymentException(Progress.InstallRecovery, "Failed to register recovery image.", ex);
             }
 
             worker?.ReportProgress(100, new ActionWorker
@@ -690,16 +781,9 @@ namespace Dive.Core
             {
                 System.IO.Directory.CreateDirectory(System.IO.Path.Combine(windowsPath, "Panther"));
             }
-            catch
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallUnattend,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Failed to create Panther directory."
-                });
-                return;
+                throw new DeploymentException(Progress.InstallUnattend, "Failed to create Panther directory.", ex);
             }
 
             // Write config to disk as unattend.xml
@@ -707,16 +791,9 @@ namespace Dive.Core
             {
                 System.IO.File.WriteAllText(System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml"), configuration);
             }
-            catch
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallUnattend,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Failed to write Unattend configuration to disk."
-                });
-                return;
+                throw new DeploymentException(Progress.InstallUnattend, "Failed to write Unattend configuration to disk.", ex);
             }
 
             // Copy OEM logo to Windows\System32 directory
@@ -726,16 +803,9 @@ namespace Dive.Core
                 {
                     System.IO.File.Copy(oemLogoPath, Path.Combine(windowsPath, "System32", "logo.bmp"), true);
                 }
-                catch
+                catch (Exception ex) when (ex is not DeploymentException)
                 {
-                    worker?.ReportProgress(0, new ActionWorker
-                    {
-                        Action = Progress.InstallUnattend,
-                        IsError = true,
-                        IsIndeterminate = false,
-                        Message = "Failed to copy OEM logo to disk."
-                    });
-                    return;
+                    throw new DeploymentException(Progress.InstallUnattend, "Failed to copy OEM logo to disk.", ex);
                 }
             }
 
@@ -754,24 +824,22 @@ namespace Dive.Core
                     var f = new FileInfo(windowsPath);
                     var drive = Path.GetPathRoot(f.FullName);
 
-                    var p = new Process();
-                    p.StartInfo.FileName = System.IO.Path.Combine(windowsPath, "System32", "Dism.exe");
-                    p.StartInfo.Arguments = $"/Image:{drive} /Apply-Unattend:{System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml")}";
-                    p.StartInfo.RedirectStandardOutput = true;
-                    p.StartInfo.CreateNoWindow = true;
-                    p.Start();
-                    p.WaitForExit();
-                }
-                catch
-                {
-                    worker?.ReportProgress(0, new ActionWorker
+                    var (dismExitCode, dismOutput) = RunProcess(
+                        System.IO.Path.Combine(windowsPath, "System32", "Dism.exe"),
+                        $"/Image:{drive} /Apply-Unattend:{System.IO.Path.Combine(windowsPath, "Panther", "unattend.xml")}");
+                    if (dismExitCode != 0)
                     {
-                        Action = Progress.InstallUnattend,
-                        IsError = true,
-                        IsIndeterminate = false,
-                        Message = "Failed to apply Unattend configuration with DISM."
-                    });
-                    return;
+                        worker?.ReportProgress(0, new ActionWorker
+                        {
+                            Action = Progress.InstallUnattend,
+                            IsWarning = true,
+                            Message = $"DISM /Apply-Unattend terminated with exit code {dismExitCode}.{FormatToolOutput(dismOutput)}"
+                        });
+                    }
+                }
+                catch (Exception ex) when (ex is not DeploymentException)
+                {
+                    throw new DeploymentException(Progress.InstallUnattend, "Failed to apply Unattend configuration with DISM.", ex);
                 }
             }
 

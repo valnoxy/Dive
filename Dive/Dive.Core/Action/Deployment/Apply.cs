@@ -11,10 +11,12 @@ namespace Dive.Core.Action.Deployment
     internal class Apply
     {
         internal static BackgroundWorker Bw;
+        private static string _firstApplyError;
 
         internal static void WriteToDisk(string imagePath, int index, string drive, BackgroundWorker worker = null)
         {
             Bw = worker;
+            _firstApplyError = null;
 
             var imageExtension = Path.GetExtension(imagePath);
             var option = imageExtension switch
@@ -38,6 +40,10 @@ namespace Dive.Core.Action.Deployment
             {
                 WimgApi.UnregisterMessageCallback(file, ApplyCallbackMethod);
             }
+
+            // Errors on single files are only reported through the callback.
+            if (_firstApplyError != null)
+                throw new DeploymentException(Progress.ApplyImage, $"Failed to apply the Windows image: {_firstApplyError}");
         }
 
         internal static void AddDriverToDisk(string windowsDrive, List<string> driverPath, BackgroundWorker worker = null)
@@ -80,21 +86,15 @@ namespace Dive.Core.Action.Deployment
                         Message = $"[Driver] Session opened."
                     });
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not DeploymentException)
                 {
-                    worker?.ReportProgress(0, new ActionWorker
-                    {
-                        Action = Progress.InstallDrivers,
-                        IsError = true,
-                        Message = $"[Driver] Failed to open offline session: " + ex.Message
-                    });
                     worker?.ReportProgress(0, new ActionWorker
                     {
                         IsDebug = true,
                         Message = $"[Driver] Shutting down API ..."
                     });
                     DismApi.Shutdown();
-                    return;
+                    throw new DeploymentException(Progress.InstallDrivers, "Failed to open the offline DISM session: " + ex.Message, ex);
                 }
 
                 var currentDriverCount = 0;
@@ -122,14 +122,14 @@ namespace Dive.Core.Action.Deployment
                         });
                         DismApi.AddDriver(session, driver, true);
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not DeploymentException)
                     {
                         worker?.ReportProgress(0, new ActionWorker
                         {
                             Action = Progress.InstallDrivers,
                             IsWarning = true,
                             IsIndeterminate = false,
-                            Message = $"Failed to inject driver {driver}."
+                            Message = $"Failed to inject driver {driver}: {ex.Message}"
                         });
                     }
                 }
@@ -147,15 +147,9 @@ namespace Dive.Core.Action.Deployment
                 });
                 DismApi.Shutdown();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not DeploymentException)
             {
-                worker?.ReportProgress(0, new ActionWorker
-                {
-                    Action = Progress.InstallDrivers,
-                    IsError = true,
-                    IsIndeterminate = false,
-                    Message = "Unknown error at installing drivers."
-                });
+                throw new DeploymentException(Progress.InstallDrivers, "Failed to install drivers: " + ex.Message, ex);
             }
         }
 
@@ -181,12 +175,13 @@ namespace Dive.Core.Action.Deployment
 
                 case WimMessageType.Error:
                     var wimMessageError = (WimMessageError)message;
+                    var errorText = $"{wimMessageError.Path} (Win32 error {wimMessageError.Win32ErrorCode})";
+                    _firstApplyError ??= errorText;
                     Bw?.ReportProgress(0, new ActionWorker
                     {
                         Action = Progress.ApplyImage,
-                        IsError = true,
-                        IsIndeterminate = false,
-                        Message = $"Error: {wimMessageError.Path} {wimMessageError.Win32ErrorCode}"
+                        IsWarning = true,
+                        Message = $"Error while applying file: {errorText}"
                     });
                     break;
 
@@ -194,10 +189,9 @@ namespace Dive.Core.Action.Deployment
                     var wimMessageWarning = (WimMessageWarning)message;
                     Bw?.ReportProgress(0, new ActionWorker
                     {
-                        Action = Progress.PrepareDisk,
+                        Action = Progress.ApplyImage,
                         IsWarning = true,
-                        IsIndeterminate = false,
-                        Message = $"Error: {wimMessageWarning.Path} {wimMessageWarning.Win32ErrorCode}"
+                        Message = $"Warning while applying file: {wimMessageWarning.Path} (Win32 error {wimMessageWarning.Win32ErrorCode})"
                     });
                     break;
             }

@@ -242,10 +242,10 @@ namespace Dive.UI.Pages.TweaksPages
 
             foreach (var partition in searcher.Get())
             {
-                Console.WriteLine("Type: " + partition["Type"]);
-                Console.WriteLine("Size: " + partition["Size"] + " bytes");
-                Console.WriteLine("Name: " + partition["Name"]);
-                Console.WriteLine("DeviceID: " + partition["DeviceID"]);
+                Common.Diagnostics.Log.Debug("Type: " + partition["Type"]);
+                Common.Diagnostics.Log.Debug("Size: " + partition["Size"] + " bytes");
+                Common.Diagnostics.Log.Debug("Name: " + partition["Name"]);
+                Common.Diagnostics.Log.Debug("DeviceID: " + partition["DeviceID"]);
             }
 
             // Identify installed Windows Version

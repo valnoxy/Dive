@@ -81,10 +81,24 @@ namespace Dive.UI.Pages.ApplyPages
             _applyBackgroundWorker.WorkerSupportsCancellation = true;
             _applyBackgroundWorker.DoWork += ApplyImage;
             _applyBackgroundWorker.ProgressChanged += ApplyBackgroundWorker_ProgressChanged;
+            _applyBackgroundWorker.RunWorkerCompleted += ApplyBackgroundWorker_RunWorkerCompleted;
             _applyBackgroundWorker.RunWorkerAsync();
         }
 
-        private void ApplyImage(object? sender, DoWorkEventArgs e) => DeployImage.ApplyWindowsImage(e, _applyBackgroundWorker);
+        private void ApplyImage(object? sender, DoWorkEventArgs e) => DeployImage.ApplyWindowsImage(_applyBackgroundWorker);
+
+        private void ApplyBackgroundWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error == null)
+            {
+                ApplyBackgroundWorker_ProgressChanged(sender, new ProgressChangedEventArgs(100, new ActionWorker { IsDebug = true, Message = "Job Done." }));
+                return;
+            }
+
+            var message = DeployImage.DescribeError(e.Error);
+            Debug.WriteLine($"Deployment failed: {message}", ConsoleColor.Red);
+            ApplyBackgroundWorker_ProgressChanged(sender, new ProgressChangedEventArgs(0, new ActionWorker { IsError = true, Message = message }));
+        }
 
         private void ApplyBackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
         {
@@ -113,7 +127,6 @@ namespace Dive.UI.Pages.ApplyPages
                         CloudContent.ContentWindow.CancelBtn.IsEnabled = true;
                     }
 
-                    DeployImage.Configuration.IsCanceled = true;
                     return;
                 }
 

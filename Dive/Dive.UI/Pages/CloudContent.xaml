@@ -17,7 +17,7 @@
 
         <!-- step content -->
         <!--<ContentPresenter Grid.Row="1" Content="{Binding StepViewModel}"/>-->
-        <ContentControl x:Name="FrameWindow"/>
+        <ContentControl x:Name="FrameWindow" Focusable="False" FocusVisualStyle="{x:Null}"/>
 
         <!-- buttons -->
         <Grid Grid.Row="2">

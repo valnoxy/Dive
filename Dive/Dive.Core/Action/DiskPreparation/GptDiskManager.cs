@@ -1,3 +1,4 @@
+using Dive.Core.Common;
 using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -6,7 +7,11 @@ namespace Dive.Core.Action.DiskPreparation
 {
     public class GptDiskManager(int diskNumber)
     {
-        private const string DllPath = "Dive.DiskMgr.dll";
+        private const string DllPath = "DiskMgr.dll";
+
+        // Space not assigned to any partition: 1 MB in front of the first partition (alignment)
+        // and 1 MB at the end of the disk (backup GPT header / rounding of the disk size).
+        private const ulong ReservedSpaceMB = 2;
 
         [DllImport(DllPath, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool DiskMgr_CleanDisk(int diskNumber);
@@ -35,6 +40,9 @@ namespace Dive.Core.Action.DiskPreparation
             [MarshalAs(UnmanagedType.LPWStr)] string label,
             bool quickFormat);
 
+        [DllImport(DllPath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr DiskMgr_GetLastError();
+
         // GPT Partition Type GUIDs
         private static readonly Guid GUID_EFI_SYSTEM = new("c12a7328-f81f-11d2-ba4b-00a0c93ec93b");
         private static readonly Guid GUID_MSR = new("e3c9e316-0b5c-4db8-817d-f92df00215ae");
@@ -58,136 +66,87 @@ namespace Dive.Core.Action.DiskPreparation
         /// <param name="recoveryDrive">The drive letter to assign to the Recovery partition. Must be a single uppercase letter (e.g., "R").</param>
         /// <param name="worker">An optional BackgroundWorker used to report progress and errors during the operation. Can be null if
         /// progress reporting is not required.</param>
-        /// <returns>true if the disk layout was created successfully; otherwise, false.</returns>
-        public bool CreateFullLayout(string bootDrive, string windowsDrive, string recoveryDrive, BackgroundWorker worker = null)
+        public void CreateFullLayout(string bootDrive, string windowsDrive, string recoveryDrive, BackgroundWorker worker = null)
         {
             ReportProgress(worker, "Cleaning disk...");
             if (!DiskMgr_CleanDisk(diskNumber))
-            {
-                ReportError(worker, "Failed to clean disk");
-                return false;
-            }
+                throw Fail("Failed to clean disk");
 
             ReportProgress(worker, "Initializing GPT...");
             if (!DiskMgr_InitializeGPT(diskNumber))
-            {
-                ReportError(worker, "Failed to initialize GPT");
-                return false;
-            }
+                throw Fail("Failed to initialize GPT");
 
             var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
             const ulong efiSize = 300;
             const ulong msrSize = 16;
             const ulong recoverySize = 1024;
-            var windowsSize = diskSizeMB - efiSize - msrSize - recoverySize - 4; // little buffer
+            RequireDiskSpace(diskSizeMB, efiSize + msrSize + recoverySize);
+            var windowsSize = diskSizeMB - efiSize - msrSize - recoverySize - ReservedSpaceMB;
 
             // EFI Partition
             ReportProgress(worker, "Creating EFI partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, efiSize, GUID_BASIC_DATA))
-            {
-                ReportError(worker, "Failed to create EFI partition");
-                return false;
-            }
+                throw Fail("Failed to create EFI partition");
 
             ReportProgress(worker, "Assigning drive letter to EFI partition...");
             if (!DiskMgr_AssignDriveLetter(diskNumber, 0, bootDrive[0]))
-            {
-                ReportError(worker, "Failed to assign drive letter to EFI partition");
-                return false;
-            }
+                throw Fail("Failed to assign drive letter to EFI partition");
 
             ReportProgress(worker, "Formatting EFI partition...");
             var efiFormatSummary = DiskMgr_FormatPartition(bootDrive[0], "FAT32", "EFI", true);
             if (efiFormatSummary != 0)
-            {
-                ReportError(worker, "Failed to format EFI partition");
-                return false;
-            }
+                throw Fail("Failed to format EFI partition", efiFormatSummary);
 
             ReportProgress(worker, "Changing EFI partition type...");
             if (!DiskMgr_ChangeGPTPartitionType(diskNumber, 0, GUID_EFI_SYSTEM))
-            {
-                ReportError(worker, "Failed to change EFI partition type");
-                return false;
-            }
+                throw Fail("Failed to change EFI partition type");
 
             // MSR Partition
             ReportProgress(worker, "Creating MSR partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, msrSize, GUID_MSR))
-            {
-                ReportError(worker, "Failed to create MSR partition");
-                return false;
-            }
+                throw Fail("Failed to create MSR partition");
 
             // Windows Partition
             ReportProgress(worker, "Creating Windows partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, windowsSize, GUID_BASIC_DATA))
-            {
-                ReportError(worker, "Failed to create Windows partition");
-                return false;
-            }
+                throw Fail("Failed to create Windows partition");
 
             ReportProgress(worker, "Assigning drive letter to Windows partition...");
             if (!DiskMgr_AssignDriveLetter(diskNumber, 2, windowsDrive[0]))
-            {
-                ReportError(worker, "Failed to assign drive letter to Windows partition");
-                return false;
-            }
+                throw Fail("Failed to assign drive letter to Windows partition");
 
             ReportProgress(worker, "Formatting Windows partition...");
             var windowsFormatSummary = DiskMgr_FormatPartition(windowsDrive[0], "NTFS", "Windows", true);
             if (windowsFormatSummary != 0)
-            {
-                ReportError(worker, "Failed to format Windows partition");
-                return false;
-            }
+                throw Fail("Failed to format Windows partition", windowsFormatSummary);
 
             // Recovery Partition
             ReportProgress(worker, "Creating Recovery partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, recoverySize, GUID_BASIC_DATA))
-            {
-                ReportError(worker, "Failed to create Recovery partition");
-                return false;
-            }
+                throw Fail("Failed to create Recovery partition");
 
             ReportProgress(worker, "Assigning drive letter to Recovery partition...");
             if (!DiskMgr_AssignDriveLetter(diskNumber, 3, recoveryDrive[0]))
-            {
-                ReportError(worker, "Failed to assign drive letter to Recovery partition");
-                return false;
-            }
+                throw Fail("Failed to assign drive letter to Recovery partition");
 
             ReportProgress(worker, "Formatting Recovery partition...");
             var recoveryFormatSummary = DiskMgr_FormatPartition(recoveryDrive[0], "NTFS", "Recovery", true);
             if (recoveryFormatSummary != 0)
-            {
-                ReportError(worker, "Failed to format Recovery partition");
-                return false;
-            }
+                throw Fail("Failed to format Recovery partition", recoveryFormatSummary);
 
             ReportProgress(worker, "Changing Recovery partition type...");
             if (!DiskMgr_ChangeGPTPartitionType(diskNumber, 3, GUID_RECOVERY))
-            {
-                ReportError(worker, "Failed to change Recovery partition type");
-                return false;
-            }
+                throw Fail("Failed to change Recovery partition type");
 
             // Some partition attributes
             ReportProgress(worker, "Setting partition attributes...");
             if (!DiskMgr_SetGPTPartitionAttributes(diskNumber, 3, GPT_ATTR_REQUIRED_PARTITION | GPT_ATTR_NO_AUTO_MOUNT)) // Recovery
-            {
-                ReportError(worker, "Failed to set Recovery partition attributes");
-                return false;
-            }
+                throw Fail("Failed to set Recovery partition attributes");
 
             if (!DiskMgr_SetGPTPartitionAttributes(diskNumber, 0, GPT_ATTR_REQUIRED_PARTITION | GPT_ATTR_NO_AUTO_MOUNT)) // EFI
-            {
-                ReportError(worker, "Failed to set EFI partition attributes");
-                return false;
-            }
+                throw Fail("Failed to set EFI partition attributes");
 
             ReportProgress(worker, "Layout created successfully");
-            return true;
         }
 
         /// <summary>
@@ -202,94 +161,104 @@ namespace Dive.Core.Action.DiskPreparation
         /// <param name="windowsDrive">The drive letter to assign to the Windows partition. Must be a single uppercase letter (e.g., "W").</param>
         /// <param name="worker">An optional BackgroundWorker used to report progress and errors during the operation. If null, progress is
         /// not reported.</param>
-        /// <returns>true if the standard layout is created successfully; otherwise, false.</returns>
-        public bool CreateStandardLayout(string bootDrive, string windowsDrive, BackgroundWorker worker = null)
+        public void CreateStandardLayout(string bootDrive, string windowsDrive, BackgroundWorker worker = null)
         {
             ReportProgress(worker, "Cleaning disk...");
             if (!DiskMgr_CleanDisk(diskNumber))
-            {
-                ReportError(worker, "Failed to clean disk");
-                return false;
-            }
+                throw Fail("Failed to clean disk");
 
             ReportProgress(worker, "Initializing GPT...");
             if (!DiskMgr_InitializeGPT(diskNumber))
-            {
-                ReportError(worker, "Failed to initialize GPT");
-                return false;
-            }
+                throw Fail("Failed to initialize GPT");
 
             var diskSizeMB = DiskMgr_GetDiskSize(diskNumber);
             const ulong efiSize = 300;
             const ulong msrSize = 16;
-            var windowsSize = diskSizeMB - efiSize - msrSize - 4;
+            RequireDiskSpace(diskSizeMB, efiSize + msrSize);
+            var windowsSize = diskSizeMB - efiSize - msrSize - ReservedSpaceMB;
 
             // EFI Partition
             ReportProgress(worker, "Creating EFI partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, efiSize, GUID_EFI_SYSTEM))
-            {
-                ReportError(worker, "Failed to create EFI partition");
-                return false;
-            }
+                throw Fail("Failed to create EFI partition");
 
             ReportProgress(worker, "Assigning drive letter to EFI partition...");
             if (!DiskMgr_AssignDriveLetter(diskNumber, 0, bootDrive[0]))
-            {
-                ReportError(worker, "Failed to assign drive letter to EFI partition");
-                return false;
-            }
+                throw Fail("Failed to assign drive letter to EFI partition");
 
             ReportProgress(worker, "Formatting EFI partition...");
             var efiFormatSummary = DiskMgr_FormatPartition(bootDrive[0], "FAT32", "EFI", true);
             if (efiFormatSummary != 0)
-            {
-                ReportError(worker, "Failed to format EFI partition");
-                return false;
-            }
+                throw Fail("Failed to format EFI partition", efiFormatSummary);
 
             // MSR Partition
             ReportProgress(worker, "Creating MSR partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, msrSize, GUID_MSR))
-            {
-                ReportError(worker, "Failed to create MSR partition");
-                return false;
-            }
+                throw Fail("Failed to create MSR partition");
 
             // Windows Partition
             ReportProgress(worker, "Creating Windows partition...");
             if (!DiskMgr_CreateGPTPartition(diskNumber, windowsSize, GUID_BASIC_DATA))
-            {
-                ReportError(worker, "Failed to create Windows partition");
-                return false;
-            }
+                throw Fail("Failed to create Windows partition");
 
             ReportProgress(worker, "Assigning drive letter to Windows partition...");
             if (!DiskMgr_AssignDriveLetter(diskNumber, 2, windowsDrive[0]))
-            {
-                ReportError(worker, "Failed to assign drive letter to Windows partition");
-                return false;
-            }
+                throw Fail("Failed to assign drive letter to Windows partition");
 
             ReportProgress(worker, "Formatting Windows partition...");
             var windowsFormatSummary = DiskMgr_FormatPartition(windowsDrive[0], "NTFS", "Windows", true);
             if (windowsFormatSummary != 0)
-            {
-                ReportError(worker, "Failed to format Windows partition");
-                return false;
-            }
+                throw Fail("Failed to format Windows partition", windowsFormatSummary);
 
             ReportProgress(worker, "Layout created successfully");
-            return true;
         }
 
-        private void ReportProgress(BackgroundWorker worker, string message)
+        /// <summary>
+        /// Ensures the disk can hold the fixed-size partitions plus a minimal Windows partition.
+        /// </summary>
+        private static void RequireDiskSpace(ulong diskSizeMB, ulong fixedPartitionsMB)
         {
-            worker?.ReportProgress(0, message);
+            if (diskSizeMB == 0)
+                throw Fail("Failed to read disk size");
+
+            const ulong minimumWindowsSizeMB = 1024;
+            var requiredMB = fixedPartitionsMB + ReservedSpaceMB + minimumWindowsSizeMB;
+            if (diskSizeMB < requiredMB)
+                throw new DeploymentException(Progress.PrepareDisk,
+                    $"The disk is too small ({diskSizeMB} MB). At least {requiredMB} MB are required.");
         }
 
-        private void ReportError(BackgroundWorker worker, string message)
+        private static void ReportProgress(BackgroundWorker worker, string message)
         {
-            worker?.ReportProgress(-1, message);
+            worker?.ReportProgress(0, new ActionWorker
+            {
+                Action = Progress.PrepareDisk,
+                IsIndeterminate = true,
+                Message = message
+            });
+        }
+
+        /// <summary>
+        /// Builds the exception for a failed step, including the last error reported by DiskMgr.
+        /// </summary>
+        private static DeploymentException Fail(string message, int? hResult = null)
+        {
+            string nativeError = null;
+            try
+            {
+                nativeError = Marshal.PtrToStringUni(DiskMgr_GetLastError());
+            }
+            catch
+            {
+                // ignored
+            }
+
+            if (hResult is not null)
+                message += $" (HRESULT 0x{hResult.Value:X8})";
+            else if (!string.IsNullOrWhiteSpace(nativeError))
+                message += $": {nativeError}";
+
+            return new DeploymentException(Progress.PrepareDisk, message);
         }
     }
 }

@@ -1,169 +1,158 @@
-﻿using Dive.Core.Common;
-using Konsole;
+﻿using Dive.Core.Action.DiskPreparation;
+using Dive.Core.Common;
+using Dive.UI.Common.Diagnostics;
+using Spectre.Console;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using LogLevel = Dive.UI.Common.Diagnostics.LogLevel;
+using Progress = Dive.Core.Common.Progress;
 
 namespace Dive.UI.Common.UserInterface
 {
+    /// <summary>
+    /// Compatibility facade over <see cref="Log"/>.
+    /// Fragments written with <see cref="Write"/> are buffered until a line break
+    /// and then emitted as a single log entry.
+    /// </summary>
     public static class Debug
     {
         private static readonly FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
-        private static IConsole? _logConsole;
-        private static IConsole? _actionConsole;
+        private static readonly object SyncRoot = new();
+        private static readonly List<LogSegment> PendingSegments = new();
+        private static readonly Dictionary<Progress, (int Step, string Action)> ProgressState = new();
+        private static bool _initialized;
 
-        private static ProgressBar? _prepareDiskProgressBar;
-        private static ProgressBar? _applyImageProgressBar;
-        private static ProgressBar? _installBootloaderProgressBar;
-        private static ProgressBar? _installRecoveryProgressBar;
-        private static ProgressBar? _installUnattendProgressBar;
-        private static ProgressBar? _installDriversProgressBar;
-        private static ProgressBar? _installUefiSevenProgressBar;
-        private static ProgressBar? _captureDiskProgressBar;
+        static Debug()
+        {
+            // Ensure output works even if InitializeConsole() was never called.
+            EnsureConsoleSink();
+        }
 
         public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
         {
-            if (_logConsole == null)
+            lock (SyncRoot)
             {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("[");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("*");
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("] ");
-
-                Console.ForegroundColor = color;
-                Console.WriteLine(message);
-                return;
+                FlushPending();
+                Log.Write(new LogEntry(DateTime.Now, LevelFromColor(color), new[] { new LogSegment(message.TrimEnd('\r', '\n'), color) }));
             }
-
-            _logConsole.ForegroundColor = ConsoleColor.DarkGray;
-            _logConsole.Write("[");
-            _logConsole.ForegroundColor = ConsoleColor.White;
-            _logConsole.Write("*");
-            _logConsole.ForegroundColor = ConsoleColor.DarkGray;
-            _logConsole.Write("] ");
-
-            _logConsole.ForegroundColor = color;
-            _logConsole.WriteLine(message);
         }
 
         public static void Write(string message, bool continueLine = false, ConsoleColor color = ConsoleColor.White)
         {
-            if (_logConsole == null)
+            lock (SyncRoot)
             {
-                if (!continueLine)
+                if (!continueLine) FlushPending();
+
+                var parts = message.Replace("\r", string.Empty).Split('\n');
+                for (var i = 0; i < parts.Length; i++)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.Write("[");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("*");
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.Write("] ");
+                    if (parts[i].Length > 0) PendingSegments.Add(new LogSegment(parts[i], color));
+                    if (i < parts.Length - 1) FlushPending();
                 }
-
-                Console.ForegroundColor = color;
-                Console.Write(message);
-                return;
             }
-
-            if (!continueLine)
-            {
-                _logConsole.ForegroundColor = ConsoleColor.DarkGray;
-                _logConsole.Write("[");
-                _logConsole.ForegroundColor = ConsoleColor.White;
-                _logConsole.Write("*");
-                _logConsole.ForegroundColor = ConsoleColor.DarkGray;
-                _logConsole.Write("] ");
-            }
-
-            _logConsole.ForegroundColor = color;
-            _logConsole.Write(message);
         }
 
+        /// <summary>
+        /// Reports the status of a running process. Only logged when the action changes
+        /// or the progress crosses another 10% step to keep the log readable.
+        /// </summary>
         public static void RefreshProgressBar(Progress progress, int value, string action)
         {
-            ProgressBar progressBar;
-            switch (progress)
+            var step = Math.Clamp(value, 0, 100) / 10;
+            lock (SyncRoot)
             {
-                case Progress.PrepareDisk:
-                    _prepareDiskProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _prepareDiskProgressBar;
-                    break;
-                case Progress.ApplyImage:
-                    _applyImageProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _applyImageProgressBar;
-                    break;
-                case Progress.InstallBootloader:
-                    _installBootloaderProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _installBootloaderProgressBar;
-                    break;
-                case Progress.InstallRecovery:
-                    _installRecoveryProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _installRecoveryProgressBar;
-                    break;
-                case Progress.InstallUnattend:
-                    _installUnattendProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _installUnattendProgressBar;
-                    break;
-                case Progress.InstallDrivers:
-                    _installDriversProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _installDriversProgressBar;
-                    break;
-                case Progress.InstallUefiSeven:
-                    _installUefiSevenProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _installUefiSevenProgressBar;
-                    break;
-                case Progress.CaptureDisk:
-                    _captureDiskProgressBar ??= new ProgressBar(_actionConsole, PbStyle.SingleLine, 100);
-                    progressBar = _captureDiskProgressBar;
-                    break;
-                default:
+                if (ProgressState.TryGetValue(progress, out var last) && last.Step == step && last.Action == action)
                     return;
-            }
 
-            progressBar.Refresh(value, action);
+                ProgressState[progress] = (step, action);
+                FlushPending();
+                Log.Write(new LogEntry(DateTime.Now, LogLevel.Info, new[]
+                {
+                    new LogSegment($"[{progress}] "),
+                    new LogSegment($"{value,3}%", ConsoleColor.DarkYellow),
+                    new LogSegment(string.IsNullOrWhiteSpace(action) ? string.Empty : $" - {action}")
+                }));
+            }
         }
 
         public static void InitializeConsole()
         {
-            Console.Title = $@"{VersionInfo.ProductName} - Debug Console";
+            lock (SyncRoot)
+            {
+                if (_initialized) return;
+                _initialized = true;
+            }
 
             try
             {
-                var window = new Window(Console.WindowWidth, Console.WindowHeight - 1);
-                var consoles = window.SplitRows(
-                    new Split(0, "Log", LineThickNess.Single),
-                    new Split(8, "Action", LineThickNess.Single)
-                );
-
-                _logConsole = consoles[0];
-                _actionConsole = consoles[1];
+                Console.Title = $"{VersionInfo.ProductName} - Debug Console";
             }
-            catch (System.ArgumentOutOfRangeException ex)
+            catch
             {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("[");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("*");
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("] ");
-
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Error: ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("The console window is too small. Please resize the window and try again.");
-                Logging.Log("The console window is too small. Please resize the window and try again.", Logging.LogLevel.ERROR);
-                Environment.Exit(1);
+                // No console attached
             }
 
-            _logConsole.WriteLine($"{VersionInfo.ProductName} [Version: {VersionInfo.ProductVersion}]"); // Header
-            _logConsole.WriteLine(VersionInfo.LegalCopyright + "\n"); // Copyright text
+            AnsiConsole.Write(new Rule($"[bold]{Markup.Escape(VersionInfo.ProductName ?? "Dive")}[/] [grey]{Markup.Escape(VersionInfo.ProductVersion ?? string.Empty)}[/]").LeftJustified());
+            AnsiConsole.MarkupLine($"[grey]{Markup.Escape(VersionInfo.LegalCopyright ?? string.Empty)}[/]");
+            AnsiConsole.WriteLine();
+
+            // Route the output of the native DiskMgr library into the log.
+            DiskMgrLog.MessageLogged += OnDiskMgrMessage;
 #if DEBUG
-            Debug.Write("Warning! ", false, ConsoleColor.Red);
-            Debug.Write("This is a Debug build. This is not a production ready version.\n", true);
+            Log.Warning("This is a Debug build. This is not a production ready version.");
             Logging.Log("This is a Debug build. This is not a production ready version.", Logging.LogLevel.WARNING);
 #endif
         }
+
+        private static void OnDiskMgrMessage(DiskMgrLog.Level level, string message)
+        {
+            var logLevel = level switch
+            {
+                DiskMgrLog.Level.Debug => LogLevel.Debug,
+                DiskMgrLog.Level.Warning => LogLevel.Warning,
+                DiskMgrLog.Level.Error => LogLevel.Error,
+                _ => LogLevel.Info
+            };
+
+            Log.Write(new LogEntry(DateTime.Now, logLevel, new[]
+            {
+                new LogSegment("[DiskMgr] ", ConsoleColor.DarkGray),
+                new LogSegment(message)
+            }));
+        }
+
+        private static ConsoleLogSink? _consoleSink;
+
+        private static void EnsureConsoleSink()
+        {
+            if (_consoleSink != null) return;
+            _consoleSink = new ConsoleLogSink();
+            Log.AddSink(_consoleSink);
+        }
+
+        private static void FlushPending()
+        {
+            if (PendingSegments.Count == 0) return;
+
+            var level = LogLevel.Info;
+            foreach (var s in PendingSegments)
+            {
+                var l = LevelFromColor(s.Color ?? ConsoleColor.White);
+                if (l > level) level = l;
+            }
+
+            Log.Write(new LogEntry(DateTime.Now, level, PendingSegments.ToArray()));
+            PendingSegments.Clear();
+        }
+
+        private static LogLevel LevelFromColor(ConsoleColor color) => color switch
+        {
+            ConsoleColor.Red or ConsoleColor.DarkRed => LogLevel.Error,
+            ConsoleColor.Yellow => LogLevel.Warning,
+            ConsoleColor.DarkGray => LogLevel.Debug,
+            _ => LogLevel.Info
+        };
     }
 }

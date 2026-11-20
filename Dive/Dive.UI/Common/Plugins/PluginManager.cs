@@ -35,7 +35,7 @@ namespace Dive.UI.Common.Plugins
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($@"Failed to load assembly '{file}': {ex.Message}");
+                    Diagnostics.Log.Error($"Failed to load assembly '{file}': {ex.Message}");
                 }
             }
             return count;
