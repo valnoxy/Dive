@@ -37,6 +37,7 @@ namespace Dive.UI.Pages
                     BackBtn.IsEnabled = true;
                     break;
                 case DeploymentSettingsStep:
+                    if (!deploymentSettingsStep.TryContinue()) return;
                     var diskStep = new DiskSelectStep();
                     FrameWindow.Content = diskStep;
                     break;

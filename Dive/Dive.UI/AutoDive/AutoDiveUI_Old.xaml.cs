@@ -38,9 +38,6 @@ namespace Dive.UI.AutoDive
         private static string _driveLetter = null;
 
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
-        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
-        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
-        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         public AutoDiveUi_Old()
         {
@@ -128,8 +125,11 @@ namespace Dive.UI.AutoDive
                 }
 
                 // Deployment Info
-                DeploymentInfoInstance.Password = _defaultPassword;
-                DeploymentInfoInstance.Username = _defaultUsername;
+                var setup = Common.Configuration.SetupConfiguration.Current;
+                setup.Password = _defaultPassword ?? string.Empty;
+                setup.UserName = _defaultUsername ?? string.Empty;
+                if (!string.IsNullOrEmpty(setup.UserName))
+                    setup.Mode = Common.Configuration.SetupMode.Express;
 
             }
             catch (Exception ex)
@@ -508,7 +508,7 @@ namespace Dive.UI.AutoDive
             if (bootloader == Entities.Bootloader.BOOTMGR && ApplyDetailsInstance.UseRecovery)
             {
                 worker?.ReportProgress(204, "");     // Installing Bootloader Text
-                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, DeploymentOptionInstance.AddDiveToWinRE, worker);
+                Actions.InstallRecovery($"{windowsDrive}Windows", recoveryDrive, Common.Configuration.SetupConfiguration.Current.AddDiveToRecovery, worker);
 
                 if (IsCanceled)
                 {
@@ -518,14 +518,15 @@ namespace Dive.UI.AutoDive
             }
 
             // Install unattend file (only for Vista and higher)
-            if (DeploymentInfoInstance.UseUserInfo || OemInfoInstance.UseOemInfo)
+            var unattendConfig = Common.UnattendBuilder.Build();
+            if (unattendConfig != null)
             {
                 worker?.ReportProgress(205, "");     // Installing unattend file
 
                 // Building config
-                var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : Common.UnattendBuilder.Build();
-                Debug.WriteLine(config);
-                Actions.InstallUnattend($"{windowsDrive}Windows", config, OemInfoInstance.LogoPath, DeploymentOptionInstance.UseSMode, worker);
+                Debug.WriteLine(unattendConfig);
+                var effective = Common.Configuration.SetupConfiguration.Current.GetEffective();
+                Actions.InstallUnattend($"{windowsDrive}Windows", unattendConfig, effective.HasOemInfo ? effective.OemLogoPath : null, effective.SMode, worker);
 
                 if (IsCanceled)
                 {

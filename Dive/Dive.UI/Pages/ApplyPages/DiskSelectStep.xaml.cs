@@ -20,7 +20,7 @@ namespace Dive.UI.Pages.ApplyPages
         public const int ErrorInvalidFunction = 1;
         public static DiskSelectStep? ContentWindow;
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
-        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
+
 
         [DllImport("kernel32.dll",
             EntryPoint = "GetFirmwareEnvironmentVariableW",
@@ -92,7 +92,7 @@ namespace Dive.UI.Pages.ApplyPages
             }
             else if (ApplyDetailsInstance.Name.Contains("(") || ApplyDetailsInstance.Name.Contains(")"))
             {
-                DeploymentOptionInstance.UseCopyProfile = true;
+                Common.Configuration.SetupConfiguration.Current.CopyProfile = true;
                 CheckFirmware();
             }
             else

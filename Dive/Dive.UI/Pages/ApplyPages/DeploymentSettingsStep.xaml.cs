@@ -3,257 +3,242 @@ using Dive.UI.Common.Configuration;
 using Dive.UI.Common.UserInterface;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Windows.Controls;
 
 namespace Dive.UI.Pages.ApplyPages
 {
     /// <summary>
-    /// Interaktionslogik für DeploymentSettingsStep.xaml
+    /// Step "Set up Windows": defines how Windows is configured on first start.
     /// </summary>
     public partial class DeploymentSettingsStep
     {
-        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
-        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
-        private static readonly DeviceInfo DeviceInfoInstance = DeviceInfo.Instance;
-        private static readonly DomainInfo DomainInfoInstance = DomainInfo.Instance;
-        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
-        private static readonly OutOfBoxExperienceInfo OutOfBoxExperienceInfoInstance = OutOfBoxExperienceInfo.Instance;
+        /// <summary>Entry of a region / time zone list. An empty value means "unchanged".</summary>
+        public sealed record Option(string Value, string Display);
+
+        private readonly ObservableCollection<SummaryItem> _summary = new();
+        private SetupConfiguration _configuration = null!;
+        private bool _suppressProfileSelection;
 
         public DeploymentSettingsStep()
         {
             InitializeComponent();
-            DeploymentInfoInstance.UseUserInfo = false;
-            OemInfoInstance.UseOemInfo = false;
+            SummaryList.ItemsSource = _summary;
 
-            DataContext = DeploymentInfo.Instance;
+            FillLists();
+            Attach(SetupConfiguration.Current);
+            SetupConfiguration.CurrentChanged += Attach;
+            LocalizationManager.LanguageChanged += _ => { FillLists(); UpdateSummary(); };
+
+            Loaded += (_, _) => { RefreshProfiles(); UpdateSummary(); };
         }
 
-        private void Import_OnClicked(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Called by the wizard before it moves on. Returns false (and shows the problems) if the
+        /// configuration contains errors.
+        /// </summary>
+        public bool TryContinue()
         {
-            var openFileDialog = new OpenFileDialog
+            UpdateSummary();
+            var hasErrors = _summary.Any(i => i.Kind == SummaryKind.Error);
+            BlockingHint.Visibility = hasErrors ? Visibility.Visible : Visibility.Collapsed;
+            if (hasErrors)
+                Debug.WriteLine("Setup configuration contains errors, cannot continue.", ConsoleColor.Yellow);
+            else
+                Debug.WriteLine($"Setup mode: {_configuration.Mode}");
+            return !hasErrors;
+        }
+
+        #region Configuration binding
+
+        private void Attach(SetupConfiguration configuration)
+        {
+            if (_configuration != null)
+                _configuration.PropertyChanged -= Configuration_PropertyChanged;
+
+            _configuration = configuration;
+            _configuration.PropertyChanged += Configuration_PropertyChanged;
+            DataContext = _configuration;
+            UpdateSummary();
+        }
+
+        private void Configuration_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            BlockingHint.Visibility = Visibility.Collapsed;
+            UpdateSummary();
+        }
+
+        private void UpdateSummary()
+        {
+            if (_configuration == null) return;
+
+            var version = ApplyDetails.Instance.NTVersion ?? string.Empty;
+            var isModern = version.StartsWith("10.", StringComparison.Ordinal);
+
+            _summary.Clear();
+            foreach (var item in _configuration.GetSummary(isModern))
+                _summary.Add(item);
+        }
+
+        #endregion
+
+        #region Lists
+
+        private void FillLists()
+        {
+            var unchanged = LocalizationManager.LocalizeValue("SetupUnchanged");
+
+            var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                .Where(c => !string.IsNullOrEmpty(c.Name))
+                .OrderBy(c => c.DisplayName, StringComparer.CurrentCultureIgnoreCase)
+                .Select(c => new Option(c.Name, $"{c.DisplayName} ({c.Name})"))
+                .ToList();
+            var locales = new List<Option> { new(string.Empty, unchanged) };
+            locales.AddRange(cultures);
+
+            var keyboards = new List<Option> { new(string.Empty, LocalizationManager.LocalizeValue("SetupKeyboardSameAsRegion")) };
+            keyboards.AddRange(cultures);
+
+            var timeZones = new List<Option> { new(string.Empty, unchanged) };
+            timeZones.AddRange(TimeZoneInfo.GetSystemTimeZones().Select(t => new Option(t.Id, t.DisplayName)));
+
+            SetItems(ExpressLocaleBox, locales);
+            SetItems(LocaleBox, locales);
+            SetItems(KeyboardBox, keyboards);
+            SetItems(ExpressTimeZoneBox, timeZones);
+            SetItems(TimeZoneBox, timeZones);
+        }
+
+        private static void SetItems(ComboBox box, List<Option> items)
+        {
+            // Keep the selection when the list is rebuilt (e.g. after a language change)
+            var selected = box.SelectedValue;
+            box.ItemsSource = items;
+            box.SelectedValue = selected ?? string.Empty;
+        }
+
+        #endregion
+
+        #region Advanced sections
+
+        private void SectionList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var sections = new UIElement[]
             {
-                Filter = "Dive Configuration (*.xml)|*.xml"
+                SectionAccount, SectionDevice, SectionRegion, SectionSetup, SectionDomain, SectionOem, SectionOptions
             };
-            if (openFileDialog.ShowDialog() != true) return;
-
-            var doc = new XmlDocument();
-            doc.LoadXml(File.ReadAllText(openFileDialog.FileName));
-
-            try
+            for (var i = 0; i < sections.Length; i++)
             {
-                var imageNames = doc.DocumentElement!.SelectNodes("/settings/AdministratorAccount");
-
-                foreach (XmlNode node in imageNames!)
-                {
-                    DeploymentInfoInstance.Username = node.SelectSingleNode("Username")!.InnerText;
-                    DeploymentInfoInstance.Password = node.SelectSingleNode("Password")!.InnerText;
-                }
-
-                if (DeploymentInfoInstance.Username != "" || DeploymentInfoInstance.Password != "")
-                {
-                    DeploymentInfoInstance.UseUserInfo = true;
-                }
-                else
-                {
-                    DeploymentInfoInstance.UseUserInfo = false;
-                }
+                if (sections[i] != null)
+                    sections[i].Visibility = i == SectionList.SelectedIndex ? Visibility.Visible : Visibility.Collapsed;
             }
-            catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
-
-            try
-            {
-                var imageNames = doc.DocumentElement!.SelectNodes("/settings/OEMSupport");
-
-                foreach (XmlNode node in imageNames!)
-                {
-                    var oemLogoFileName = node.SelectSingleNode("OEMLogo")!.InnerText;
-                    var oemLogoPath = Path.Combine(Path.GetDirectoryName(openFileDialog.FileName)!, oemLogoFileName);
-                    if (oemLogoFileName != "")
-                    {
-                        if (File.Exists(oemLogoPath))
-                        {
-                            OemInfoInstance.LogoPath = oemLogoPath;
-                        }
-                        else
-                        {
-                            // TODO: Add Error handling
-                        }
-                    }
-
-                    OemInfoInstance.Manufacturer = node.SelectSingleNode("Manufacturer")!.InnerText;
-                    OemInfoInstance.Model = node.SelectSingleNode("Model")!.InnerText;
-                    OemInfoInstance.SupportHours = node.SelectSingleNode("SupportHours")!.InnerText;
-                    OemInfoInstance.SupportPhone = node.SelectSingleNode("SupportNo")!.InnerText;
-                    OemInfoInstance.SupportURL = node.SelectSingleNode("Homepage")!.InnerText;
-                }
-
-                OemInfoInstance.UseOemInfo = !string.IsNullOrEmpty(OemInfoInstance.LogoPath) ||
-                                             !string.IsNullOrEmpty(OemInfoInstance.Manufacturer) ||
-                                             !string.IsNullOrEmpty(OemInfoInstance.Model) ||
-                                             !string.IsNullOrEmpty(OemInfoInstance.SupportHours) ||
-                                             !string.IsNullOrEmpty(OemInfoInstance.SupportPhone) ||
-                                             !string.IsNullOrEmpty(OemInfoInstance.SupportURL);
-
-                //ToggleOem.IsChecked = OemInfoInstance.UseOemInfo;
-                Debug.WriteLine("Successfully imported settings from file.");
-            }
-            catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.DarkRed); }
-
-            try
-            {
-                var imageNames = doc.DocumentElement!.SelectNodes("/settings/DeviceInfo");
-
-                foreach (XmlNode node in imageNames!)
-                {
-                    DeviceInfoInstance.DeviceName = node.SelectSingleNode("DeviceName")!.InnerText;
-                    DeviceInfoInstance.RegisteredOwner = node.SelectSingleNode("RegisteredOwner")!.InnerText;
-                    DeviceInfoInstance.RegisteredOrganization = node.SelectSingleNode("RegisteredOrganization")!.InnerText;
-                    DeviceInfoInstance.ProductKey = node.SelectSingleNode("ProductKey")!.InnerText;
-                    DeviceInfoInstance.TimeZone = node.SelectSingleNode("Timezone")!.InnerText;
-                }
-
-                DeviceInfoInstance.UseDeviceInfo = !string.IsNullOrEmpty(DeviceInfoInstance.DeviceName) ||
-                                                   !string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOwner) ||
-                                                   !string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOrganization) ||
-                                                   !string.IsNullOrEmpty(DeviceInfoInstance.ProductKey) ||
-                                                   !string.IsNullOrEmpty(DeviceInfoInstance.TimeZone);
-            }
-            catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
-
-            try
-            {
-                var imageNames = doc.DocumentElement!.SelectNodes("/settings/DomainInfo");
-
-                foreach (XmlNode node in imageNames!)
-                {
-                    DomainInfoInstance.UserName = node.SelectSingleNode("UserName")!.InnerText;
-                    DomainInfoInstance.Password = node.SelectSingleNode("Password")!.InnerText;
-                    DomainInfoInstance.Domain = node.SelectSingleNode("Domain")!.InnerText;
-                }
-
-                DomainInfoInstance.UseDomainInfo = !string.IsNullOrEmpty(DomainInfoInstance.UserName) ||
-                                                   !string.IsNullOrEmpty(DomainInfoInstance.Password) ||
-                                                   !string.IsNullOrEmpty(DomainInfoInstance.Domain);
-            }
-            catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
-
-            try
-            {
-                var imageNames = doc.DocumentElement!.SelectNodes("/settings/OutOfBoxExperience");
-
-                foreach (XmlNode node in imageNames!)
-                {
-                    OutOfBoxExperienceInfoInstance.HideEULAPage = node.SelectSingleNode("HideEULAPage")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen = node.SelectSingleNode("HideOEMRegistrationScreen")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens = node.SelectSingleNode("HideOnlineAccountScreens")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE = node.SelectSingleNode("HideWirelessSetupInOOBE")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.HideLocalAccountScreen = node.SelectSingleNode("HideLocalAccountScreen")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.SkipMachineOOBE = node.SelectSingleNode("SkipMachineOOBE")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.SkipUserOOBE = node.SelectSingleNode("SkipUserOOBE")!.InnerText == "true";
-                    OutOfBoxExperienceInfoInstance.NetworkLocation = node.SelectSingleNode("NetworkLocation")!.InnerText;
-                }
-
-                OutOfBoxExperienceInfoInstance.UseOOBEInfo = !OutOfBoxExperienceInfoInstance.HideEULAPage ||
-                                                             !OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen ||
-                                                             !OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens ||
-                                                             !OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE ||
-                                                             !OutOfBoxExperienceInfoInstance.HideLocalAccountScreen ||
-                                                             !OutOfBoxExperienceInfoInstance.SkipMachineOOBE ||
-                                                             !OutOfBoxExperienceInfoInstance.SkipUserOOBE ||
-                                                             !string.IsNullOrEmpty(OutOfBoxExperienceInfoInstance.NetworkLocation);
-            }
-            catch (Exception ex) { Debug.WriteLine(ex.Message, ConsoleColor.Red); }
         }
 
-        private void Export_OnClicked(object sender, RoutedEventArgs e)
-        {
+        #endregion
 
-            var saveFileDialog = new SaveFileDialog
+        #region File selection
+
+        private void BrowseLogo_OnClick(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog { Filter = "Bitmap (*.bmp)|*.bmp" };
+            if (dialog.ShowDialog() == true)
+                _configuration.OemLogoPath = dialog.FileName;
+        }
+
+        private void BrowseCustomFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog { Filter = "Answer file (*.xml)|*.xml" };
+            if (dialog.ShowDialog() == true)
+                _configuration.CustomFilePath = dialog.FileName;
+        }
+
+        #endregion
+
+        #region Profiles
+
+        private void RefreshProfiles(string? selectFile = null)
+        {
+            _suppressProfileSelection = true;
+            try
             {
-                Filter = "Dive Configuration (*.xml)|*.xml"
+                var items = new List<object> { LocalizationManager.LocalizeValue("SetupNoProfile") };
+                items.AddRange(SetupProfiles.FindProfiles());
+                ProfileBox.ItemsSource = items;
+                ProfileBox.SelectedItem = items.OfType<SetupProfile>()
+                    .FirstOrDefault(p => string.Equals(p.FilePath, selectFile, StringComparison.OrdinalIgnoreCase)) ?? items[0];
+            }
+            finally
+            {
+                _suppressProfileSelection = false;
+            }
+        }
+
+        private void ProfileBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_suppressProfileSelection || ProfileBox.SelectedItem is not SetupProfile profile) return;
+            LoadProfile(profile.FilePath);
+        }
+
+        private void OpenProfile_OnClick(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Dive Configuration (*.xml)|*.xml",
+                InitialDirectory = SetupProfiles.DefaultFolder
             };
+            if (dialog.ShowDialog() != true) return;
 
-            if (saveFileDialog.ShowDialog() != true) return;
-            var fileNameOfOemLogo = Path.GetFileName(ApplyDetailsInstance.IconPath);
-            if (fileNameOfOemLogo != "")
-            {
-                try
-                {
-                    File.Copy(ApplyDetailsInstance.IconPath,
-                        Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName)!, fileNameOfOemLogo));
-                }
-                catch
-                {
-                    // TODO: Add error handling
-                }
-            }
+            LoadProfile(dialog.FileName);
+            RefreshProfiles(dialog.FileName);
+        }
 
-            var settings = new ApplyConfig.settings
+        private void SaveProfile_OnClick(object sender, RoutedEventArgs e)
+        {
+            var folder = SetupProfiles.DefaultFolder;
+            try { Directory.CreateDirectory(folder); } catch { /* the dialog falls back to another folder */ }
+
+            var dialog = new SaveFileDialog
             {
-                AdministratorAccount = new ApplyConfig.settingsAdministratorAccount
-                {
-                    Username = DeploymentInfoInstance.Username,
-                    Password = DeploymentInfoInstance.Password,
-                },
-                OEMSupport = new ApplyConfig.settingsOEMSupport
-                {
-                    OEMLogo = fileNameOfOemLogo,
-                    Manufacturer = OemInfoInstance.Manufacturer,
-                    Model = OemInfoInstance.Model,
-                    SupportHours = OemInfoInstance.SupportHours,
-                    SupportNo = OemInfoInstance.SupportPhone,
-                    Homepage = OemInfoInstance.SupportURL
-                },
-                DeviceInfo = new ApplyConfig.settingsDeviceInfo
-                {
-                    DeviceName = DeviceInfoInstance.DeviceName,
-                    ProductKey = DeviceInfoInstance.ProductKey,
-                    RegisteredOwner = DeviceInfoInstance.RegisteredOwner,
-                    RegisteredOrganization = DeviceInfoInstance.RegisteredOrganization,
-                    Timezone = DeviceInfoInstance.TimeZone
-                },
-                DomainInfo = new ApplyConfig.settingsDomainInfo
-                {
-                    UserName = DomainInfoInstance.UserName,
-                    Password = DomainInfoInstance.Password,
-                    Domain = DomainInfoInstance.Domain
-                },
-                OutOfBoxExperience = new ApplyConfig.settingsOutOfBoxExperience
-                {
-                    HideEULAPage = OutOfBoxExperienceInfoInstance.HideEULAPage,
-                    HideOEMRegistrationScreen = OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen,
-                    HideOnlineAccountScreens = OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens,
-                    HideWirelessSetupInOOBE = OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE,
-                    HideLocalAccountScreen = OutOfBoxExperienceInfoInstance.HideLocalAccountScreen,
-                    NetworkLocation = OutOfBoxExperienceInfoInstance.NetworkLocation,
-                    SkipUserOOBE = OutOfBoxExperienceInfoInstance.SkipUserOOBE,
-                    SkipMachineOOBE = OutOfBoxExperienceInfoInstance.SkipMachineOOBE
-                }
+                Filter = "Dive Configuration (*.xml)|*.xml",
+                InitialDirectory = folder,
+                FileName = (ProfileBox.SelectedItem as SetupProfile)?.Name ?? "Profile"
             };
+            if (dialog.ShowDialog() != true) return;
 
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
-
-            // Create the serializer
-            var slz = new XmlSerializer(typeof(ApplyConfig.settings));
-            using TextWriter writer = new StreamWriter(saveFileDialog.FileName);
-            slz.Serialize(writer, settings);
-
-            Debug.WriteLine("Successfully exported settings to file.");
+            try
+            {
+                SetupProfiles.Save(_configuration, dialog.FileName);
+                RefreshProfiles(dialog.FileName);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not save profile: {ex}", ConsoleColor.Red);
+                MessageBox.Show(LocalizationManager.LocalizeValue("SetupProfileSaveFailed") + "\n\n" + ex.Message, "Dive",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void DeploymentSettingsStep_OnLoaded(object sender, RoutedEventArgs e)
+        private void LoadProfile(string file)
         {
-            NavView.Navigate(typeof(Extras.UnattendConfigurationPages.DeploymentConfigurationPage));
+            try
+            {
+                SetupConfiguration.Current = SetupProfiles.Load(file);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Could not load profile '{file}': {ex}", ConsoleColor.Red);
+                MessageBox.Show(LocalizationManager.LocalizeValue("SetupProfileLoadFailed") + "\n\n" + ex.Message, "Dive",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                RefreshProfiles();
+            }
         }
 
-        private void ConfigAssistant(object sender, RoutedEventArgs e)
-        {
-            var w = new Extras.ConfigAssistant.ConfigAssistantWindow();
-            w.ShowDialog();
-        }
+        #endregion
     }
 }

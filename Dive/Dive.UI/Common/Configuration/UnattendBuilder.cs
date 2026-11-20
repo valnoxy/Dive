@@ -1,1400 +1,277 @@
-﻿using Dive.UI.Common.UserInterface;
+﻿using Dive.UI.Common.Configuration;
+using Dive.UI.Common.UserInterface;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Dive.UI.Common
 {
-    public class UnattendXmlClass
+    /// <summary>
+    /// Generates the unattend.xml for the selected image from a <see cref="SetupConfiguration"/>.
+    /// </summary>
+    public static class UnattendBuilder
     {
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        [System.Xml.Serialization.XmlRootAttribute(Namespace = "urn:schemas-microsoft-com:unattend", IsNullable = false)]
-        public partial class unattend
+        private static readonly XNamespace Ns = "urn:schemas-microsoft-com:unattend";
+        private static readonly XNamespace Wcm = "http://schemas.microsoft.com/WMIConfig/2002/State";
+
+        /// <summary>
+        /// Builds the answer file for the current configuration and image.
+        /// Returns null if no answer file is required (standard setup without options).
+        /// </summary>
+        public static string? Build() => Build(SetupConfiguration.Current, ApplyDetails.Instance);
+
+        public static string? Build(SetupConfiguration configuration, ApplyDetails image)
         {
+            Debug.WriteLine("[UnattendBuilder v3] Building answer file ...");
 
-            private unattendSettings[] settingsField;
+            if (configuration.Mode == SetupMode.CustomFile)
+                return File.ReadAllText(configuration.CustomFilePath);
 
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("settings")]
-            public unattendSettings[] settings
+            var c = configuration.GetEffective();
+            var target = new TargetInfo(image);
+            var settings = new List<XElement>();
+
+            AddIfNotEmpty(settings, BuildOfflineServicing(c, target));
+            AddIfNotEmpty(settings, BuildSpecialize(c, target));
+            AddIfNotEmpty(settings, BuildOobeSystem(c, target));
+
+            if (settings.Count == 0)
             {
-                get
+                Debug.WriteLine("[UnattendBuilder v3] Nothing to configure, no answer file required.");
+                return null;
+            }
+
+            var document = new XDocument(
+                new XDeclaration("1.0", "utf-8", null),
+                new XElement(Ns + "unattend",
+                    new XAttribute(XNamespace.Xmlns + "wcm", Wcm),
+                    settings));
+
+            Debug.WriteLine($"[UnattendBuilder v3] Done ({settings.Count} pass(es), architecture {target.Architecture}).");
+            return ToXml(document);
+        }
+
+        #region Passes
+
+        private static XElement? BuildOfflineServicing(SetupConfiguration c, TargetInfo t)
+        {
+            if (!c.SMode) return null;
+            return Pass("offlineServicing",
+                Component("Microsoft-Windows-CodeIntegrity", t,
+                    new XElement(Ns + "SkuPolicyRequired", 1)));
+        }
+
+        private static XElement? BuildSpecialize(SetupConfiguration c, TargetInfo t)
+        {
+            var components = new List<XElement>();
+            var answers = c.UsesAnswerFileSettings;
+
+            // Shell-Setup (child elements in schema order)
+            var shell = new List<XElement>();
+            if (answers) AddValue(shell, "ComputerName", c.ComputerName);
+            if (c.CopyProfile) shell.Add(new XElement(Ns + "CopyProfile", true));
+            if (answers) AddValue(shell, "ProductKey", c.ProductKey.Trim().ToUpperInvariant());
+            if (answers) AddValue(shell, "TimeZone", c.TimeZone);
+            if (shell.Count > 0)
+                components.Add(Component("Microsoft-Windows-Shell-Setup", t, shell));
+
+            // Domain join
+            if (answers && c.HasDomain)
+            {
+                components.Add(Component("Microsoft-Windows-UnattendedJoin", t,
+                    new XElement(Ns + "Identification",
+                        new XElement(Ns + "Credentials",
+                            new XElement(Ns + "Domain", c.Domain),
+                            new XElement(Ns + "Password", c.DomainPassword),
+                            new XElement(Ns + "Username", c.DomainUser)),
+                        new XElement(Ns + "JoinDomain", c.Domain))));
+            }
+
+            // Windows 11: allow setup without internet connection
+            if (answers && c.BypassNetworkRequirement && t.IsWindows10OrNewer)
+            {
+                components.Add(Component("Microsoft-Windows-Deployment", t,
+                    new XElement(Ns + "RunSynchronous",
+                        SynchronousCommand("RunSynchronousCommand", 1,
+                            @"reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE /v BypassNRO /t REG_DWORD /d 1 /f",
+                            "Allow setup without internet connection"))));
+            }
+
+            return components.Count == 0 ? null : Pass("specialize", components);
+        }
+
+        private static XElement? BuildOobeSystem(SetupConfiguration c, TargetInfo t)
+        {
+            if (!c.UsesAnswerFileSettings) return null;
+            var components = new List<XElement>();
+
+            // Region and keyboard
+            if (!string.IsNullOrWhiteSpace(c.Locale) || !string.IsNullOrWhiteSpace(c.KeyboardLocale))
+            {
+                var keyboard = string.IsNullOrWhiteSpace(c.KeyboardLocale) ? c.Locale : c.KeyboardLocale;
+                var international = new List<XElement>();
+                AddValue(international, "InputLocale", keyboard);
+                AddValue(international, "SystemLocale", c.Locale);
+                AddValue(international, "UserLocale", c.Locale);
+                components.Add(Component("Microsoft-Windows-International-Core", t, international));
+            }
+
+            var shell = new List<XElement>();
+            var hasAccount = c.HasAccount && !string.IsNullOrWhiteSpace(c.EffectiveUserName);
+
+            // AutoLogon
+            if (hasAccount && c.AutoLogon)
+            {
+                shell.Add(new XElement(Ns + "AutoLogon",
+                    Password(c.Password),
+                    new XElement(Ns + "Enabled", true),
+                    new XElement(Ns + "LogonCount", 1),
+                    new XElement(Ns + "Username", c.EffectiveUserName)));
+            }
+
+            // Password never expires (local account only)
+            if (hasAccount && c.PasswordNeverExpires && c.AccountMode == AccountMode.LocalAdministrator)
+            {
+                var command = t.IsWindows10OrNewer
+                    ? $"powershell.exe -NoProfile -Command \"Set-LocalUser -Name '{c.EffectiveUserName.Replace("'", "''")}' -PasswordNeverExpires $true\""
+                    : $"cmd /C wmic useraccount where name=\"{c.EffectiveUserName}\" set PasswordExpires=false";
+                shell.Add(new XElement(Ns + "FirstLogonCommands",
+                    SynchronousCommand("SynchronousCommand", 1, command, "Password never expires")));
+            }
+
+            // OEM information
+            if (c.HasOemInfo)
+            {
+                var oem = new List<XElement>();
+                if (!string.IsNullOrWhiteSpace(c.OemLogoPath))
+                    oem.Add(new XElement(Ns + "Logo", @"%WINDIR%\System32\logo.bmp"));
+                AddValue(oem, "Manufacturer", c.OemManufacturer);
+                AddValue(oem, "Model", c.OemModel);
+                AddValue(oem, "SupportHours", c.OemSupportHours);
+                AddValue(oem, "SupportPhone", c.OemSupportPhone);
+                AddValue(oem, "SupportURL", c.OemSupportUrl);
+                shell.Add(new XElement(Ns + "OEMInformation", oem));
+            }
+
+            // OOBE screens
+            var oobe = new List<XElement>();
+            if (c.HideEula) oobe.Add(new XElement(Ns + "HideEULAPage", true));
+            if (t.IsWindows8OrNewer && hasAccount) oobe.Add(new XElement(Ns + "HideLocalAccountScreen", true));
+            if (t.IsWindows8OrNewer && c.HideOemRegistration) oobe.Add(new XElement(Ns + "HideOEMRegistrationScreen", true));
+            if (t.IsWindows8OrNewer && c.HideOnlineAccountScreens) oobe.Add(new XElement(Ns + "HideOnlineAccountScreens", true));
+            if (c.HideWirelessSetup) oobe.Add(new XElement(Ns + "HideWirelessSetupInOOBE", true));
+            if (!t.IsWindows8OrNewer) AddValue(oobe, "NetworkLocation", c.NetworkLocation);
+            if (c.SkipPrivacySettings) oobe.Add(new XElement(Ns + "ProtectYourPC", 3));
+            if (oobe.Count > 0) shell.Add(new XElement(Ns + "OOBE", oobe));
+
+            AddValue(shell, "RegisteredOrganization", c.RegisteredOrganization);
+            AddValue(shell, "RegisteredOwner", c.RegisteredOwner);
+
+            // User accounts
+            if (hasAccount)
+            {
+                if (c.AccountMode == AccountMode.BuiltInAdministrator)
                 {
-                    return this.settingsField;
+                    shell.Add(new XElement(Ns + "UserAccounts",
+                        new XElement(Ns + "AdministratorPassword",
+                            new XElement(Ns + "Value", c.Password),
+                            new XElement(Ns + "PlainText", true))));
                 }
-                set
+                else
                 {
-                    this.settingsField = value;
+                    shell.Add(new XElement(Ns + "UserAccounts",
+                        new XElement(Ns + "LocalAccounts",
+                            new XElement(Ns + "LocalAccount",
+                                new XAttribute(Wcm + "action", "add"),
+                                Password(c.Password),
+                                new XElement(Ns + "DisplayName", c.EffectiveUserName),
+                                new XElement(Ns + "Group", "Administrators"),
+                                new XElement(Ns + "Name", c.EffectiveUserName)))));
                 }
+            }
+
+            if (shell.Count > 0)
+                components.Add(Component("Microsoft-Windows-Shell-Setup", t, shell));
+
+            return components.Count == 0 ? null : Pass("oobeSystem", components);
+        }
+
+        #endregion
+
+        #region Helpers
+
+        /// <summary>Information about the image the answer file is built for.</summary>
+        private sealed class TargetInfo
+        {
+            public string Architecture { get; }
+            public bool IsWindows8OrNewer { get; }
+            public bool IsWindows10OrNewer { get; }
+
+            public TargetInfo(ApplyDetails image)
+            {
+                var arch = image.Architecture ?? string.Empty;
+                Architecture = arch.EndsWith("arm64", StringComparison.OrdinalIgnoreCase) ? "arm64"
+                    : arch.EndsWith("x86", StringComparison.OrdinalIgnoreCase) ? "x86"
+                    : "amd64";
+
+                var version = image.NTVersion ?? string.Empty;
+                IsWindows10OrNewer = version.StartsWith("10.", StringComparison.Ordinal);
+                IsWindows8OrNewer = IsWindows10OrNewer || version is "6.2" or "6.3";
             }
         }
 
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettings
+        private static XElement Pass(string name, params object[] components) =>
+            new(Ns + "settings", new XAttribute("pass", name), components);
+
+        private static XElement Component(string name, TargetInfo t, params object[] content) =>
+            new(Ns + "component",
+                new XAttribute("name", name),
+                new XAttribute("processorArchitecture", t.Architecture),
+                new XAttribute("publicKeyToken", "31bf3856ad364e35"),
+                new XAttribute("language", "neutral"),
+                new XAttribute("versionScope", "nonSxS"),
+                content);
+
+        private static XElement Password(string password) =>
+            new(Ns + "Password",
+                new XElement(Ns + "Value", password),
+                new XElement(Ns + "PlainText", true));
+
+        private static XElement SynchronousCommand(string elementName, int order, string commandLine, string description) =>
+            new(Ns + elementName,
+                new XAttribute(Wcm + "action", "add"),
+                new XElement(Ns + "CommandLine", commandLine),
+                new XElement(Ns + "Description", description),
+                new XElement(Ns + "Order", order));
+
+        private static void AddValue(List<XElement> target, string name, string? value)
         {
-
-            private unattendSettingsComponent[] componentField;
-
-            private string passField;
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlElementAttribute("component")]
-            public unattendSettingsComponent[] component
-            {
-                get
-                {
-                    return this.componentField;
-                }
-                set
-                {
-                    this.componentField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public string pass
-            {
-                get
-                {
-                    return this.passField;
-                }
-                set
-                {
-                    this.passField = value;
-                }
-            }
+            if (!string.IsNullOrWhiteSpace(value))
+                target.Add(new XElement(Ns + name, value.Trim()));
         }
 
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponent
+        private static void AddIfNotEmpty(List<XElement> target, XElement? element)
         {
-
-            private bool copyProfileField;
-
-            private bool copyProfileFieldSpecified;
-
-            private byte skuPolicyRequiredField;
-
-            private bool skuPolicyRequiredFieldSpecified;
-
-            private unattendSettingsComponentIdentification identificationField;
-
-            private object computerNameField;
-
-            private string productKeyField;
-
-            private string registeredOrganizationField;
-
-            private string registeredOwnerField;
-
-            private unattendSettingsComponentOOBE oOBEField;
-
-            private unattendSettingsComponentOEMInformation oEMInformationField;
-
-            private unattendSettingsComponentAutoLogon autoLogonField;
-
-            private unattendSettingsComponentUserAccounts userAccountsField;
-
-            private unattendSettingsComponentSynchronousCommand[] firstLogonCommandsField;
-
-            private string timeZoneField;
-
-            private string nameField;
-
-            private string processorArchitectureField;
-
-            private string publicKeyTokenField;
-
-            private string languageField;
-
-            private string versionScopeField;
-
-            /// <remarks/>
-            public bool CopyProfile
-            {
-                get
-                {
-                    return this.copyProfileField;
-                }
-                set
-                {
-                    this.copyProfileField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
-            public bool CopyProfileSpecified
-            {
-                get
-                {
-                    return this.copyProfileFieldSpecified;
-                }
-                set
-                {
-                    this.copyProfileFieldSpecified = value;
-                }
-            }
-
-            /// <remarks/>
-            public byte SkuPolicyRequired
-            {
-                get
-                {
-                    return this.skuPolicyRequiredField;
-                }
-                set
-                {
-                    this.skuPolicyRequiredField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlIgnoreAttribute()]
-            public bool SkuPolicyRequiredSpecified
-            {
-                get
-                {
-                    return this.skuPolicyRequiredFieldSpecified;
-                }
-                set
-                {
-                    this.skuPolicyRequiredFieldSpecified = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentIdentification Identification
-            {
-                get
-                {
-                    return this.identificationField;
-                }
-                set
-                {
-                    this.identificationField = value;
-                }
-            }
-
-            /// <remarks/>
-            public object ComputerName
-            {
-                get
-                {
-                    return this.computerNameField;
-                }
-                set
-                {
-                    this.computerNameField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string ProductKey
-            {
-                get
-                {
-                    return this.productKeyField;
-                }
-                set
-                {
-                    this.productKeyField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string RegisteredOrganization
-            {
-                get
-                {
-                    return this.registeredOrganizationField;
-                }
-                set
-                {
-                    this.registeredOrganizationField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string RegisteredOwner
-            {
-                get
-                {
-                    return this.registeredOwnerField;
-                }
-                set
-                {
-                    this.registeredOwnerField = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentOOBE OOBE
-            {
-                get
-                {
-                    return this.oOBEField;
-                }
-                set
-                {
-                    this.oOBEField = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentOEMInformation OEMInformation
-            {
-                get
-                {
-                    return this.oEMInformationField;
-                }
-                set
-                {
-                    this.oEMInformationField = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentAutoLogon AutoLogon
-            {
-                get
-                {
-                    return this.autoLogonField;
-                }
-                set
-                {
-                    this.autoLogonField = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentUserAccounts UserAccounts
-            {
-                get
-                {
-                    return this.userAccountsField;
-                }
-                set
-                {
-                    this.userAccountsField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlArrayItemAttribute("SynchronousCommand", IsNullable = false)]
-            public unattendSettingsComponentSynchronousCommand[] FirstLogonCommands
-            {
-                get
-                {
-                    return this.firstLogonCommandsField;
-                }
-                set
-                {
-                    this.firstLogonCommandsField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string TimeZone
-            {
-                get
-                {
-                    return this.timeZoneField;
-                }
-                set
-                {
-                    this.timeZoneField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public string name
-            {
-                get
-                {
-                    return this.nameField;
-                }
-                set
-                {
-                    this.nameField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public string processorArchitecture
-            {
-                get
-                {
-                    return this.processorArchitectureField;
-                }
-                set
-                {
-                    this.processorArchitectureField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public string publicKeyToken
-            {
-                get
-                {
-                    return this.publicKeyTokenField;
-                }
-                set
-                {
-                    this.publicKeyTokenField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public string language
-            {
-                get
-                {
-                    return this.languageField;
-                }
-                set
-                {
-                    this.languageField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute()]
-            public string versionScope
-            {
-                get
-                {
-                    return this.versionScopeField;
-                }
-                set
-                {
-                    this.versionScopeField = value;
-                }
-            }
+            if (element != null) target.Add(element);
         }
 
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentIdentification
+        private static string ToXml(XDocument document)
         {
-
-            private unattendSettingsComponentIdentificationCredentials credentialsField;
-
-            private string joinDomainField;
-
-            /// <remarks/>
-            public unattendSettingsComponentIdentificationCredentials Credentials
-            {
-                get
-                {
-                    return this.credentialsField;
-                }
-                set
-                {
-                    this.credentialsField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string JoinDomain
-            {
-                get
-                {
-                    return this.joinDomainField;
-                }
-                set
-                {
-                    this.joinDomainField = value;
-                }
-            }
+            var builder = new StringBuilder();
+            using (var writer = XmlWriter.Create(new Utf8StringWriter(builder), new XmlWriterSettings { Indent = true, Encoding = Encoding.UTF8 }))
+                document.Save(writer);
+            return builder.ToString();
         }
 
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentIdentificationCredentials
-        {
-
-            private string domainField;
-
-            private string passwordField;
-
-            private string usernameField;
-
-            /// <remarks/>
-            public string Domain
-            {
-                get
-                {
-                    return this.domainField;
-                }
-                set
-                {
-                    this.domainField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Password
-            {
-                get
-                {
-                    return this.passwordField;
-                }
-                set
-                {
-                    this.passwordField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Username
-            {
-                get
-                {
-                    return this.usernameField;
-                }
-                set
-                {
-                    this.usernameField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentOOBE
-        {
-
-            private bool hideEULAPageField;
-
-            private bool hideOEMRegistrationScreenField;
-
-            private bool hideOnlineAccountScreensField;
-
-            private bool hideWirelessSetupInOOBEField;
-
-            private string networkLocationField;
-
-            private bool skipMachineOOBEField;
-
-            private bool skipUserOOBEField;
-
-            private bool hideLocalAccountScreenField;
-
-            /// <remarks/>
-            public bool HideEULAPage
-            {
-                get
-                {
-                    return this.hideEULAPageField;
-                }
-                set
-                {
-                    this.hideEULAPageField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool HideOEMRegistrationScreen
-            {
-                get
-                {
-                    return this.hideOEMRegistrationScreenField;
-                }
-                set
-                {
-                    this.hideOEMRegistrationScreenField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool HideOnlineAccountScreens
-            {
-                get
-                {
-                    return this.hideOnlineAccountScreensField;
-                }
-                set
-                {
-                    this.hideOnlineAccountScreensField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool HideWirelessSetupInOOBE
-            {
-                get
-                {
-                    return this.hideWirelessSetupInOOBEField;
-                }
-                set
-                {
-                    this.hideWirelessSetupInOOBEField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string NetworkLocation
-            {
-                get
-                {
-                    return this.networkLocationField;
-                }
-                set
-                {
-                    this.networkLocationField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool SkipMachineOOBE
-            {
-                get
-                {
-                    return this.skipMachineOOBEField;
-                }
-                set
-                {
-                    this.skipMachineOOBEField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool SkipUserOOBE
-            {
-                get
-                {
-                    return this.skipUserOOBEField;
-                }
-                set
-                {
-                    this.skipUserOOBEField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool HideLocalAccountScreen
-            {
-                get
-                {
-                    return this.hideLocalAccountScreenField;
-                }
-                set
-                {
-                    this.hideLocalAccountScreenField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentOEMInformation
-        {
-
-            private string logoField;
-
-            private string manufacturerField;
-
-            private string modelField;
-
-            private string supportHoursField;
-
-            private string supportPhoneField;
-
-            private string supportURLField;
-
-            /// <remarks/>
-            public string Logo
-            {
-                get
-                {
-                    return this.logoField;
-                }
-                set
-                {
-                    this.logoField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Manufacturer
-            {
-                get
-                {
-                    return this.manufacturerField;
-                }
-                set
-                {
-                    this.manufacturerField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Model
-            {
-                get
-                {
-                    return this.modelField;
-                }
-                set
-                {
-                    this.modelField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string SupportHours
-            {
-                get
-                {
-                    return this.supportHoursField;
-                }
-                set
-                {
-                    this.supportHoursField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string SupportPhone
-            {
-                get
-                {
-                    return this.supportPhoneField;
-                }
-                set
-                {
-                    this.supportPhoneField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string SupportURL
-            {
-                get
-                {
-                    return this.supportURLField;
-                }
-                set
-                {
-                    this.supportURLField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentAutoLogon
-        {
-
-            private unattendSettingsComponentAutoLogonPassword passwordField;
-
-            private int logonCountField;
-
-            private bool enabledField;
-
-            private string usernameField;
-
-            /// <remarks/>
-            public unattendSettingsComponentAutoLogonPassword Password
-            {
-                get
-                {
-                    return this.passwordField;
-                }
-                set
-                {
-                    this.passwordField = value;
-                }
-            }
-
-            /// <remarks/>
-            public int LogonCount
-            {
-                get
-                {
-                    return this.logonCountField;
-                }
-                set
-                {
-                    this.logonCountField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool Enabled
-            {
-                get
-                {
-                    return this.enabledField;
-                }
-                set
-                {
-                    this.enabledField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Username
-            {
-                get
-                {
-                    return this.usernameField;
-                }
-                set
-                {
-                    this.usernameField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentAutoLogonPassword
-        {
-
-            private string valueField;
-
-            private bool plainTextField;
-
-            /// <remarks/>
-            public string Value
-            {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool PlainText
-            {
-                get
-                {
-                    return this.plainTextField;
-                }
-                set
-                {
-                    this.plainTextField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentUserAccounts
-        {
-
-            private unattendSettingsComponentUserAccountsAdministratorPassword administratorPasswordField;
-
-            private unattendSettingsComponentUserAccountsLocalAccounts localAccountsField;
-
-            /// <remarks/>
-            public unattendSettingsComponentUserAccountsAdministratorPassword AdministratorPassword
-            {
-                get
-                {
-                    return this.administratorPasswordField;
-                }
-                set
-                {
-                    this.administratorPasswordField = value;
-                }
-            }
-
-            /// <remarks/>
-            public unattendSettingsComponentUserAccountsLocalAccounts LocalAccounts
-            {
-                get
-                {
-                    return this.localAccountsField;
-                }
-                set
-                {
-                    this.localAccountsField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentUserAccountsAdministratorPassword
-        {
-
-            private string valueField;
-
-            private bool plainTextField;
-
-            /// <remarks/>
-            public string Value
-            {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool PlainText
-            {
-                get
-                {
-                    return this.plainTextField;
-                }
-                set
-                {
-                    this.plainTextField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentUserAccountsLocalAccounts
-        {
-
-            private unattendSettingsComponentUserAccountsLocalAccountsLocalAccount localAccountField;
-
-            /// <remarks/>
-            public unattendSettingsComponentUserAccountsLocalAccountsLocalAccount LocalAccount
-            {
-                get
-                {
-                    return this.localAccountField;
-                }
-                set
-                {
-                    this.localAccountField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
-        {
-
-            private unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword passwordField;
-
-            private string nameField;
-
-            private string groupField;
-
-            private string actionField;
-
-            /// <remarks/>
-            public unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword Password
-            {
-                get
-                {
-                    return this.passwordField;
-                }
-                set
-                {
-                    this.passwordField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Name
-            {
-                get
-                {
-                    return this.nameField;
-                }
-                set
-                {
-                    this.nameField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Group
-            {
-                get
-                {
-                    return this.groupField;
-                }
-                set
-                {
-                    this.groupField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State")]
-            public string action
-            {
-                get
-                {
-                    return this.actionField;
-                }
-                set
-                {
-                    this.actionField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
-        {
-
-            private string valueField;
-
-            private bool plainTextField;
-
-            /// <remarks/>
-            public string Value
-            {
-                get
-                {
-                    return this.valueField;
-                }
-                set
-                {
-                    this.valueField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool PlainText
-            {
-                get
-                {
-                    return this.plainTextField;
-                }
-                set
-                {
-                    this.plainTextField = value;
-                }
-            }
-        }
-
-        /// <remarks/>
-        [System.SerializableAttribute()]
-        [System.ComponentModel.DesignerCategoryAttribute("code")]
-        [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn:schemas-microsoft-com:unattend")]
-        public partial class unattendSettingsComponentSynchronousCommand
-        {
-
-            private int orderField;
-
-            private bool requiresUserInputField;
-
-            private string commandLineField;
-
-            private string descriptionField;
-
-            private string actionField;
-
-            /// <remarks/>
-            public int Order
-            {
-                get
-                {
-                    return this.orderField;
-                }
-                set
-                {
-                    this.orderField = value;
-                }
-            }
-
-            /// <remarks/>
-            public bool RequiresUserInput
-            {
-                get
-                {
-                    return this.requiresUserInputField;
-                }
-                set
-                {
-                    this.requiresUserInputField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string CommandLine
-            {
-                get
-                {
-                    return this.commandLineField;
-                }
-                set
-                {
-                    this.commandLineField = value;
-                }
-            }
-
-            /// <remarks/>
-            public string Description
-            {
-                get
-                {
-                    return this.descriptionField;
-                }
-                set
-                {
-                    this.descriptionField = value;
-                }
-            }
-
-            /// <remarks/>
-            [System.Xml.Serialization.XmlAttributeAttribute(Form = System.Xml.Schema.XmlSchemaForm.Qualified, Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State")]
-            public string action
-            {
-                get
-                {
-                    return this.actionField;
-                }
-                set
-                {
-                    this.actionField = value;
-                }
-            }
-        }
-    }
-
-    public class UnattendBuilder
-    {
-        private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
-        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
-        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
-        private static readonly DeviceInfo DeviceInfoInstance = DeviceInfo.Instance;
-        private static readonly DomainInfo DomainInfoInstance = DomainInfo.Instance;
-        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
-        private static readonly OutOfBoxExperienceInfo OutOfBoxExperienceInfoInstance = OutOfBoxExperienceInfo.Instance;
-
-        public static string Build()
-        {
-            Debug.WriteLine("[UnattendBuilder v2] Entering building process ...");
-            var currentSettings = 0;
-
-            // Calculate Settings Array Size
-            var settingsArraySize = 0;
-            if (DeviceInfoInstance.UseDeviceInfo || DomainInfoInstance.UseDomainInfo || DeploymentOptionInstance.UseCopyProfile)
-                settingsArraySize++; // pass="specialize"
-            if (DeviceInfoInstance.UseDeviceInfo || OemInfoInstance.UseOemInfo || DeploymentInfoInstance.UseUserInfo)
-                settingsArraySize++; // pass="oobeSystem"
-            if (DeploymentOptionInstance.UseSMode)
-                settingsArraySize++; // pass="offlineServicing"
-
-            var uc = new UnattendXmlClass.unattend
-            {
-                settings = new UnattendXmlClass.unattendSettings[settingsArraySize]
-            };
-
-            #region oobeSystem (single component)
-            if (DeploymentInfoInstance.UseUserInfo || DeviceInfoInstance.UseDeviceInfo || OemInfoInstance.UseOemInfo ||
-                OutOfBoxExperienceInfoInstance.UseOOBEInfo)
-            {
-                Debug.WriteLine("Entered region: oobeSystem (single component)");
-                uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
-                {
-                    pass = "oobeSystem",
-                    component = new UnattendXmlClass.unattendSettingsComponent[1]
-                };
-                uc.settings[currentSettings].component[0] = new UnattendXmlClass.unattendSettingsComponent
-                {
-                    name = "Microsoft-Windows-Shell-Setup",
-                    processorArchitecture = "amd64",
-                    publicKeyToken = "31bf3856ad364e35",
-                    language = "neutral",
-                    versionScope = "nonSxS"
-                };
-
-                if (!string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOwner))
-                    uc.settings[currentSettings].component[0].RegisteredOwner = DeviceInfoInstance.RegisteredOwner;
-                if (!string.IsNullOrEmpty(DeviceInfoInstance.RegisteredOrganization))
-                    uc.settings[currentSettings].component[0].RegisteredOrganization = DeviceInfoInstance.RegisteredOrganization;
-
-                // OOBE Information
-                if (OutOfBoxExperienceInfoInstance.UseOOBEInfo)
-                {
-                    // Windows Vista / 7
-                    if (ApplyDetailsInstance.NTVersion == "6.0" || ApplyDetailsInstance.NTVersion == "6.1")
-                        uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
-                        {
-                            HideEULAPage = OutOfBoxExperienceInfoInstance.HideEULAPage,
-                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE,
-                            NetworkLocation = OutOfBoxExperienceInfoInstance.NetworkLocation,
-                            SkipMachineOOBE = OutOfBoxExperienceInfoInstance.SkipMachineOOBE,
-                            SkipUserOOBE = OutOfBoxExperienceInfoInstance.SkipUserOOBE,
-                        };
-
-                    // Windows 10 / 11 
-                    if (ApplyDetailsInstance.NTVersion == "6.2" || ApplyDetailsInstance.NTVersion == "6.3" || ApplyDetailsInstance.NTVersion.Contains("10."))
-                        uc.settings[currentSettings].component[0].OOBE = new UnattendXmlClass.unattendSettingsComponentOOBE
-                        {
-                            HideEULAPage = OutOfBoxExperienceInfoInstance.HideEULAPage,
-                            HideOEMRegistrationScreen = OutOfBoxExperienceInfoInstance.HideOEMRegistrationScreen,
-                            HideOnlineAccountScreens = OutOfBoxExperienceInfoInstance.HideOnlineAccountScreens,
-                            HideWirelessSetupInOOBE = OutOfBoxExperienceInfoInstance.HideWirelessSetupInOOBE,
-                            NetworkLocation = OutOfBoxExperienceInfoInstance.NetworkLocation,
-                            SkipMachineOOBE = OutOfBoxExperienceInfoInstance.SkipMachineOOBE,
-                            SkipUserOOBE = OutOfBoxExperienceInfoInstance.SkipUserOOBE,
-                            HideLocalAccountScreen = OutOfBoxExperienceInfoInstance.HideLocalAccountScreen
-                        };
-                }
-
-                // OEM Information
-                if (OemInfoInstance.UseOemInfo)
-                {
-                    var oemLogo = "";
-                    if (!string.IsNullOrEmpty(OemInfoInstance.LogoPath))
-                    {
-                        Debug.WriteLine("[UnattendBuilder v2] OEM Logo found: " + OemInfoInstance.LogoPath);
-                        oemLogo = "%WINDIR%\\System32\\logo.bmp";
-                    }
-
-                    uc.settings[currentSettings].component[0].OEMInformation =
-                        new UnattendXmlClass.unattendSettingsComponentOEMInformation
-                        {
-                            Logo = oemLogo,
-                            Manufacturer = OemInfoInstance.Manufacturer,
-                            Model = OemInfoInstance.Model,
-                            SupportHours = OemInfoInstance.SupportHours,
-                            SupportPhone = OemInfoInstance.SupportPhone,
-                            SupportURL = OemInfoInstance.SupportURL
-                        };
-                }
-
-                // User Accounts
-                if (DeploymentInfoInstance.UseUserInfo)
-                {
-                    uc.settings[currentSettings].component[0].UserAccounts =
-                        new UnattendXmlClass.unattendSettingsComponentUserAccounts();
-
-                    if (DeploymentInfoInstance.Username == "Administrator")
-                    {
-                        // Administrator Password
-                        uc.settings[currentSettings].component[0].UserAccounts.AdministratorPassword =
-                            new UnattendXmlClass.unattendSettingsComponentUserAccountsAdministratorPassword
-                            {
-                                Value = DeploymentInfoInstance.Password,
-                                PlainText = true
-                            };
-                    }
-                    else
-                    {
-                        // Local Account
-                        uc.settings[currentSettings].component[0].UserAccounts.LocalAccounts =
-                            new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccounts
-                            {
-                                LocalAccount = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccount
-                                {
-                                    action = "add",
-                                    Name = DeploymentInfoInstance.Username,
-                                    Password = new UnattendXmlClass.unattendSettingsComponentUserAccountsLocalAccountsLocalAccountPassword
-                                    {
-                                        Value = DeploymentInfoInstance.Password,
-                                        PlainText = true
-                                    },
-                                    Group = "Administrators"
-                                }
-                            };
-                    }
-
-                    // Auto Logon
-                    uc.settings[currentSettings].component[0].AutoLogon =
-                        new UnattendXmlClass.unattendSettingsComponentAutoLogon
-                        {
-                            Username = DeploymentInfoInstance.Username,
-                            Password = new UnattendXmlClass.unattendSettingsComponentAutoLogonPassword
-                            {
-                                Value = DeploymentInfoInstance.Password,
-                                PlainText = true
-                            },
-                            Enabled = true,
-                            LogonCount = 1
-                        };
-
-                    // First Logon Command (set PasswordExpires to false)
-                    if (DeploymentInfoInstance.Username != "Administrator")
-                    {
-                        uc.settings[currentSettings].component[0].FirstLogonCommands = new[]
-                        {
-                            new UnattendXmlClass.unattendSettingsComponentSynchronousCommand
-                            {
-                                Order = 1,
-                                RequiresUserInput = false,
-                                CommandLine =
-                                    $"cmd /C wmic useraccount where name=\"{DeploymentInfoInstance.Username}\" set PasswordExpires=false",
-                                Description = "Password never expires"
-                            }
-                        };
-                    }
-                }
-
-                currentSettings++;
-                Debug.WriteLine("Completed region: oobeSetup (single component)");
-            }
-            #endregion
-
-            #region specialize (2 components)
-            if (DeviceInfoInstance.UseDeviceInfo || DomainInfoInstance.UseDomainInfo || DeploymentOptionInstance.UseCopyProfile)
-            {
-                Debug.WriteLine("Entered region: specialize (2 component)");
-                var currentComponent = 0;
-
-                // Calculate component Array size
-                var componentArraySize = 0;
-                if (DeviceInfoInstance.UseDeviceInfo || DeploymentOptionInstance.UseCopyProfile)
-                    componentArraySize++;
-                if (DomainInfoInstance.UseDomainInfo)
-                    componentArraySize++;
-
-                uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
-                {
-                    pass = "specialize",
-                    component = new UnattendXmlClass.unattendSettingsComponent[componentArraySize]
-                };
-
-                if (DeviceInfoInstance.UseDeviceInfo || DeploymentOptionInstance.UseCopyProfile)
-                {
-                    uc.settings[currentSettings].component[currentComponent] = new UnattendXmlClass.unattendSettingsComponent
-                    {
-                        name = "Microsoft-Windows-Shell-Setup",
-                        processorArchitecture = "amd64",
-                        publicKeyToken = "31bf3856ad364e35",
-                        language = "neutral",
-                        versionScope = "nonSxS"
-                    };
-
-                    if (DeviceInfoInstance.UseDeviceInfo)
-                    {
-                        uc.settings[currentSettings].component[currentComponent].ComputerName = DeviceInfoInstance.DeviceName;
-                        uc.settings[currentSettings].component[currentComponent].ProductKey = DeviceInfoInstance.ProductKey;
-                        uc.settings[currentSettings].component[currentComponent].RegisteredOwner = DeviceInfoInstance.RegisteredOwner;
-                        uc.settings[currentSettings].component[currentComponent].RegisteredOrganization = DeviceInfoInstance.RegisteredOrganization;
-                        uc.settings[currentSettings].component[currentComponent].TimeZone = DeviceInfoInstance.TimeZone;
-                    }
-
-                    if (DeploymentOptionInstance.UseCopyProfile)
-                    {
-                        uc.settings[currentSettings].component[currentComponent].CopyProfile = true;
-                        uc.settings[currentSettings].component[currentComponent].CopyProfileSpecified = true;
-                    }
-
-                    currentComponent++;
-                }
-
-                if (DomainInfoInstance.UseDomainInfo)
-                {
-                    uc.settings[currentSettings].component[currentComponent] = new UnattendXmlClass.unattendSettingsComponent
-                    {
-                        name = "Microsoft-Windows-UnattendedJoin",
-                        processorArchitecture = "amd64",
-                        publicKeyToken = "31bf3856ad364e35",
-                        language = "neutral",
-                        versionScope = "nonSxS"
-                    };
-                    uc.settings[currentSettings].component[currentComponent].Identification =
-                        new UnattendXmlClass.unattendSettingsComponentIdentification
-                        {
-                            Credentials = new UnattendXmlClass.unattendSettingsComponentIdentificationCredentials
-                            {
-                                Domain = DomainInfoInstance.Domain,
-                                Username = DomainInfoInstance.UserName,
-                                Password = DomainInfoInstance.Password
-                            },
-                            JoinDomain = DomainInfoInstance.Domain
-                        };
-                    //currentComponent++;
-                }
-
-                currentSettings++;
-                Debug.WriteLine("Completed region: specialize (2 component)");
-            }
-            #endregion
-
-            #region offlineServicing (single component)
-            if (DeploymentOptionInstance.UseSMode)
-            {
-                Debug.WriteLine("Entered region: offlineServicing (single component)");
-
-                uc.settings[currentSettings] = new UnattendXmlClass.unattendSettings
-                {
-                    pass = "offlineServicing",
-                    component = new UnattendXmlClass.unattendSettingsComponent[1]
-                };
-                uc.settings[currentSettings].component[0] = new UnattendXmlClass.unattendSettingsComponent
-                {
-                    name = "Microsoft-Windows-CodeIntegrity",
-                    processorArchitecture = "amd64",
-                    publicKeyToken = "31bf3856ad364e35",
-                    language = "neutral",
-                    versionScope = "nonSxS",
-                    SkuPolicyRequired = 1,
-                    SkuPolicyRequiredSpecified = true
-                };
-                //currentSettings++;
-                Debug.WriteLine("Completed region: offlineServicing (single component)");
-            }
-            #endregion
-
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
-
-            // Create the serializer
-            var slz = new XmlSerializer(typeof(UnattendXmlClass.unattend), "urn:schemas-microsoft-com:unattend");
-
-            using StringWriter textWriter = new Utf8StringWriter();
-            slz.Serialize(textWriter, uc, ns);
-
-            Debug.WriteLine("[UnattendBuilder v2] Building completed.");
-            return textWriter.ToString();
-        }
-
-        public class Utf8StringWriter : StringWriter
+        private sealed class Utf8StringWriter(StringBuilder builder) : StringWriter(builder)
         {
             public override Encoding Encoding => Encoding.UTF8;
         }
+
+        #endregion
     }
 }

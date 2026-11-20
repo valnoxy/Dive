@@ -24,8 +24,8 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <ui:Button Grid.Column="0"
@@ -38,7 +38,7 @@
             <ui:Button Grid.Column="2"
                        Content="{DynamicResource Back}"
                        x:Name="BackBtn"
-                       Margin="-8,0,0,0"
+                       Margin="0,0,8,0"
                        MinWidth="80"
                        Icon="{ui:SymbolIcon ArrowLeft24}"
                        Click="Back_Click"

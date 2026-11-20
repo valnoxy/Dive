@@ -228,6 +228,7 @@ namespace Dive.UI.Pages.ApplyPages
             _applyDetailsInstance.IconPath = item.Picture;
             _applyDetailsInstance.Build = item.Build;
             _applyDetailsInstance.NTVersion = item.NTVersion;
+            _applyDetailsInstance.Architecture = item.Arch;
 
             Debug.Write("Selected ");
             Debug.Write(_applyDetailsInstance.Name, true, ConsoleColor.DarkYellow);

@@ -16,8 +16,6 @@ namespace Dive.UI.Pages.ApplyPages
     {
         private readonly BackgroundWorker _applyBackgroundWorker = new();
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
-        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
-        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         public ApplySelectStep()
         {
@@ -38,30 +36,6 @@ namespace Dive.UI.Pages.ApplyPages
 
             ApplyDetailsInstance.UseNTLDR = DiskSelectStep.ContentWindow!.IsNTLDRChecked();
             ApplyDetailsInstance.UseRecovery = DiskSelectStep.ContentWindow.IsRecoveryChecked();
-
-            // Validate deployment settings
-            if (OemInfoInstance.UseOemInfo)
-            {
-                if (string.IsNullOrEmpty(OemInfoInstance.SupportPhone)
-                    && string.IsNullOrEmpty(OemInfoInstance.LogoPath)
-                    && string.IsNullOrEmpty(OemInfoInstance.Manufacturer)
-                    && string.IsNullOrEmpty(OemInfoInstance.Model)
-                    && string.IsNullOrEmpty(OemInfoInstance.SupportHours)
-                    && string.IsNullOrEmpty(OemInfoInstance.SupportURL))
-                {
-                    OemInfoInstance.UseOemInfo = false;
-                }
-            }
-
-            if (DeploymentInfoInstance.UseUserInfo)
-            {
-                if (string.IsNullOrEmpty(DeploymentInfoInstance.Username)
-                    && string.IsNullOrEmpty(DeploymentInfoInstance.Password))
-                {
-                    DeploymentInfoInstance.UseUserInfo = false;
-                }
-            }
-
 
             // Set active Image to card
             ImageName.Text = ApplyDetailsInstance.Name;

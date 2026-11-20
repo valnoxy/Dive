@@ -12,6 +12,7 @@
 
 using Dive.UI.AutoDive;
 using Dive.UI.Common;
+using Dive.UI.Common.Configuration;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -133,38 +134,31 @@ namespace Dive.UI
                 Debug.WriteLine("Debug console initialized.");
                 Debug.WriteLine("Unit Test - Unattend Compiling\n", ConsoleColor.Magenta);
 
-                var deploymentInfoInstance = DeploymentInfo.Instance;
-                var deploymentOptionInstance = DeploymentOption.Instance;
-                var oemInfoInstance = OemInfo.Instance;
+                var setup = new SetupConfiguration
+                {
+                    Mode = SetupMode.Advanced,
+                    UserName = "User",
+                    Password = "Pa$$w0rd",
+                    ComputerName = "TEST-PC",
+                    Locale = "de-DE",
+                    TimeZone = "W. Europe Standard Time",
+                    CopyProfile = true,
+                    SMode = true,
+                    OemManufacturer = "Fabrikam",
+                    OemModel = "Toaster",
+                    OemSupportHours = "24/7",
+                    OemSupportUrl = "https://fabrikam.com",
+                    OemSupportPhone = "+1 111 11111111"
+                };
+                var image = ApplyDetails.Instance;
+                image.NTVersion = "10.0";
+                image.Architecture = "NT 10.0.22621.525 - x64";
 
-                var config = "";
-                deploymentInfoInstance.UseUserInfo = true;
-                deploymentInfoInstance.Username = "User";
-                deploymentInfoInstance.Password = "Pa$$w0rd";
-                deploymentOptionInstance.UseCopyProfile = true;
-                deploymentOptionInstance.UseSMode = true;
-                oemInfoInstance.UseOemInfo = true;
-                oemInfoInstance.Model = "Toaster";
-                oemInfoInstance.Manufacturer = "Fabrikam";
-                oemInfoInstance.SupportHours = "24/7";
-                oemInfoInstance.SupportURL = "https://fabrikam.com";
-                oemInfoInstance.SupportPhone = "+1 111 11111111";
-
-                Debug.WriteLine("Use User: " + deploymentInfoInstance.UseUserInfo);
-                Debug.WriteLine("Username: " + deploymentInfoInstance.Username);
-                Debug.WriteLine("Password: " + deploymentInfoInstance.Password);
-                Debug.WriteLine("Use S Mode: " + deploymentOptionInstance.UseSMode);
-                Debug.WriteLine("Use Copy Path: " + deploymentOptionInstance.UseCopyProfile);
-                Debug.WriteLine("Use OEM: " + oemInfoInstance.UseOemInfo);
-                Debug.WriteLine("Manufacturer: " + oemInfoInstance.Manufacturer);
-                Debug.WriteLine("Model: " + oemInfoInstance.Model);
-                Debug.WriteLine("Support Tel.: " + oemInfoInstance.SupportPhone);
-                Debug.WriteLine("Support Hours: " + oemInfoInstance.SupportHours);
-                Debug.WriteLine("Support URL: " + oemInfoInstance.SupportURL);
+                foreach (var item in setup.GetSummary(isModernWindows: true))
+                    Debug.WriteLine($"[{item.Kind}] {item.Text}");
 
                 Debug.WriteLine("Building unattend configuration ...", ConsoleColor.DarkYellow);
-                config = UnattendBuilder.Build();
-                Console.WriteLine(config);
+                Console.WriteLine(UnattendBuilder.Build(setup, image));
 
                 Environment.Exit(0);
             }

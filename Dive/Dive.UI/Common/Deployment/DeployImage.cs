@@ -1,6 +1,7 @@
 ﻿using Dive.Core;
 using Dive.Core.Action.Deployment;
 using Dive.Core.Common;
+using Dive.UI.Common.Configuration;
 using Dive.UI.Common.UserInterface;
 using System;
 using System.ComponentModel;
@@ -12,9 +13,6 @@ namespace Dive.UI.Common.Deployment
     internal class DeployImage
     {
         private static readonly ApplyDetails ApplyDetailsInstance = ApplyDetails.Instance;
-        private static readonly DeploymentInfo DeploymentInfoInstance = DeploymentInfo.Instance;
-        private static readonly DeploymentOption DeploymentOptionInstance = DeploymentOption.Instance;
-        private static readonly OemInfo OemInfoInstance = OemInfo.Instance;
 
         internal class Configuration
         {
@@ -109,29 +107,43 @@ namespace Dive.UI.Common.Deployment
                 Actions.InstallRecovery(
                     $"{Configuration.WindowsDrive}Windows",
                     Configuration.RecoveryDrive,
-                    DeploymentOptionInstance.AddDiveToWinRE,
+                    SetupConfiguration.Current.AddDiveToRecovery,
                     worker);
 
                 Debug.WriteLine("Recovery Image registered.");
             }
 
-            // Install unattended file (only for Vista and higher)
-            if (DeploymentInfoInstance.UseUserInfo || OemInfoInstance.UseOemInfo)
+            // Install answer file (only for Vista and higher)
+            var setup = SetupConfiguration.Current;
+            if (Configuration.BootLoader == Bootloader.BOOTMGR)
             {
-                Debug.WriteLine("Building config...");
-                var config = File.Exists(DeploymentInfoInstance.CustomFilePath) ? File.ReadAllText(DeploymentInfoInstance.CustomFilePath) : UnattendBuilder.Build();
+                Debug.WriteLine($"Building answer file (mode: {setup.Mode}) ...");
+                string? config;
+                try
+                {
+                    config = UnattendBuilder.Build();
+                }
+                catch (Exception ex)
+                {
+                    throw new DeploymentException(Progress.InstallUnattend, "Could not build or read the answer file.", ex);
+                }
 
-                if (string.IsNullOrEmpty(config))
-                    throw new DeploymentException(Progress.InstallUnattend, "Could not build or read the unattended configuration file.");
-
-                Actions.InstallUnattend($"{Configuration.WindowsDrive}Windows", config, OemInfoInstance.LogoPath, DeploymentOptionInstance.UseSMode, worker);
-                Debug.Write("Configuration file written to ");
-                Debug.Write($"{Configuration.WindowsDrive}Windows\\Panther\\unattend.xml\n", true, ConsoleColor.DarkYellow);
-
+                if (config == null)
+                {
+                    Debug.WriteLine("No answer file required. Windows setup will run normally.");
+                }
+                else
+                {
+                    var effective = setup.GetEffective();
+                    var oemLogo = effective.HasOemInfo && !string.IsNullOrWhiteSpace(effective.OemLogoPath) ? effective.OemLogoPath : null;
+                    Actions.InstallUnattend($"{Configuration.WindowsDrive}Windows", config, oemLogo, effective.SMode, worker);
+                    Debug.Write("Answer file written to ");
+                    Debug.Write($"{Configuration.WindowsDrive}Windows\\Panther\\unattend.xml\n", true, ConsoleColor.DarkYellow);
+                }
             }
             else
             {
-                Debug.WriteLine("No OEM Information entered. Skipping ...");
+                Debug.WriteLine("Answer files are not supported for NTLDR based Windows versions. Skipping ...");
             }
 
             // Install Drivers (only for Vista and higher)

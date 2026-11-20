@@ -1,61 +1,394 @@
 ﻿<UserControl x:Class="Dive.UI.Pages.ApplyPages.DeploymentSettingsStep"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Dive.UI.Pages.ApplyPages"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-             xmlns:unattendConfigurationPages="clr-namespace:Dive.UI.Pages.Extras.UnattendConfigurationPages"
+             xmlns:conv="clr-namespace:Dive.UI.Common.UserInterface"
+             xmlns:cfg="clr-namespace:Dive.UI.Common.Configuration"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800"
-             Loaded="DeploymentSettingsStep_OnLoaded">
-    <Grid Margin="0,-20,0,0">
+             d:DesignHeight="430" d:DesignWidth="760">
+    <UserControl.Resources>
+        <conv:EnumEqualsConverter x:Key="EnumEquals" />
+        <conv:EnumToVisibilityConverter x:Key="EnumVisible" />
+
+        <!-- Mode selection: radio buttons that look like cards -->
+        <Style x:Key="ModeCard" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Card" CornerRadius="6" BorderThickness="1" Padding="10,8" Margin="0,0,8,0"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Card" Property="Background" Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                <Setter TargetName="Card" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="Card" Property="Padding" Value="9,7" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionItem" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinHeight" Value="30" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+        </Style>
+
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,0,0,3" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        </Style>
+        <Style x:Key="Field" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,10,10" />
+        </Style>
+        <Style x:Key="Option" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+            <Setter Property="Margin" Value="0,0,0,6" />
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="0,-20,0,0" Height="425" VerticalAlignment="Top">
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <!-- Title with button text -->
-            <RowDefinition Height="*"/>
-            <!-- Content -->
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="450"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0">
-                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource ConfigureTitle}"/>
-                <TextBlock FontWeight="Normal" FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource ConfigureTitleDescription}"/>
+        <!-- Header with profiles -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <StackPanel>
+                <TextBlock FontWeight="Bold" FontSize="20" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource SetupTitle}" />
+                <TextBlock FontSize="14" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupDescription}" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
-                <ui:Button Margin="0,0,8,0" Content="ConfigAssistant" Click="ConfigAssistant" />
-                <ui:Button Margin="0,0,8,0" Content="{DynamicResource ImportBtn}" Click="Import_OnClicked" />
-                <ui:Button Content="{DynamicResource ExportBtn}" Click="Export_OnClicked" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <ComboBox x:Name="ProfileBox" Width="190" SelectionChanged="ProfileBox_OnSelectionChanged"
+                          ToolTip="{DynamicResource SetupProfileTooltip}" />
+                <ui:Button Margin="6,0,0,0" Height="35" Width="35" Padding="8" Icon="{ui:SymbolIcon FolderOpen24}" ToolTip="{DynamicResource SetupProfileOpen}" Click="OpenProfile_OnClick" />
+                <ui:Button Margin="6,0,0,0" Height="35" Width="35" Padding="8" Icon="{ui:SymbolIcon Save24}" ToolTip="{DynamicResource SetupProfileSave}" Click="SaveProfile_OnClick" />
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="1" Height="365" Margin="0,-10,0,0">
-            <ui:NavigationView x:Name="NavView" PaneDisplayMode="Top" IsBackButtonVisible="Collapsed">
-                <ui:NavigationView.MenuItems>
-                    <ui:NavigationViewItem Content="{DynamicResource Deployment}" NavigationCacheMode="Enabled" TargetPageType="{x:Type unattendConfigurationPages:DeploymentConfigurationPage}">
-                        <ui:NavigationViewItem.Icon>
-                            <ui:SymbolIcon Symbol="HardDrive20" />
-                        </ui:NavigationViewItem.Icon>
-                    </ui:NavigationViewItem>
-                    <ui:NavigationViewItem Content="{DynamicResource OOBE}" NavigationCacheMode="Enabled" TargetPageType="{x:Type unattendConfigurationPages:OOBEConfigurationPage}">
-                        <ui:NavigationViewItem.Icon>
-                            <ui:SymbolIcon Symbol="CheckboxPerson24" />
-                        </ui:NavigationViewItem.Icon>
-                    </ui:NavigationViewItem>
-                    <!-- Not implemented
-                    <ui:NavigationViewItem Content="{DynamicResource Application}" NavigationCacheMode="Enabled" TargetPageType="{x:Type unattendConfigurationPages:ApplicationConfigurationPage}">
-                        <ui:NavigationViewItem.Icon>
-                            <ui:SymbolIcon Symbol="AppGeneric24" />
-                        </ui:NavigationViewItem.Icon>
-                    </ui:NavigationViewItem>
-                    -->
-                </ui:NavigationView.MenuItems>
-            </ui:NavigationView>
+        <!-- Mode -->
+        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,-8,10">
+            <RadioButton Style="{StaticResource ModeCard}" GroupName="SetupMode"
+                         IsChecked="{Binding Mode, Converter={StaticResource EnumEquals}, ConverterParameter=Standard}">
+                <StackPanel>
+                    <ui:SymbolIcon Symbol="Play24" FontSize="20" HorizontalAlignment="Left" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,4,0,0" FontWeight="SemiBold" Text="{DynamicResource SetupModeStandard}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupModeStandardDesc}" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Style="{StaticResource ModeCard}" GroupName="SetupMode"
+                         IsChecked="{Binding Mode, Converter={StaticResource EnumEquals}, ConverterParameter=Express}">
+                <StackPanel>
+                    <ui:SymbolIcon Symbol="Flash24" FontSize="20" HorizontalAlignment="Left" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,4,0,0" FontWeight="SemiBold" Text="{DynamicResource SetupModeExpress}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupModeExpressDesc}" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Style="{StaticResource ModeCard}" GroupName="SetupMode"
+                         IsChecked="{Binding Mode, Converter={StaticResource EnumEquals}, ConverterParameter=Advanced}">
+                <StackPanel>
+                    <ui:SymbolIcon Symbol="Options24" FontSize="20" HorizontalAlignment="Left" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,4,0,0" FontWeight="SemiBold" Text="{DynamicResource SetupModeAdvanced}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupModeAdvancedDesc}" />
+                </StackPanel>
+            </RadioButton>
+            <RadioButton Style="{StaticResource ModeCard}" GroupName="SetupMode"
+                         IsChecked="{Binding Mode, Converter={StaticResource EnumEquals}, ConverterParameter=CustomFile}">
+                <StackPanel>
+                    <ui:SymbolIcon Symbol="DocumentText24" FontSize="20" HorizontalAlignment="Left" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,4,0,0" FontWeight="SemiBold" Text="{DynamicResource SetupModeCustom}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupModeCustomDesc}" />
+                </StackPanel>
+            </RadioButton>
+        </UniformGrid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="240" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Standard -->
+            <StackPanel Grid.Column="0" Margin="0,4,16,0" Visibility="{Binding Mode, Converter={StaticResource EnumVisible}, ConverterParameter=Standard}">
+                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupStandardInfo}" />
+            </StackPanel>
+
+            <!-- Express -->
+            <Grid Grid.Column="0" Margin="0,0,6,0" Visibility="{Binding Mode, Converter={StaticResource EnumVisible}, ConverterParameter=Express}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Style="{StaticResource Field}">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupComputerName}" />
+                    <ui:TextBox PlaceholderText="BUERO-PC-01" Text="{Binding ComputerName, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Style="{StaticResource Field}">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupUserName}" />
+                    <ui:TextBox PlaceholderText="Admin" Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0" Style="{StaticResource Field}">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupPassword}" />
+                    <ui:PasswordBox Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Style="{StaticResource Field}">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupRegion}" />
+                    <ComboBox x:Name="ExpressLocaleBox" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding Locale}" />
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource Field}">
+                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupTimeZone}" />
+                    <ComboBox x:Name="ExpressTimeZoneBox" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding TimeZone}" />
+                </StackPanel>
+                <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="{DynamicResource SetupBypassNetwork}" IsChecked="{Binding BypassNetworkRequirement}" />
+            </Grid>
+
+            <!-- Advanced -->
+            <Grid Grid.Column="0" Margin="0,0,10,0" Visibility="{Binding Mode, Converter={StaticResource EnumVisible}, ConverterParameter=Advanced}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ListBox x:Name="SectionList" Grid.Column="0" ItemContainerStyle="{StaticResource SectionItem}"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="SectionList_OnSelectionChanged">
+                    <ListBoxItem Content="{DynamicResource SetupSectionAccount}" IsSelected="True" />
+                    <ListBoxItem Content="{DynamicResource SetupSectionDevice}" />
+                    <ListBoxItem Content="{DynamicResource SetupSectionRegion}" />
+                    <ListBoxItem Content="{DynamicResource SetupSectionSetup}" />
+                    <ListBoxItem Content="{DynamicResource SetupSectionDomain}" />
+                    <ListBoxItem Content="{DynamicResource SetupSectionOem}" />
+                    <ListBoxItem Content="{DynamicResource SetupSectionOptions}" />
+                </ListBox>
+
+                <ScrollViewer Grid.Column="1" Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <!-- Account -->
+                        <StackPanel x:Name="SectionAccount">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionAccount}" />
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupAccountType}" />
+                                <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding AccountMode}">
+                                    <ComboBoxItem Tag="{x:Static cfg:AccountMode.LocalAdministrator}" Content="{DynamicResource SetupAccountLocal}" />
+                                    <ComboBoxItem Tag="{x:Static cfg:AccountMode.BuiltInAdministrator}" Content="{DynamicResource SetupAccountBuiltIn}" />
+                                    <ComboBoxItem Tag="{x:Static cfg:AccountMode.AskDuringSetup}" Content="{DynamicResource SetupAccountAsk}" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}" Visibility="{Binding AccountMode, Converter={StaticResource EnumVisible}, ConverterParameter=LocalAdministrator}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupUserName}" />
+                                <ui:TextBox PlaceholderText="Admin" Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Visibility="{Binding AccountMode, Converter={StaticResource EnumVisible}, ConverterParameter='LocalAdministrator,BuiltInAdministrator'}">
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupPassword}" />
+                                    <ui:PasswordBox Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                                <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupAutoLogon}" IsChecked="{Binding AutoLogon}" />
+                                <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupPasswordNeverExpires}" IsChecked="{Binding PasswordNeverExpires}"
+                                          Visibility="{Binding AccountMode, Converter={StaticResource EnumVisible}, ConverterParameter=LocalAdministrator}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Device -->
+                        <StackPanel x:Name="SectionDevice" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionDevice}" />
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupComputerName}" />
+                                <ui:TextBox PlaceholderText="BUERO-PC-01" Text="{Binding ComputerName, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupProductKey}" />
+                                <ui:TextBox PlaceholderText="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" Text="{Binding ProductKey, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupRegisteredOwner}" />
+                                <ui:TextBox Text="{Binding RegisteredOwner, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupRegisteredOrganization}" />
+                                <ui:TextBox Text="{Binding RegisteredOrganization, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Region -->
+                        <StackPanel x:Name="SectionRegion" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionRegion}" />
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupFormats}" />
+                                <ComboBox x:Name="LocaleBox" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding Locale}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupKeyboard}" />
+                                <ComboBox x:Name="KeyboardBox" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding KeyboardLocale}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupTimeZone}" />
+                                <ComboBox x:Name="TimeZoneBox" DisplayMemberPath="Display" SelectedValuePath="Value" SelectedValue="{Binding TimeZone}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Setup screens -->
+                        <StackPanel x:Name="SectionSetup" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionSetup}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupBypassNetwork}" IsChecked="{Binding BypassNetworkRequirement}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupHideEula}" IsChecked="{Binding HideEula}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupSkipPrivacy}" IsChecked="{Binding SkipPrivacySettings}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupHideOnlineAccounts}" IsChecked="{Binding HideOnlineAccountScreens}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupHideWireless}" IsChecked="{Binding HideWirelessSetup}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupHideOemRegistration}" IsChecked="{Binding HideOemRegistration}" />
+                            <StackPanel Style="{StaticResource Field}" Margin="0,6,10,10">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupNetworkLocation}" />
+                                <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding NetworkLocation}">
+                                    <ComboBoxItem Tag="Work" Content="{DynamicResource SetupNetworkWork}" />
+                                    <ComboBoxItem Tag="Home" Content="{DynamicResource SetupNetworkHome}" />
+                                    <ComboBoxItem Tag="Other" Content="{DynamicResource SetupNetworkPublic}" />
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Domain -->
+                        <StackPanel x:Name="SectionDomain" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionDomain}" />
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupDomain}" />
+                                <ui:TextBox PlaceholderText="corp.contoso.com" Text="{Binding Domain, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupDomainUser}" />
+                                <ui:TextBox Text="{Binding DomainUser, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupPassword}" />
+                                <ui:PasswordBox Password="{Binding DomainPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- OEM -->
+                        <StackPanel x:Name="SectionOem" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionOem}" />
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupOemManufacturer}" />
+                                <ui:TextBox Text="{Binding OemManufacturer, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupOemModel}" />
+                                <ui:TextBox Text="{Binding OemModel, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupOemPhone}" />
+                                <ui:TextBox Text="{Binding OemSupportPhone, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupOemHours}" />
+                                <ui:TextBox Text="{Binding OemSupportHours, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupOemUrl}" />
+                                <ui:TextBox PlaceholderText="https://" Text="{Binding OemSupportUrl, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupOemLogo}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:TextBox Text="{Binding OemLogoPath, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="logo.bmp" />
+                                    <ui:Button Grid.Column="1" Margin="6,0,0,0" Padding="8" Icon="{ui:SymbolIcon FolderOpen24}" Click="BrowseLogo_OnClick" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Options -->
+                        <StackPanel x:Name="SectionOptions" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource SetupSectionOptions}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupCopyProfile}" IsChecked="{Binding CopyProfile}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupSMode}" IsChecked="{Binding SMode}" />
+                            <CheckBox Style="{StaticResource Option}" Content="{DynamicResource SetupDiveRecovery}" IsChecked="{Binding AddDiveToRecovery}" />
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Custom answer file -->
+            <StackPanel Grid.Column="0" Margin="0,4,16,0" Visibility="{Binding Mode, Converter={StaticResource EnumVisible}, ConverterParameter=CustomFile}">
+                <TextBlock Style="{StaticResource FieldLabel}" Text="{DynamicResource SetupCustomFile}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox Text="{Binding CustomFilePath, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="unattend.xml" />
+                    <ui:Button Grid.Column="1" Margin="6,0,0,0" Height="35" Width="35" Padding="8" Icon="{ui:SymbolIcon FolderOpen24}" Click="BrowseCustomFile_OnClick" />
+                </Grid>
+                <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextFillColorSecondaryBrush}" Text="{DynamicResource SetupCustomFileInfo}" />
+            </StackPanel>
+
+            <!-- Summary -->
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <Border CornerRadius="6" Padding="12" VerticalAlignment="Top"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Margin="0,0,0,8"  FontWeight="SemiBold" Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="{DynamicResource SetupSummaryTitle}" />
+                    <ItemsControl x:Name="SummaryList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type cfg:SummaryItem}">
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="22" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:SymbolIcon x:Name="Icon" Symbol="Checkmark24" FontSize="14" VerticalAlignment="Top" Margin="0,1,0,0"
+                                                   Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                    <TextBlock Grid.Column="1" FontSize="12" TextWrapping="Wrap" Text="{Binding Text}"
+                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Skipped">
+                                        <Setter TargetName="Icon" Property="Symbol" Value="ArrowForward24" />
+                                        <Setter TargetName="Icon" Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Warning">
+                                        <Setter TargetName="Icon" Property="Symbol" Value="Warning24" />
+                                        <Setter TargetName="Icon" Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Error">
+                                        <Setter TargetName="Icon" Property="Symbol" Value="ErrorCircle24" />
+                                        <Setter TargetName="Icon" Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="BlockingHint" Visibility="Collapsed" Margin="0,4,0,0" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{DynamicResource SystemFillColorCriticalBrush}" Text="{DynamicResource SetupFixErrors}" />
+                </StackPanel>
+            </Border>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </UserControl>
