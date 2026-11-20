@@ -56,31 +56,12 @@ namespace Dive.UI
             _timer.Tick += UpdateTimeAndDate_Tick!;
             _timer.Start();
 
-            // Check for valid license
-            if (File.Exists("Dive.lic"))
-            {
-                var licenseData = File.ReadAllText("Dive.lic");
-                Common.Licensing.Validation.Validate(licenseData);
-            }
-            else
-            {
-                var allDrives = DriveInfo.GetDrives();
-                foreach (var d in allDrives)
-                {
-                    if (File.Exists($"{d.Name}Dive.lic"))
-                    {
-                        var licenseData = File.ReadAllText($"{d.Name}Dive.lic");
-                        Common.Licensing.Validation.Validate(licenseData);
-                        break;
-                    }
-                    if (File.Exists($"{d.Name}Dive\\Dive.lic"))
-                    {
-                        var licenseData = File.ReadAllText($"{d.Name}Dive\\Dive.lic");
-                        Common.Licensing.Validation.Validate(licenseData);
-                        break;
-                    }
-                }
-            }
+            // Language menu in the title bar
+            BuildLanguageMenu();
+            Common.LocalizationManager.LanguageChanged += OnLanguageChanged;
+            Closed += (_, _) => Common.LocalizationManager.LanguageChanged -= OnLanguageChanged;
+
+            // The license was checked by the splash screen
             if (Common.Licensing.Validation.Info.Valid)
             {
                 FoundersBanner.Visibility = Visibility.Visible;
@@ -93,6 +74,59 @@ namespace Dive.UI
                 Logging.Log("License validation failed! Invalid license detected.", Logging.LogLevel.ERROR);
             }
         }
+
+        #region Language menu
+
+        private void BuildLanguageMenu()
+        {
+            LanguageMenu.Items.Clear();
+            foreach (var language in Common.LocalizationManager.Languages)
+            {
+                var item = new System.Windows.Controls.MenuItem
+                {
+                    Header = language.Name,
+                    Tag = language.Code,
+                    IsCheckable = false
+                };
+                item.Click += LanguageMenuItem_Click;
+                LanguageMenu.Items.Add(item);
+            }
+            UpdateLanguageMenu();
+        }
+
+        private void UpdateLanguageMenu()
+        {
+            var currentCode = Common.LocalizationManager.CurrentLanguage.Code;
+            foreach (System.Windows.Controls.MenuItem item in LanguageMenu.Items)
+                item.IsChecked = (string)item.Tag == currentCode;
+
+            foreach (var language in Common.LocalizationManager.Languages)
+            {
+                if (language.Code == currentCode)
+                    LanguageItem.Content = language.Name;
+            }
+        }
+
+        private void LanguageItem_Click(object sender, RoutedEventArgs e)
+        {
+            // Open the language menu directly below the navigation item
+            LanguageMenu.PlacementTarget = LanguageItem;
+            LanguageMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+            LanguageMenu.IsOpen = true;
+        }
+
+        private void OnLanguageChanged(Common.LocalizationManager.Language language) => UpdateLanguageMenu();
+
+        private void LanguageMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not System.Windows.Controls.MenuItem { Tag: string code }) return;
+            if (code == Common.LocalizationManager.CurrentLanguage.Code) return;
+
+            Logging.Log($"Switching language to '{code}' ...");
+            Common.LocalizationManager.LoadLanguage(code);
+        }
+
+        #endregion
 
         private void UpdateTimeAndDate_Tick(object sender, EventArgs e)
         {

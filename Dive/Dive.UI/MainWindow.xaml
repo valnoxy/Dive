@@ -62,7 +62,16 @@
                 </ui:NavigationView.MenuItems>
                 
                 <ui:NavigationView.FooterMenuItems>
-                    <ui:NavigationViewItem x:Name="FunIcon" Visibility="Hidden" Click="FunIcon_OnClick" ToolTip="{DynamicResource FunSettingsToolTip}">
+                    <!-- Language selection: opens a menu with all languages below the item -->
+                    <ui:NavigationViewItem x:Name="LanguageItem" Click="LanguageItem_Click" ToolTip="{DynamicResource Language}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="LocalLanguage24" />
+                        </ui:NavigationViewItem.Icon>
+                        <ui:NavigationViewItem.ContextMenu>
+                            <ContextMenu x:Name="LanguageMenu" Placement="Bottom" />
+                        </ui:NavigationViewItem.ContextMenu>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem x:Name="FunIcon" Visibility="Collapsed" Click="FunIcon_OnClick" ToolTip="{DynamicResource FunSettingsToolTip}">
                         <ui:NavigationViewItem.Icon>
                             <ui:SymbolIcon Symbol="Emoji24" />
                         </ui:NavigationViewItem.Icon>

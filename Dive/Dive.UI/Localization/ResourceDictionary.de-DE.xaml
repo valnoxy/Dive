@@ -117,5 +117,16 @@
     <system:String x:Key="CapturingDescription">Dive wird nun die angegebene Quelle erfassen. Dies kann eine Weile dauern.</system:String>
     <system:String x:Key="CapturingWaiting">Warten ...</system:String>
 
+    <!-- Startup / Header -->
+    <system:String x:Key="Language">Sprache</system:String>
+    <system:String x:Key="SplashInitializing">Wird initialisiert ...</system:String>
+    <system:String x:Key="SplashLoadingPlugins">Plugins werden geladen ...</system:String>
+    <system:String x:Key="SplashInitializingCore">Kernkomponenten werden initialisiert ...</system:String>
+    <system:String x:Key="SplashCheckingLicense">Lizenz wird geprüft ...</system:String>
+    <system:String x:Key="SplashCheckingHardware">Hardwarekompatibilität wird geprüft ...</system:String>
+    <system:String x:Key="SplashStarting">Dive wird gestartet ...</system:String>
+    <system:String x:Key="SplashFailed">Dive konnte nicht gestartet werden.</system:String>
+    <system:String x:Key="CpuCompatible">Ihr Gerät ist mit Windows 11 kompatibel!</system:String>
+    <system:String x:Key="CpuNotCompatible">Ihr Gerät ist nicht mit Windows 11 kompatibel!</system:String>
 
 </ResourceDictionary>

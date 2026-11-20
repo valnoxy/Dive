@@ -111,19 +111,15 @@ namespace Dive.UI.Pages
                 }
                 _firstLoad = true;
 
-                // Check CPU
+                // CPU check (already performed by the splash screen, the result is cached)
                 var img = new ImageSourceConverter();
-                var compatible = Common.CPUCompatibility.IsCpuCompatible();
-                if (compatible)
-                {
-                    WinIcon.Source = (ImageSource)img.ConvertFromString("pack://application:,,,/Assets/Windows-OK.png")!;
-                    WinText.Text = "Your device is compatible with Windows 11!";
-                }
-                else
-                {
-                    WinIcon.Source = (ImageSource)img.ConvertFromString("pack://application:,,,/Assets/Windows-Bad.png")!;
-                    WinText.Text = "Your device is not compatible with Windows 11!";
-                }
+                var compatible = await Task.Run(Common.CPUCompatibility.IsCpuCompatible);
+                WinIcon.Source = (ImageSource)img.ConvertFromString(compatible
+                    ? "pack://application:,,,/Assets/Windows-OK.png"
+                    : "pack://application:,,,/Assets/Windows-Bad.png")!;
+                // Resource reference, so the text follows a language change
+                WinText.SetResourceReference(System.Windows.Controls.TextBlock.TextProperty,
+                    compatible ? "CpuCompatible" : "CpuNotCompatible");
             }
             catch
             {

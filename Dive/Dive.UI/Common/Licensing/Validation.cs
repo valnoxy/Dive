@@ -16,6 +16,25 @@ namespace Dive.UI.Common.Licensing
             public static bool ValidationFailed { get; set; }
         }
 
+        /// <summary>
+        /// Looks for a Dive.lic next to the application or on any drive (root or \Dive) and validates it.
+        /// The result is available in <see cref="Info"/>.
+        /// </summary>
+        public static void FindAndValidate()
+        {
+            var candidates = new System.Collections.Generic.List<string> { "Dive.lic" };
+            foreach (var drive in System.IO.DriveInfo.GetDrives())
+            {
+                candidates.Add($"{drive.Name}Dive.lic");
+                candidates.Add($"{drive.Name}Dive\\Dive.lic");
+            }
+
+            var licenseFile = candidates.FirstOrDefault(System.IO.File.Exists);
+            if (licenseFile == null) return;
+
+            Validate(System.IO.File.ReadAllText(licenseFile));
+        }
+
         public static void Validate(string licenseData)
         {
             var license = License.Load(licenseData);

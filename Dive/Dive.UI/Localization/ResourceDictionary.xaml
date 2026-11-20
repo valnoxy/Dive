@@ -117,4 +117,16 @@
     <system:String x:Key="CapturingDescription">Dive will now capture the specified source. This might take a while.</system:String>
     <system:String x:Key="CapturingWaiting">Waiting ...</system:String>
 
+    <!-- Startup / Header -->
+    <system:String x:Key="Language">Language</system:String>
+    <system:String x:Key="SplashInitializing">Initializing ...</system:String>
+    <system:String x:Key="SplashLoadingPlugins">Loading plugins ...</system:String>
+    <system:String x:Key="SplashInitializingCore">Initializing core components ...</system:String>
+    <system:String x:Key="SplashCheckingLicense">Checking license ...</system:String>
+    <system:String x:Key="SplashCheckingHardware">Checking hardware compatibility ...</system:String>
+    <system:String x:Key="SplashStarting">Starting Dive ...</system:String>
+    <system:String x:Key="SplashFailed">Dive could not be started.</system:String>
+    <system:String x:Key="CpuCompatible">Your device is compatible with Windows 11!</system:String>
+    <system:String x:Key="CpuNotCompatible">Your device is not compatible with Windows 11!</system:String>
+
 </ResourceDictionary>

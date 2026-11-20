@@ -33,19 +33,21 @@ namespace Dive.UI
         public static readonly FileVersionInfo VersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly()!.Location);
         public static readonly string Ver = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
 
+        /// <summary>
+        /// Shows the splash screen, which initializes Dive. Returns false if the initialization failed.
+        /// </summary>
+        private static bool RunSplashScreen()
+        {
+            var splash = new SplashScreen();
+            splash.ShowDialog();
+            return splash.Succeeded;
+        }
+
         private static void ShowGui()
         {
             var wnd = new MainWindow();
-            var splash = new SplashScreen();
-            splash.Show();
-            while (splash.IsVisible)
-            {
-                Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() => { }));
-            }
-
-            // Update language
-            LocalizationManager.LoadLanguage(LocalizationManager.CurrentLanguage.Code);
-
+            // The splash screen was the first window, so it would otherwise stay Application.MainWindow.
+            Current.MainWindow = wnd;
             wnd.ShowDialog();
             Environment.Exit(0);
         }
@@ -87,16 +89,13 @@ namespace Dive.UI
                 Core.Common.Logging.Initialize();
                 Debug.InitializeConsole();
 
-                // Load plugins
-                Debug.WriteLine("Loading plugins ...");
-                loadedPlugins = Plugin.PluginManager.LoadPlugins(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"));
-                Debug.WriteLine($"Loaded {loadedPlugins} plugin(s).");
-                Plugin.PluginManager.InitPlugins();
-                Debug.WriteLine("Initialized all plugins.");
+                // Windows are opened one after another (splash -> main window), so closing the
+                // splash screen must not end the application.
+                Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-                // Load Core initialization
-                Debug.WriteLine("Initialize Core ...");
-                Core.Actions.Initialize();
+                // Splash screen: language, plugins, core, license and hardware check
+                if (!RunSplashScreen())
+                    Environment.Exit(1);
 
                 var allDrives = DriveInfo.GetDrives();
                 foreach (var d in allDrives)

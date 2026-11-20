@@ -1244,11 +1244,19 @@ namespace Dive.UI.Common
             return string.Empty;
         }
 
-        public static bool IsCpuCompatible()
+        private static readonly Lazy<bool> CachedCompatibility = new(DetectCpuCompatibility);
+
+        /// <summary>
+        /// Returns whether the CPU is supported by Windows 11. The (slow) WMI query runs only once;
+        /// the splash screen triggers it during startup.
+        /// </summary>
+        public static bool IsCpuCompatible() => CachedCompatibility.Value;
+
+        private static bool DetectCpuCompatibility()
         {
             var fullCpuName = GetFullCpuName();
-            Debug.WriteLine("Got CPU: " + fullCpuName, ConsoleColor.Yellow);
-            Logging.Log("Got CPU: " + fullCpuName, Logging.LogLevel.ERROR);
+            Debug.WriteLine("Got CPU: " + fullCpuName);
+            Logging.Log("Got CPU: " + fullCpuName);
 
             if (string.IsNullOrEmpty(fullCpuName))
             {

@@ -3,107 +3,77 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Dive.UI"
         mc:Ignorable="d"
-        Title="Dive" MinHeight="360" MinWidth="650" MaxHeight="360" MaxWidth="650"
+        Title="Dive" Height="300" Width="560"
+        ResizeMode="NoResize"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        Closing="SplashScreen_OnClosing"
         Background="{ui:ThemeResource ApplicationBackgroundBrush}"
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Mica"
         WindowCornerPreference="Round"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Loaded="SplashScreen_OnLoaded">
 
     <Grid>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
-                <!-- Title with button text -->
-                <ColumnDefinition Width="*"/>
-                <!-- Content -->
-            </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="1" Margin="20,30,20,20">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0">
-                    <StackPanel>
-                        <TextBlock
-                            FontSize="28"
-                            FontWeight="Bold"
-                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                            Text="Welcome to Dive 👋" />
-                        <TextBlock
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="Enter your preferences and click 'Next' to continue." />
-                        <ui:CardControl Icon="{ui:SymbolIcon LocalLanguage24}" Margin="0,15,0,0">
-                            <ui:CardControl.Header>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock
-                                            FontSize="13"
-                                            FontWeight="Medium"
-                                            Text="Language" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" Width="200" x:Name="LanguageDropDown" 
-                                              SelectionChanged="LanguageDropDown_OnSelectionChanged"/>
-                                </Grid>
-                            </ui:CardControl.Header>
-                        </ui:CardControl>
+        <!-- Branding -->
+        <Border Grid.Column="0">
+            <Border.Background>
+                <ImageBrush
+                    ImageSource="pack://application:,,,/Assets/dash.png"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Stretch="UniformToFill" />
+            </Border.Background>
+            <Border>
+                <Border.Background>
+                    <RadialGradientBrush>
+                        <GradientStop Offset="0" Color="#1F000000" />
+                        <GradientStop Offset="1" Color="#4F000000" />
+                    </RadialGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <StackPanel Margin="32,0" VerticalAlignment="Center">
+                        <TextBlock FontSize="32" FontWeight="Bold" Foreground="#FFFFFF" Text="Dive" />
+                        <TextBlock FontSize="14" Foreground="#B7FFFFFF" x:Name="VersionLabel" Text="Version" />
                     </StackPanel>
-                </ScrollViewer>
-            </Grid>
+                    <TextBlock
+                        Margin="12"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        FontSize="10"
+                        Foreground="#57FFFFFF"
+                        Text="Created with ♥️ by valnoxy" />
+                </Grid>
+            </Border>
+        </Border>
 
-            <StackPanel Grid.Column="0">
-                <Border
-                    Height="360"
-                    CornerRadius="0">
-                    <Border.Background>
-                        <ImageBrush
-                            ImageSource="pack://application:,,,/Assets/banner.jpg"
-                            RenderOptions.BitmapScalingMode="HighQuality"
-                            Stretch="UniformToFill" />
-                    </Border.Background>
-                    <Border CornerRadius="0">
-                        <Border.Background>
-                            <RadialGradientBrush>
-                                <GradientStop Offset="0" Color="#1F000000" />
-                                <GradientStop Offset="1" Color="#4F000000" />
-                            </RadialGradientBrush>
-                        </Border.Background>
-                        <Grid>
-                            <StackPanel
-                                Margin="48,0"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Background="Transparent">
-                                <TextBlock
-                                    FontSize="28"
-                                    FontWeight="Bold"
-                                    Foreground="#FFFFFF"
-                                    Text="Dive" />
-                                <TextBlock
-                                    FontSize="18"
-                                    Foreground="#B7FFFFFF"
-                                    x:Name="VersionLabel"
-                                    Text="Version" />
+        <!-- Progress -->
+        <Grid Grid.Column="1" Margin="28,0,28,28">
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock
+                    FontSize="22"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Deployment is very easy" />
+                <TextBlock
+                    Margin="0,4,0,0"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    x:Name="BranchLabel" />
+            </StackPanel>
 
-                            </StackPanel>
-                            <TextBlock
-                                Margin="12"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                FontSize="10"
-                                Foreground="#57FFFFFF"
-                                Text="Created with ♥️ by valnoxy" />
-                        </Grid>
-                    </Border>
-                </Border>
+            <StackPanel VerticalAlignment="Bottom">
+                <TextBlock
+                    x:Name="StatusText"
+                    Margin="0,0,0,8"
+                    TextTrimming="CharacterEllipsis"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{DynamicResource SplashInitializing}" />
+                <ProgressBar x:Name="StatusProgress" IsIndeterminate="True" />
             </StackPanel>
         </Grid>
-        <ui:TitleBar ShowMinimize="False" ShowMaximize="False" CanMaximize="False"/>
-        <ui:Button Content="Next" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="20" Click="ExitButton_Click"/>
     </Grid>
 </ui:FluentWindow>
